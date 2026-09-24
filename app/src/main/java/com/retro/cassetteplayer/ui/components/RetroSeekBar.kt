@@ -1,8 +1,6 @@
 package com.retro.cassetteplayer.ui.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,31 +16,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.AluInk
+import com.retro.cassetteplayer.ui.theme.AluInkMuted
 import com.retro.cassetteplayer.ui.theme.DisplayFont
-import com.retro.cassetteplayer.ui.theme.LcdBackground
-import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.HotlineAmber
-import com.retro.cassetteplayer.ui.theme.HotlineOrange
+import com.retro.cassetteplayer.ui.theme.TapeOrange
 
-private const val TICKS = 60
+private const val SCALE_MARKS = 10
 
 /**
- * Seek bar drawn as a graduated ruler with an orange needle. Tap or drag to seek;
- * while dragging the counter previews the target time.
+ * Tape-counter style seek bar: a 0–9 graduated scale above a dark groove with an orange
+ * slider block. Tap or drag to seek; while dragging the counter previews the target time.
  */
 @Composable
 fun RetroSeekBar(
@@ -56,12 +53,19 @@ fun RetroSeekBar(
     val fraction = dragFraction
         ?: if (durationMs > 0) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
     val shownPosition = dragFraction?.let { (it * durationMs).toLong() } ?: positionMs
+    val textMeasurer = rememberTextMeasurer()
+    val numberStyle = TextStyle(
+        color = AluInkMuted,
+        fontFamily = DisplayFont,
+        fontWeight = FontWeight.Bold,
+        fontSize = 11.sp,
+    )
 
     Column(modifier) {
         Canvas(
             Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(44.dp)
                 .semantics { contentDescription = "Barra de progresso" }
                 .pointerInput(durationMs) {
                     detectTapGestures { offset ->
@@ -89,97 +93,62 @@ fun RetroSeekBar(
                     )
                 }
         ) {
-            val inset = 6.dp.toPx()
+            val inset = 8.dp.toPx()
             val trackWidth = size.width - inset * 2
-            val grooveTop = size.height * 0.62f
-            val grooveHeight = size.height * 0.14f
-            val needleX = inset + trackWidth * fraction
+            val grooveHeight = 10.dp.toPx()
+            val grooveTop = size.height - grooveHeight - 2.dp.toPx()
+            val scaleY = 7.dp.toPx()
 
-            // Recessed groove
+            // Scale: numbers 0..9 with minor ticks between them
+            val step = trackWidth / SCALE_MARKS
+            for (i in 0 until SCALE_MARKS) {
+                val cx = inset + step * (i + 0.5f)
+                val layout = textMeasurer.measure(i.toString(), numberStyle)
+                drawText(layout, topLeft = Offset(cx - layout.size.width / 2f, scaleY - layout.size.height / 2f))
+                for (t in listOf(-0.35f, -0.2f, 0.2f, 0.35f)) {
+                    val tx = cx + step * t
+                    drawLine(AluInkMuted, Offset(tx, scaleY - 4.dp.toPx()), Offset(tx, scaleY + 4.dp.toPx()), 1.dp.toPx())
+                }
+                drawLine(AluInkMuted, Offset(inset + step * i, scaleY - 5.dp.toPx()), Offset(inset + step * i, scaleY + 5.dp.toPx()), 1.dp.toPx())
+            }
+
+            // Groove with a light rim
             drawRoundRect(
-                color = Color.Black.copy(alpha = 0.55f),
+                color = Color.White.copy(alpha = 0.7f),
+                topLeft = Offset(inset - 1.dp.toPx(), grooveTop - 1.dp.toPx()),
+                size = Size(trackWidth + 2.dp.toPx(), grooveHeight + 3.dp.toPx()),
+                cornerRadius = CornerRadius(grooveHeight),
+            )
+            drawRoundRect(
+                brush = Brush.verticalGradient(listOf(Color(0xFF1B1C1F), Color(0xFF3A3C41))),
                 topLeft = Offset(inset, grooveTop),
                 size = Size(trackWidth, grooveHeight),
-                cornerRadius = CornerRadius(grooveHeight / 2),
+                cornerRadius = CornerRadius(grooveHeight),
             )
-            // Played portion
+            // Played part, slightly lighter
             drawRoundRect(
-                brush = Brush.horizontalGradient(listOf(HotlineOrange, HotlineAmber)),
+                color = Color.White.copy(alpha = 0.12f),
                 topLeft = Offset(inset, grooveTop),
                 size = Size(trackWidth * fraction, grooveHeight),
-                cornerRadius = CornerRadius(grooveHeight / 2),
+                cornerRadius = CornerRadius(grooveHeight),
             )
-
-            // Graduations
-            for (i in 0..TICKS) {
-                val x = inset + trackWidth * i / TICKS
-                val tickHeight = when {
-                    i % 10 == 0 -> size.height * 0.34f
-                    i % 5 == 0 -> size.height * 0.24f
-                    else -> size.height * 0.13f
-                }
-                val passed = x <= needleX
-                drawLine(
-                    color = if (passed) HotlineAmber else TextPrimary.copy(alpha = 0.55f),
-                    start = Offset(x, grooveTop - 3.dp.toPx()),
-                    end = Offset(x, grooveTop - 3.dp.toPx() - tickHeight),
-                    strokeWidth = if (i % 10 == 0) 2.dp.toPx() else 1.dp.toPx(),
-                )
-            }
-
-            // Needle with glow and a pointer on top
-            drawLine(
-                color = HotlineOrange.copy(alpha = 0.3f),
-                start = Offset(needleX, 0f),
-                end = Offset(needleX, size.height),
-                strokeWidth = 8.dp.toPx(),
-            )
-            drawLine(
-                color = HotlineOrange,
-                start = Offset(needleX, 4.dp.toPx()),
-                end = Offset(needleX, size.height),
-                strokeWidth = 2.5.dp.toPx(),
-            )
-            val pointer = Path().apply {
-                val half = 6.dp.toPx()
-                moveTo(needleX - half, 0f)
-                lineTo(needleX + half, 0f)
-                lineTo(needleX, 9.dp.toPx())
-                close()
-            }
-            drawPath(pointer, HotlineOrange)
+            // Orange slider block
+            val blockWidth = 12.dp.toPx()
+            val blockX = (inset + trackWidth * fraction - blockWidth / 2f)
+                .coerceIn(inset, inset + trackWidth - blockWidth)
+            drawRect(TapeOrange, Offset(blockX, grooveTop - 1.dp.toPx()), Size(blockWidth, grooveHeight + 2.dp.toPx()))
         }
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(horizontal = 4.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-            LcdCounter(formatTime(shownPosition))
-            LcdCounter(formatTime(durationMs))
+            Text(formatTime(shownPosition), style = MaterialTheme.typography.labelLarge.copy(fontFamily = DisplayFont), color = AluInk)
+            Text(formatTime(durationMs), style = MaterialTheme.typography.labelLarge.copy(fontFamily = DisplayFont), color = AluInk)
         }
     }
-}
-
-/** Small amber-on-black "LCD" digit window. */
-@Composable
-fun LcdCounter(text: String, modifier: Modifier = Modifier) {
-    val shape = RoundedCornerShape(6.dp)
-    Text(
-        text = text,
-        modifier = modifier
-            .background(LcdBackground, shape)
-            .border(1.dp, MetalDark, shape)
-            .padding(horizontal = 10.dp, vertical = 4.dp),
-        style = MaterialTheme.typography.labelLarge.copy(
-            fontFamily = DisplayFont,
-            fontSize = 15.sp,
-            letterSpacing = 2.sp,
-        ),
-        color = HotlineAmber,
-    )
 }
 
 fun formatTime(ms: Long): String {

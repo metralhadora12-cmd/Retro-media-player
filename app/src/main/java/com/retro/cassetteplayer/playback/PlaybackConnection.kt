@@ -16,6 +16,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+/** One entry of the play queue, in playback order (shuffle-aware). */
+data class QueueItem(
+    val index: Int,
+    val mediaId: String,
+    val title: String,
+    val artist: String,
+    val artworkUri: Uri?,
+)
+
 data class PlaybackState(
     val mediaId: String? = null,
     val title: String = "",
@@ -25,6 +34,9 @@ data class PlaybackState(
     val positionMs: Long = 0L,
     val durationMs: Long = 0L,
     val shuffleEnabled: Boolean = false,
+    val repeatMode: Int = Player.REPEAT_MODE_OFF,
+    /** Current item first, then what plays next. */
+    val queue: List<QueueItem> = emptyList(),
 ) {
     val hasMedia: Boolean get() = mediaId != null
     val progress: Float
@@ -129,6 +141,26 @@ class PlaybackConnection(context: Context) {
 
     fun toggleShuffle() = withController { it.shuffleModeEnabled = !it.shuffleModeEnabled }
 
+    /** OFF -> ALL -> ONE -> OFF */
+    fun cycleRepeat() = withController { player ->
+        player.repeatMode = when (player.repeatMode) {
+            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+            else -> Player.REPEAT_MODE_OFF
+        }
+    }
+
+    fun playQueueItem(index: Int) = withController { player ->
+        if (index in 0 until player.mediaItemCount) {
+            player.seekToDefaultPosition(index)
+            player.play()
+        }
+    }
+
+    fun removeQueueItem(index: Int) = withController { player ->
+        if (index in 0 until player.mediaItemCount) player.removeMediaItem(index)
+    }
+
     private fun withController(command: (MediaController) -> Unit) {
         val current = controller
         if (current != null) command(current) else pendingCommands += command
@@ -146,7 +178,32 @@ class PlaybackConnection(context: Context) {
             positionMs = player.currentPosition.coerceAtLeast(0L),
             durationMs = player.safeDuration(),
             shuffleEnabled = player.shuffleModeEnabled,
+            repeatMode = player.repeatMode,
+            queue = buildQueue(player),
         )
+    }
+
+    private fun buildQueue(player: Player): List<QueueItem> {
+        val timeline = player.currentTimeline
+        if (timeline.isEmpty) return emptyList()
+        val items = mutableListOf<QueueItem>()
+        var index = player.currentMediaItemIndex
+        while (index != C.INDEX_UNSET && items.size < MAX_QUEUE_ITEMS) {
+            val item = player.getMediaItemAt(index)
+            items += QueueItem(
+                index = index,
+                mediaId = item.mediaId,
+                title = item.mediaMetadata.title?.toString().orEmpty(),
+                artist = item.mediaMetadata.artist?.toString().orEmpty(),
+                artworkUri = item.mediaMetadata.artworkUri,
+            )
+            index = timeline.getNextWindowIndex(index, Player.REPEAT_MODE_OFF, player.shuffleModeEnabled)
+        }
+        return items
+    }
+
+    private companion object {
+        const val MAX_QUEUE_ITEMS = 300
     }
 
     private fun Player.safeDuration(): Long = duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: 0L

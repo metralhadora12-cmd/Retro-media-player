@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,9 +25,11 @@ import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Album
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,27 +40,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.retro.cassetteplayer.data.CollectionKind
 import com.retro.cassetteplayer.data.SongCollection
-import com.retro.cassetteplayer.ui.theme.Navy
-import com.retro.cassetteplayer.ui.theme.NavyRaised
-import com.retro.cassetteplayer.ui.theme.NavySurface
-import com.retro.cassetteplayer.ui.theme.Silver
-import com.retro.cassetteplayer.ui.theme.SilverLight
+import com.retro.cassetteplayer.ui.theme.Ink
+import com.retro.cassetteplayer.ui.theme.InkRaised
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
-import com.retro.cassetteplayer.ui.theme.DisplayFont
-import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.HotlineAmber
-import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
-/** Metallic blue glow that tints the top of Home and collection pages. */
+/** Subtle warm glow at the top of Home and collection pages. */
 val TopGlow = Brush.verticalGradient(
-    listOf(Color(0xFF2F5A97), Color(0xFF18305A), Navy)
+    listOf(Color(0xFF3B2012), Color(0xFF1A120D), Ink)
 )
 
-/** Filter chip styled like a small metal selector; selected chips turn cream. */
+/** Flat filter chip: grey when idle, white with dark text when selected. */
 @Composable
 fun RetroChip(
     text: String,
@@ -66,20 +60,18 @@ fun RetroChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier = modifier
-            .clip(shape)
-            .background(chipBrush(selected))
-            .border(1.dp, if (selected) HotlineOrange else Color.White.copy(alpha = 0.1f), shape)
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (selected) TextPrimary else InkRaised)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 9.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 0.5.sp),
-            color = if (selected) Navy else TextPrimary,
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) Ink else TextPrimary,
             maxLines = 1,
         )
     }
@@ -92,22 +84,67 @@ fun RetroIconChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier = modifier
-            .clip(shape)
-            .background(chipBrush(selected = true))
+            .clip(RoundedCornerShape(8.dp))
+            .background(InkRaised)
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 7.dp),
+            .padding(horizontal = 8.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription, tint = Navy, modifier = Modifier.size(22.dp))
+        Icon(icon, contentDescription, tint = TextPrimary, modifier = Modifier.size(22.dp))
     }
 }
 
-private fun chipBrush(selected: Boolean): Brush =
-    if (selected) Brush.verticalGradient(listOf(SilverLight, Silver))
-    else Brush.verticalGradient(listOf(NavyRaised, NavySurface))
+/** Rounded pill button; [filled] = white with dark text, otherwise outlined. */
+@Composable
+fun PillButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    filled: Boolean = false,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    content: @Composable RowScope.() -> Unit,
+) {
+    val shape = RoundedCornerShape(50)
+    val contentColor = if (filled) Ink else TextPrimary
+    Row(
+        modifier = modifier
+            .clip(shape)
+            .then(
+                if (filled) Modifier.background(TextPrimary)
+                else Modifier.border(1.dp, Color.White.copy(alpha = 0.25f), shape)
+            )
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(contentPadding),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor.copy(alpha = if (enabled) 1f else 0.4f),
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun PillButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    filled: Boolean = false,
+    enabled: Boolean = true,
+) {
+    PillButton(onClick = onClick, modifier = modifier, filled = filled, enabled = enabled) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+        }
+        Text(text, style = MaterialTheme.typography.labelLarge, color = LocalContentColor.current)
+    }
+}
 
 @Composable
 fun SectionHeader(
@@ -137,7 +174,7 @@ fun SectionHeader(
             }
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 22.sp),
+                style = MaterialTheme.typography.titleLarge,
                 color = TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -147,32 +184,17 @@ fun SectionHeader(
     }
 }
 
-/** Small metal pill, used for "Tocar tudo". */
-@Composable
-fun MetalPill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    MetalButton(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(50),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        Text(text, style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 0.5.sp))
-    }
-}
-
-/** Square cover with the title over a dark fade and an orange "tape label" stripe. */
+/** Square cover with the title over a dark fade. */
 @Composable
 fun CoverTile(
     collection: SongCollection,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .clip(shape)
-            .border(1.dp, Color.White.copy(alpha = 0.08f), shape)
+            .clip(RoundedCornerShape(6.dp))
             .clickable(onClick = onClick),
     ) {
         CollageArt(collection.artworkUris, Modifier.fillMaxSize(), RoundedCornerShape(0.dp))
@@ -181,19 +203,18 @@ fun CoverTile(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .fillMaxHeight(0.5f)
-                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f))))
+                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f))))
         )
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 2.dp, bottom = 9.dp),
+                .padding(start = 8.dp, end = 2.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = collection.title,
                 style = MaterialTheme.typography.bodyMedium,
-                fontFamily = DisplayFont,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary,
                 maxLines = 1,
@@ -209,31 +230,23 @@ fun CoverTile(
                 )
             }
         }
-        Box(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(3.dp)
-                .background(Brush.horizontalGradient(listOf(HotlineOrange, HotlineAmber)))
-        )
     }
 }
 
-/** Page indicator made of little LEDs. */
 @Composable
 fun PageDots(count: Int, current: Int, modifier: Modifier = Modifier) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         repeat(count) { i ->
             Box(
                 Modifier
-                    .size(8.dp)
-                    .background(if (i == current) HotlineOrange else MetalDark, CircleShape)
+                    .size(7.dp)
+                    .background(if (i == current) TextPrimary else Color.White.copy(alpha = 0.3f), CircleShape)
             )
         }
     }
 }
 
-private fun SongCollection.artShape(corner: Int = 8): Shape =
+private fun SongCollection.artShape(corner: Int = 6): Shape =
     if (kind == CollectionKind.ARTIST) CircleShape else RoundedCornerShape(corner.dp)
 
 private fun SongCollection.kindIcon(): ImageVector = when (kind) {
@@ -251,7 +264,7 @@ fun CollectionGridItem(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(6.dp))
             .clickable(onClick = onClick)
             .padding(bottom = 8.dp),
     ) {
@@ -275,7 +288,7 @@ fun CollectionGridItem(
             Icon(
                 collection.kindIcon(),
                 contentDescription = null,
-                tint = HotlineAmber,
+                tint = TextSecondary,
                 modifier = Modifier
                     .padding(top = 2.dp, end = 4.dp)
                     .size(14.dp),
@@ -304,7 +317,7 @@ fun CollectionListItem(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CollageArt(collection.artworkUris, Modifier.size(56.dp), collection.artShape(6))
+        CollageArt(collection.artworkUris, Modifier.size(56.dp), collection.artShape(4))
         Column(
             Modifier
                 .weight(1f)

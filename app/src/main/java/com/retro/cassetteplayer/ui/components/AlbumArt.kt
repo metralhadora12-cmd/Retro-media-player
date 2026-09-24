@@ -23,8 +23,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.retro.cassetteplayer.ui.theme.TextSecondary
-import com.retro.cassetteplayer.ui.theme.NavySurface
-import com.retro.cassetteplayer.ui.theme.NavyRaised
+import com.retro.cassetteplayer.ui.theme.InkSurface
+import com.retro.cassetteplayer.ui.theme.InkRaised
 
 /** Album art thumbnail; the placeholder stays visible when a track has no embedded art. */
 @Composable
@@ -36,7 +36,7 @@ fun AlbumArt(
     Box(
         modifier = modifier
             .clip(shape)
-            .background(Brush.linearGradient(listOf(NavyRaised, NavySurface))),
+            .background(Brush.linearGradient(listOf(InkRaised, InkSurface))),
         contentAlignment = Alignment.Center,
     ) {
         Icon(

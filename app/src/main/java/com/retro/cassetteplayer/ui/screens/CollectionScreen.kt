@@ -39,10 +39,10 @@ import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.CollageArt
-import com.retro.cassetteplayer.ui.components.MetalButton
+import com.retro.cassetteplayer.ui.components.PillButton
 import com.retro.cassetteplayer.ui.components.SongRow
 import com.retro.cassetteplayer.ui.components.TopGlow
-import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 
@@ -61,7 +61,7 @@ fun CollectionScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(Ink)
     ) {
         Box(
             Modifier
@@ -96,7 +96,7 @@ fun CollectionScreen(
                     Spacer(Modifier.height(16.dp))
                     Text(
                         collection.title,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineSmall,
                         color = TextPrimary,
                         textAlign = TextAlign.Center,
                     )
@@ -111,8 +111,8 @@ fun CollectionScreen(
                         modifier = Modifier.padding(vertical = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        KeyButton("TOCAR", Icons.Rounded.PlayArrow) { onPlayAll(collection.songs) }
-                        KeyButton("ALEATÓRIO", Icons.Rounded.Shuffle) { onShufflePlay(collection.songs) }
+                        PillButton("Tocar", onClick = { onPlayAll(collection.songs) }, icon = Icons.Rounded.PlayArrow, filled = true)
+                        PillButton("Aleatório", onClick = { onShufflePlay(collection.songs) }, icon = Icons.Rounded.Shuffle)
                     }
                 }
             }
@@ -130,21 +130,6 @@ fun CollectionScreen(
                     color = Color.White.copy(alpha = 0.06f),
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun KeyButton(text: String, icon: ImageVector, onClick: () -> Unit) {
-    MetalButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(text, style = MaterialTheme.typography.labelLarge)
         }
     }
 }

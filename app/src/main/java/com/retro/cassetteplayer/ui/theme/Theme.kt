@@ -4,25 +4,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-private val WalkmanColorScheme = darkColorScheme(
-    primary = HotlineOrange,
-    onPrimary = Navy,
-    secondary = WalkmanBlueLight,
-    onSecondary = TextPrimary,
-    tertiary = Silver,
-    background = Navy,
+private val AppColorScheme = darkColorScheme(
+    primary = TapeOrange,
+    onPrimary = TextPrimary,
+    secondary = TapeAmber,
+    onSecondary = Ink,
+    tertiary = LabelCream,
+    background = Ink,
     onBackground = TextPrimary,
-    surface = NavySurface,
+    surface = InkSurface,
     onSurface = TextPrimary,
-    surfaceVariant = NavyRaised,
+    surfaceVariant = InkRaised,
     onSurfaceVariant = TextSecondary,
-    outline = MetalDark,
+    outline = InkRaised,
 )
 
 @Composable
 fun RetroCassetteTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = WalkmanColorScheme,
+        colorScheme = AppColorScheme,
         typography = RetroTypography,
         content = content,
     )

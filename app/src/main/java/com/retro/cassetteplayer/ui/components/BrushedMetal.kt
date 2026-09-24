@@ -5,19 +5,13 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.retro.cassetteplayer.ui.theme.Navy
-import com.retro.cassetteplayer.ui.theme.NavyRaised
-import com.retro.cassetteplayer.ui.theme.NavySurface
-import com.retro.cassetteplayer.ui.theme.Silver
-import com.retro.cassetteplayer.ui.theme.SilverDark
-import com.retro.cassetteplayer.ui.theme.SilverLight
-import com.retro.cassetteplayer.ui.theme.WalkmanBlue
-import com.retro.cassetteplayer.ui.theme.WalkmanBlueDark
-import com.retro.cassetteplayer.ui.theme.WalkmanBlueLight
+import com.retro.cassetteplayer.ui.theme.AluDark
+import com.retro.cassetteplayer.ui.theme.AluLight
+import com.retro.cassetteplayer.ui.theme.AluMid
 import kotlin.random.Random
 
 private class Grain(
-    val y: Float,
+    val pos: Float,
     val start: Float,
     val length: Float,
     val alpha: Float,
@@ -25,60 +19,43 @@ private class Grain(
 )
 
 /**
- * Paints a brushed-metal texture: a banded gradient plus many thin, randomly placed
- * horizontal "brush" strokes and a soft diagonal sheen. The seed keeps it stable.
+ * Brushed-aluminium texture: a soft gradient plus many thin, randomly placed vertical
+ * "brush" strokes and a diagonal sheen. The seed keeps it stable across recompositions.
  */
-fun Modifier.brushedMetal(
-    highlight: Color,
-    base: Color,
-    shadow: Color,
-    grainCount: Int = 260,
-    seed: Int = 7,
+fun Modifier.brushedAluminium(
+    light: Color = AluLight,
+    mid: Color = AluMid,
+    dark: Color = AluDark,
+    grainCount: Int = 700,
+    seed: Int = 3,
 ): Modifier = drawWithCache {
     val random = Random(seed)
     val grains = List(grainCount) {
         Grain(
-            y = random.nextFloat(),
-            start = random.nextFloat() * 0.5f - 0.1f,
-            length = 0.4f + random.nextFloat() * 0.8f,
-            alpha = 0.02f + random.nextFloat() * 0.07f,
+            pos = random.nextFloat(),
+            start = random.nextFloat() * 0.6f - 0.1f,
+            length = 0.2f + random.nextFloat() * 0.7f,
+            alpha = 0.03f + random.nextFloat() * 0.08f,
             bright = random.nextBoolean(),
         )
     }
-    val body = Brush.verticalGradient(
-        0f to highlight,
-        0.35f to base,
-        0.7f to shadow,
-        1f to base,
-    )
+    val body = Brush.verticalGradient(0f to light, 0.5f to mid, 1f to dark)
     val sheen = Brush.linearGradient(
-        colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.07f), Color.Transparent),
-        start = Offset.Zero,
-        end = Offset(size.width, size.height),
+        colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.18f), Color.Transparent),
+        start = Offset(0f, size.height * 0.2f),
+        end = Offset(size.width, size.height * 0.6f),
     )
     onDrawBehind {
         drawRect(body)
         grains.forEach { g ->
-            val y = g.y * size.height
+            val x = g.pos * size.width
             drawLine(
                 color = (if (g.bright) Color.White else Color.Black).copy(alpha = g.alpha),
-                start = Offset(g.start * size.width, y),
-                end = Offset((g.start + g.length) * size.width, y),
+                start = Offset(x, g.start * size.height),
+                end = Offset(x, (g.start + g.length) * size.height),
                 strokeWidth = 1f,
             )
         }
         drawRect(sheen)
     }
 }
-
-/** Deep blue brushed finish used for bars and lists. */
-fun Modifier.navyBrushedMetal(): Modifier =
-    brushedMetal(highlight = NavyRaised, base = NavySurface, shadow = Navy, seed = 11)
-
-/** Metallic blue body of the player, with a denser brushed grain. */
-fun Modifier.blueBrushedMetal(): Modifier =
-    brushedMetal(highlight = WalkmanBlueLight, base = WalkmanBlue, shadow = WalkmanBlueDark, grainCount = 520, seed = 3)
-
-/** Silver trim band (top edge of the device). */
-fun Modifier.silverBrushedMetal(): Modifier =
-    brushedMetal(highlight = SilverLight, base = Silver, shadow = SilverDark, grainCount = 180, seed = 5)

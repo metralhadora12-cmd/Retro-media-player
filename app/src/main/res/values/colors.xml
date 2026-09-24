@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="navy">#FF0E1B30</color>
-    <color name="walkman_blue">#FF3A67A8</color>
-    <color name="hotline_orange">#FFF28A1E</color>
-    <color name="silver">#FFC9CDD3</color>
+    <color name="ink">#FF0B0B0B</color>
+    <color name="tape_orange">#FFD9621C</color>
+    <color name="label_cream">#FFECE7DD</color>
 </resources>

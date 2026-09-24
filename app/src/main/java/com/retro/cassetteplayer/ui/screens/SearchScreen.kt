@@ -26,14 +26,11 @@ import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.SongRow
-import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.Ink
+import com.retro.cassetteplayer.ui.theme.InkRaised
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
-import com.retro.cassetteplayer.ui.theme.DisplayFont
-import com.retro.cassetteplayer.ui.theme.LcdBackground
-import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.HotlineAmber
-import com.retro.cassetteplayer.ui.theme.HotlineOrange
+import com.retro.cassetteplayer.ui.theme.TapeOrange
 
 @Composable
 fun SearchScreen(
@@ -48,11 +45,11 @@ fun SearchScreen(
     Column(
         Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(Ink)
             .statusBarsPadding()
     ) {
         Text(
-            text = "SEARCH",
+            text = "Buscar",
             style = MaterialTheme.typography.headlineSmall,
             color = TextPrimary,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
@@ -62,7 +59,7 @@ fun SearchScreen(
             onValueChange = onQueryChange,
             singleLine = true,
             placeholder = { Text("Título, artista ou álbum", color = TextSecondary) },
-            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = HotlineAmber) },
+            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = TextSecondary) },
             trailingIcon = {
                 if (query.isNotEmpty()) {
                     IconButton(onClick = { onQueryChange("") }) {
@@ -70,14 +67,14 @@ fun SearchScreen(
                     }
                 }
             },
-            textStyle = MaterialTheme.typography.titleMedium.copy(fontFamily = DisplayFont, color = HotlineAmber),
-            shape = RoundedCornerShape(10.dp),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = TextPrimary),
+            shape = RoundedCornerShape(50),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = LcdBackground,
-                unfocusedContainerColor = LcdBackground,
-                focusedBorderColor = HotlineOrange,
-                unfocusedBorderColor = MetalDark,
-                cursorColor = HotlineOrange,
+                focusedContainerColor = InkRaised,
+                unfocusedContainerColor = InkRaised,
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent,
+                cursorColor = TapeOrange,
             ),
             modifier = Modifier
                 .fillMaxWidth()

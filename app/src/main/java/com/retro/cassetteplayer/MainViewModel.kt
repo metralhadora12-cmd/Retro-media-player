@@ -103,6 +103,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun fastForward() = connection.fastForward()
     fun seekTo(positionMs: Long) = connection.seekTo(positionMs)
     fun toggleShuffle() = connection.toggleShuffle()
+    fun cycleRepeat() = connection.cycleRepeat()
+    fun playQueueItem(index: Int) = connection.playQueueItem(index)
+    fun removeQueueItem(index: Int) = connection.removeQueueItem(index)
 
     override fun onCleared() {
         connection.release()

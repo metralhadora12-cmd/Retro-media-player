@@ -40,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.retro.cassetteplayer.MainViewModel
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.ui.components.MiniPlayer
+import com.retro.cassetteplayer.ui.components.QueueSheet
 import com.retro.cassetteplayer.ui.components.RetroBottomBar
 import com.retro.cassetteplayer.ui.navigation.Routes
 import com.retro.cassetteplayer.ui.screens.CollectionScreen
@@ -47,7 +48,7 @@ import com.retro.cassetteplayer.ui.screens.LibraryScreen
 import com.retro.cassetteplayer.ui.screens.HomeScreen
 import com.retro.cassetteplayer.ui.screens.PlayerScreen
 import com.retro.cassetteplayer.ui.screens.SearchScreen
-import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.Ink
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -98,6 +99,16 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    var showQueue by rememberSaveable { mutableStateOf(false) }
+    if (showQueue) {
+        QueueSheet(
+            playback = playback,
+            onDismiss = { showQueue = false },
+            onPlayItem = viewModel::playQueueItem,
+            onRemoveItem = viewModel::removeQueueItem,
+        )
+    }
+
     val openPlayer = { navController.navigate(Routes.PLAYER) { launchSingleTop = true } }
     val openTab: (String) -> Unit = { route ->
         navController.navigate(route) {
@@ -111,7 +122,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     }
 
     Scaffold(
-        containerColor = Navy,
+        containerColor = Ink,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             AnimatedVisibility(
@@ -164,7 +175,6 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onOpenLibrary = { openTab(Routes.LIBRARY) },
                     onOpenCollection = openCollection,
                     onPlayAll = viewModel::playAll,
-                    onShufflePlay = viewModel::shufflePlay,
                     onSongClick = viewModel::play,
                     onPlayNext = viewModel::playNext,
                     onAddToQueue = viewModel::addToQueue,
@@ -225,10 +235,10 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onTogglePlay = viewModel::togglePlayPause,
                     onPrevious = viewModel::skipPrevious,
                     onNext = viewModel::skipNext,
-                    onRewind = viewModel::rewind,
-                    onFastForward = viewModel::fastForward,
                     onSeek = viewModel::seekTo,
                     onToggleShuffle = viewModel::toggleShuffle,
+                    onCycleRepeat = viewModel::cycleRepeat,
+                    onOpenQueue = { showQueue = true },
                 )
             }
         }

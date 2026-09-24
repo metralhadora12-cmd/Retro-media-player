@@ -2,9 +2,12 @@ package com.retro.cassetteplayer.ui.navigation
 
 import android.net.Uri
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.LibraryMusic
-import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LibraryMusic
+import androidx.compose.material.icons.outlined.Search
 import com.retro.cassetteplayer.ui.components.BottomDestination
 
 object Routes {
@@ -18,8 +21,8 @@ object Routes {
     fun collection(id: String) = "collection?$COLLECTION_ARG=${Uri.encode(id)}"
 
     val bottomDestinations = listOf(
-        BottomDestination(HOME, "Início", Icons.Rounded.Home),
-        BottomDestination(SEARCH, "Buscar", Icons.Rounded.Search),
-        BottomDestination(LIBRARY, "Biblioteca", Icons.Rounded.LibraryMusic),
+        BottomDestination(HOME, "Início", Icons.Outlined.Home, Icons.Filled.Home),
+        BottomDestination(SEARCH, "Buscar", Icons.Outlined.Search, Icons.Filled.Search),
+        BottomDestination(LIBRARY, "Biblioteca", Icons.Outlined.LibraryMusic, Icons.Filled.LibraryMusic),
     )
 }

@@ -1,13 +1,15 @@
 package com.retro.cassetteplayer.ui.screens
 
+import android.app.Activity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,34 +18,47 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.FastForward
-import androidx.compose.material.icons.rounded.FastRewind
+import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Repeat
+import androidx.compose.material.icons.rounded.RepeatOne
+import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
+import androidx.media3.common.Player
 import com.retro.cassetteplayer.playback.PlaybackState
-import com.retro.cassetteplayer.ui.components.MetalButton
-import com.retro.cassetteplayer.ui.components.MetalIconButton
-import com.retro.cassetteplayer.ui.components.PlaybackLed
+import com.retro.cassetteplayer.ui.components.PianoKey
+import com.retro.cassetteplayer.ui.components.PianoKeys
 import com.retro.cassetteplayer.ui.components.RetroSeekBar
-import com.retro.cassetteplayer.ui.components.WalkmanDeck
-import com.retro.cassetteplayer.ui.components.navyBrushedMetal
-import com.retro.cassetteplayer.ui.theme.TextPrimary
-import com.retro.cassetteplayer.ui.theme.TextSecondary
+import com.retro.cassetteplayer.ui.components.VERTICAL_CASSETTE_ASPECT
+import com.retro.cassetteplayer.ui.components.VerticalCassette
+import com.retro.cassetteplayer.ui.components.brushedAluminium
+import com.retro.cassetteplayer.ui.theme.AluInk
+import com.retro.cassetteplayer.ui.theme.AluInkMuted
+import com.retro.cassetteplayer.ui.theme.DisplayFont
+import com.retro.cassetteplayer.ui.theme.TapeOrange
 
 @Composable
 fun PlayerScreen(
@@ -52,79 +67,120 @@ fun PlayerScreen(
     onTogglePlay: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
-    onRewind: () -> Unit,
-    onFastForward: () -> Unit,
     onSeek: (Long) -> Unit,
     onToggleShuffle: () -> Unit,
+    onCycleRepeat: () -> Unit,
+    onOpenQueue: () -> Unit,
 ) {
+    LightSystemBars()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .navyBrushedMetal()
+            .brushedAluminium()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Top bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp),
+                .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            MetalIconButton(
-                icon = Icons.Rounded.KeyboardArrowDown,
-                contentDescription = "Voltar",
-                onClick = onBack,
-                modifier = Modifier.size(42.dp),
-            )
+            IconButton(onClick = onBack) {
+                Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Voltar", tint = AluInk)
+            }
             Text(
-                text = "NOW PLAYING",
-                style = MaterialTheme.typography.labelLarge,
-                color = TextPrimary,
+                text = "TOCANDO AGORA",
+                style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 2.sp),
+                color = AluInkMuted,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
             )
-            Row(
-                modifier = Modifier.width(42.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End,
-            ) {
-                PlaybackLed(lit = playback.isPlaying)
-            }
+            Spacer(Modifier.width(48.dp))
         }
 
-        Spacer(Modifier.weight(1f))
+        // The cassette takes whatever height is left, keeping its upright proportions.
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            VerticalCassette(
+                isPlaying = playback.isPlaying,
+                progress = playback.progress,
+                title = playback.title,
+                subtitle = playback.artist,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(VERTICAL_CASSETTE_ASPECT, matchHeightConstraintsFirst = true),
+            )
+        }
 
-        WalkmanDeck(
-            isPlaying = playback.isPlaying,
-            progress = playback.progress,
-            label = playback.title,
+        Row(
             modifier = Modifier.fillMaxWidth(),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ModeToggle(
+                icon = Icons.Rounded.Shuffle,
+                description = "Aleatório",
+                active = playback.shuffleEnabled,
+                onClick = onToggleShuffle,
+            )
+            PianoKeys(
+                keys = listOf(
+                    PianoKey(Icons.Rounded.SkipPrevious, "Faixa anterior", onPrevious),
+                    PianoKey(
+                        icon = if (playback.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                        description = if (playback.isPlaying) "Pausar" else "Tocar",
+                        onClick = onTogglePlay,
+                        latched = playback.isPlaying,
+                        weight = 1.3f,
+                    ),
+                    PianoKey(Icons.Rounded.SkipNext, "Próxima faixa", onNext),
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp),
+            )
+            ModeToggle(
+                icon = if (playback.repeatMode == Player.REPEAT_MODE_ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
+                description = "Repetir",
+                active = playback.repeatMode != Player.REPEAT_MODE_OFF,
+                onClick = onCycleRepeat,
+            )
+        }
 
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(20.dp))
 
         Text(
             text = playback.title.ifBlank { "Nenhuma fita inserida" },
-            style = MaterialTheme.typography.titleLarge,
-            color = TextPrimary,
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+            color = AluInk,
             textAlign = TextAlign.Center,
-            maxLines = 2,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        Spacer(Modifier.height(4.dp))
+        Box(
+            Modifier
+                .padding(vertical = 6.dp)
+                .fillMaxWidth(0.6f)
+                .height(1.5.dp)
+                .background(Color.White.copy(alpha = 0.85f))
+        )
         Text(
             text = playback.artist,
             style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary,
+            color = AluInkMuted,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
 
         RetroSeekBar(
             positionMs = playback.positionMs,
@@ -133,88 +189,74 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(Modifier.height(24.dp))
-
-        DeckControls(
-            isPlaying = playback.isPlaying,
-            onTogglePlay = onTogglePlay,
-            onPrevious = onPrevious,
-            onNext = onNext,
-            onRewind = onRewind,
-            onFastForward = onFastForward,
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        MetalButton(
-            onClick = onToggleShuffle,
-            latched = playback.shuffleEnabled,
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+        // "A SEGUIR" tab, like YouTube Music's player
+        Row(
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .clip(RoundedCornerShape(50))
+                .clickable(onClick = onOpenQueue)
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                PlaybackLed(lit = playback.shuffleEnabled)
-                Spacer(Modifier.width(8.dp))
-                Text("SHUFFLE", style = MaterialTheme.typography.labelSmall)
-            }
+            Icon(
+                Icons.AutoMirrored.Rounded.QueueMusic,
+                contentDescription = null,
+                tint = AluInk,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "A SEGUIR",
+                style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp),
+                color = AluInk,
+            )
         }
-
-        Spacer(Modifier.weight(0.5f))
     }
 }
 
-/** Row of piano-style deck keys set in a recessed panel. */
+/** Small printed icon with an orange indicator dot under it when the mode is on. */
 @Composable
-private fun DeckControls(
-    isPlaying: Boolean,
-    onTogglePlay: () -> Unit,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit,
-    onRewind: () -> Unit,
-    onFastForward: () -> Unit,
-) {
-    val panelShape = RoundedCornerShape(14.dp)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.4f), panelShape)
-            .border(1.dp, Color.White.copy(alpha = 0.12f), panelShape)
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        DeckKey(Icons.Rounded.SkipPrevious, "Faixa anterior", onPrevious)
-        DeckKey(Icons.Rounded.FastRewind, "Retroceder 10 segundos", onRewind)
-        DeckKey(
-            icon = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-            description = if (isPlaying) "Pausar" else "Tocar",
-            onClick = onTogglePlay,
-            latched = isPlaying,
-            primary = true,
-        )
-        DeckKey(Icons.Rounded.FastForward, "Avançar 10 segundos", onFastForward)
-        DeckKey(Icons.Rounded.SkipNext, "Próxima faixa", onNext)
-    }
-}
-
-@Composable
-private fun RowScope.DeckKey(
+private fun ModeToggle(
     icon: ImageVector,
     description: String,
+    active: Boolean,
     onClick: () -> Unit,
-    latched: Boolean = false,
-    primary: Boolean = false,
 ) {
-    MetalIconButton(
-        icon = icon,
-        contentDescription = description,
-        onClick = onClick,
+    Column(
         modifier = Modifier
-            .weight(if (primary) 1.4f else 1f)
-            .height(if (primary) 70.dp else 62.dp),
-        iconSize = if (primary) 34.dp else 26.dp,
-        shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 12.dp, bottomEnd = 12.dp),
-        latched = latched,
-        accent = primary && latched,
-    )
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            icon,
+            contentDescription = description,
+            tint = if (active) TapeOrange else AluInkMuted,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(Modifier.height(4.dp))
+        Box(
+            Modifier
+                .size(5.dp)
+                .background(if (active) TapeOrange else Color.Transparent, CircleShape)
+        )
+    }
+}
+
+/** Dark status/navigation bar icons while the light aluminium player is on screen. */
+@Composable
+private fun LightSystemBars() {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val window = (view.context as? Activity)?.window
+        val controller = window?.let { WindowCompat.getInsetsController(it, view) }
+        controller?.isAppearanceLightStatusBars = true
+        controller?.isAppearanceLightNavigationBars = true
+        onDispose {
+            controller?.isAppearanceLightStatusBars = false
+            controller?.isAppearanceLightNavigationBars = false
+        }
+    }
 }

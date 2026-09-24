@@ -53,14 +53,14 @@ import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.CollectionGridItem
 import com.retro.cassetteplayer.ui.components.CollectionListItem
-import com.retro.cassetteplayer.ui.components.MetalButton
+import com.retro.cassetteplayer.ui.components.PillButton
 import com.retro.cassetteplayer.ui.components.RetroChip
 import com.retro.cassetteplayer.ui.components.RetroIconChip
 import com.retro.cassetteplayer.ui.components.SongRow
-import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
-import com.retro.cassetteplayer.ui.theme.NavySurface
-import com.retro.cassetteplayer.ui.theme.HotlineAmber
+import com.retro.cassetteplayer.ui.theme.InkSurface
+import com.retro.cassetteplayer.ui.theme.TapeAmber
 
 enum class LibraryFilter(val label: String) {
     PLAYLISTS("Playlists"),
@@ -118,7 +118,7 @@ fun LibraryScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(Ink)
     ) {
         Column(Modifier.statusBarsPadding()) {
             Row(
@@ -129,7 +129,7 @@ fun LibraryScreen(
             ) {
                 Text(
                     text = "Biblioteca",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 28.sp, letterSpacing = 0.sp),
+                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 30.sp),
                     color = TextPrimary,
                     modifier = Modifier.weight(1f),
                 )
@@ -214,20 +214,18 @@ fun LibraryScreen(
             }
         }
 
-        MetalButton(
+        PillButton(
             onClick = { onShufflePlay(songs) },
             enabled = songs.isNotEmpty(),
-            shape = RoundedCornerShape(50),
+            filled = true,
             contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Rounded.Shuffle, contentDescription = null)
-                Spacer(Modifier.width(10.dp))
-                Text("Modo aleatório", style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 0.5.sp))
-            }
+            Icon(Icons.Rounded.Shuffle, contentDescription = null)
+            Spacer(Modifier.width(10.dp))
+            Text("Modo aleatório", style = MaterialTheme.typography.titleMedium, color = Ink)
         }
     }
 }
@@ -242,17 +240,17 @@ private fun SortSelector(sort: LibrarySort, onSortChange: (LibrarySort) -> Unit)
                 .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(sort.label, style = MaterialTheme.typography.titleMedium, color = TextPrimary.copy(alpha = 0.85f))
+            Text(sort.label, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
             Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Ordenar", tint = TextPrimary)
         }
         DropdownMenu(
             expanded = open,
             onDismissRequest = { open = false },
-            modifier = Modifier.background(NavySurface),
+            modifier = Modifier.background(InkSurface),
         ) {
             LibrarySort.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.label, color = if (option == sort) HotlineAmber else TextPrimary) },
+                    text = { Text(option.label, color = if (option == sort) TapeAmber else TextPrimary) },
                     onClick = {
                         open = false
                         onSortChange(option)

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.rounded.MoreVert
@@ -37,9 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
-import com.retro.cassetteplayer.ui.theme.NavySurface
-import com.retro.cassetteplayer.ui.theme.HotlineAmber
-import com.retro.cassetteplayer.ui.theme.HotlineOrange
+import com.retro.cassetteplayer.ui.theme.InkSurface
+import com.retro.cassetteplayer.ui.theme.TapeAmber
+import com.retro.cassetteplayer.ui.theme.TapeOrange
 
 @Composable
 fun SongRow(
@@ -57,31 +58,23 @@ fun SongRow(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(start = 16.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
+            .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        AlbumArt(song.artworkUri, Modifier.size(50.dp))
+        AlbumArt(song.artworkUri, Modifier.size(48.dp), RoundedCornerShape(4.dp))
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 text = song.title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = if (isCurrent) HotlineAmber else TextPrimary,
+                color = if (isCurrent) TapeAmber else TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = song.artist,
+                text = "${song.artist} • ${song.album}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = song.album,
-                style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary.copy(alpha = 0.7f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -96,7 +89,7 @@ fun SongRow(
             DropdownMenu(
                 expanded = menuOpen,
                 onDismissRequest = { menuOpen = false },
-                modifier = Modifier.background(NavySurface),
+                modifier = Modifier.background(InkSurface),
             ) {
                 SongMenuItem("Tocar", Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
                 SongMenuItem("Tocar a seguir", Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
@@ -113,7 +106,7 @@ fun SongRow(
 private fun SongMenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
     DropdownMenuItem(
         text = { Text(text, color = TextPrimary) },
-        leadingIcon = { Icon(icon, contentDescription = null, tint = HotlineAmber) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = TextSecondary) },
         onClick = onClick,
     )
 }
@@ -124,7 +117,7 @@ fun PlaybackLed(lit: Boolean, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(10.dp)
-            .shadow(if (lit) 6.dp else 0.dp, CircleShape, ambientColor = HotlineOrange, spotColor = HotlineOrange)
-            .background(if (lit) HotlineOrange else HotlineOrange.copy(alpha = 0.3f), CircleShape)
+            .shadow(if (lit) 6.dp else 0.dp, CircleShape, ambientColor = TapeOrange, spotColor = TapeOrange)
+            .background(if (lit) TapeOrange else TapeOrange.copy(alpha = 0.3f), CircleShape)
     )
 }

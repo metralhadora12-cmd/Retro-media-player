@@ -63,20 +63,18 @@ import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.CollageArt
 import com.retro.cassetteplayer.ui.components.CoverTile
-import com.retro.cassetteplayer.ui.components.MetalButton
-import com.retro.cassetteplayer.ui.components.MetalPill
 import com.retro.cassetteplayer.ui.components.PageDots
+import com.retro.cassetteplayer.ui.components.PillButton
 import com.retro.cassetteplayer.ui.components.RetroChip
 import com.retro.cassetteplayer.ui.components.SectionHeader
 import com.retro.cassetteplayer.ui.components.SongRow
 import com.retro.cassetteplayer.ui.components.TopGlow
-import com.retro.cassetteplayer.ui.components.WalkmanDeck
-import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.DisplayFont
-import com.retro.cassetteplayer.ui.theme.NavyRaised
-import com.retro.cassetteplayer.ui.theme.HotlineOrange
+import com.retro.cassetteplayer.ui.theme.InkRaised
+import com.retro.cassetteplayer.ui.theme.TapeOrange
 import kotlin.random.Random
 
 private const val TILES_PER_PAGE = 9
@@ -97,7 +95,6 @@ fun HomeScreen(
     onOpenLibrary: () -> Unit,
     onOpenCollection: (SongCollection) -> Unit,
     onPlayAll: (List<Song>) -> Unit,
-    onShufflePlay: (List<Song>) -> Unit,
     onSongClick: (List<Song>, Song) -> Unit,
     onPlayNext: (Song) -> Unit,
     onAddToQueue: (Song) -> Unit,
@@ -130,7 +127,7 @@ fun HomeScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(Ink)
     ) {
         Box(
             Modifier
@@ -200,7 +197,7 @@ fun HomeScreen(
                             Column {
                                 SectionHeader(
                                     title = "Escolha a dedo",
-                                    action = { MetalPill("Tocar tudo", onClick = { onPlayAll(quickPicks) }) },
+                                    action = { PillButton("Tocar tudo", onClick = { onPlayAll(quickPicks) }) },
                                     modifier = Modifier.padding(top = 20.dp),
                                 )
                                 QuickPicks(
@@ -232,17 +229,6 @@ fun HomeScreen(
                             }
                         }
                     }
-
-                    item {
-                        Column {
-                            SectionHeader(title = "Sua mixtape", modifier = Modifier.padding(top = 20.dp))
-                            MixtapeCard(
-                                playback = playback,
-                                canShuffle = visibleSongs.isNotEmpty(),
-                                onShufflePlay = { onShufflePlay(visibleSongs) },
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -264,14 +250,9 @@ private fun HomeTopBar(onReload: () -> Unit, onOpenSearch: () -> Unit) {
             modifier = Modifier.size(52.dp),
         )
         Text(
-            text = "Retro",
-            style = MaterialTheme.typography.headlineSmall,
-            color = TextPrimary,
-        )
-        Text(
             text = "Cassette",
             style = MaterialTheme.typography.headlineSmall,
-            color = HotlineOrange,
+            color = TextPrimary,
         )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = onReload) {
@@ -289,8 +270,7 @@ private fun CassetteAvatar() {
         modifier = Modifier
             .size(44.dp)
             .clip(CircleShape)
-            .background(NavyRaised)
-            .border(1.dp, HotlineOrange, CircleShape),
+            .background(InkRaised),
         contentAlignment = Alignment.Center,
     ) {
         Image(
@@ -403,42 +383,6 @@ private fun AlbumCard(album: SongCollection, onClick: () -> Unit) {
 }
 
 @Composable
-private fun MixtapeCard(
-    playback: PlaybackState,
-    canShuffle: Boolean,
-    onShufflePlay: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        WalkmanDeck(
-            isPlaying = playback.isPlaying,
-            progress = playback.progress,
-            label = playback.title.ifBlank { "MIX TAPE VOL.1" },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(Modifier.height(16.dp))
-        MetalButton(
-            onClick = onShufflePlay,
-            enabled = canShuffle,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp),
-            shape = RoundedCornerShape(12.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Rounded.Shuffle, contentDescription = null)
-                Spacer(Modifier.width(10.dp))
-                Text("SHUFFLE PLAY", style = MaterialTheme.typography.labelLarge)
-            }
-        }
-    }
-}
-
-@Composable
 private fun PermissionCard(onRequestPermission: () -> Unit, onOpenSettings: () -> Unit) {
     Column(
         modifier = Modifier
@@ -453,11 +397,9 @@ private fun PermissionCard(onRequestPermission: () -> Unit, onOpenSettings: () -
             color = TextPrimary,
             textAlign = TextAlign.Center,
         )
-        MetalButton(onClick = onRequestPermission, modifier = Modifier.height(50.dp)) {
-            Text("PERMITIR ACESSO", style = MaterialTheme.typography.labelLarge)
-        }
+        PillButton("Permitir acesso", onClick = onRequestPermission, filled = true)
         TextButton(onClick = onOpenSettings) {
-            Text("Abrir configurações do app", color = HotlineOrange)
+            Text("Abrir configurações do app", color = TextSecondary)
         }
     }
 }
@@ -472,7 +414,7 @@ fun StatusMessage(text: String, showProgress: Boolean = false) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (showProgress) {
-                CircularProgressIndicator(color = HotlineOrange, modifier = Modifier.size(32.dp))
+                CircularProgressIndicator(color = TapeOrange, modifier = Modifier.size(32.dp))
                 Spacer(Modifier.height(12.dp))
             }
             Text(
