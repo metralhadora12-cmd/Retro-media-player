@@ -17,7 +17,22 @@ android {
         vectorDrawables { useSupportLibrary = true }
     }
 
+    // Fixed debug key committed to the repo: every CI build is signed with the same key,
+    // so a new APK installs over the previous one (the default debug key is random per
+    // CI machine). It is only a debug key, not meant for store releases.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
