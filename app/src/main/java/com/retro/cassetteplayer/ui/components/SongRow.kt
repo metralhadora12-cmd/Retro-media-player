@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
@@ -62,6 +64,8 @@ fun SongRow(
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
+    val favorites = LocalFavorites.current
+    val isFavorite = favorites.isFavorite(song)
 
     Row(
         modifier = modifier
@@ -113,6 +117,13 @@ fun SongRow(
                 SongMenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay) {
                     menuOpen = false
                     onAddToQueue()
+                }
+                SongMenuItem(
+                    if (isFavorite) "Remover das favoritas" else "Adicionar às favoritas",
+                    if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                ) {
+                    menuOpen = false
+                    favorites.toggle(song)
                 }
                 SongMenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd) {
                     menuOpen = false

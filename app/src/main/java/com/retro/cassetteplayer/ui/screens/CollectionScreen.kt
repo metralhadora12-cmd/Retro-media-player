@@ -88,7 +88,6 @@ fun CollectionScreen(
     onDeletePlaylist: (String) -> Unit,
     onRemoveFromPlaylist: (String, Song) -> Unit,
     onReorderPlaylist: (String, List<Song>) -> Unit,
-    onToggleFavorite: (Song) -> Unit,
 ) {
     val isFavorites = collection?.isFavorites == true
     val playlistId = collection?.userPlaylistId
@@ -234,7 +233,7 @@ fun CollectionScreen(
             if (collection.songs.isEmpty()) {
                 item {
                     StatusMessage(
-                        if (isFavorites) "Nenhuma favorita ainda. Toque no coração no player para adicionar a música que está tocando."
+                        if (isFavorites) "Nenhuma favorita ainda. Toque no coração no player ou use \"Adicionar às favoritas\" no menu ⋮ de uma música."
                         else "Playlist vazia. Use \"Salvar na playlist\" no menu ⋮ de uma música para adicioná-la aqui."
                     )
                 }
@@ -257,7 +256,8 @@ fun CollectionScreen(
                                 onAddToQueue = { onAddToQueue(song) },
                                 onAddToPlaylist = { onAddToPlaylist(song) },
                                 onRemoveFromPlaylist = when {
-                                    isFavorites -> { { onToggleFavorite(song) } }
+                                    // In "Favoritas" the menu's own "Remover das favoritas" covers it
+                                    isFavorites -> null
                                     playlistId != null -> { { onRemoveFromPlaylist(playlistId, song) } }
                                     else -> null
                                 },

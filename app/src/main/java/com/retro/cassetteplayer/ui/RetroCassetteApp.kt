@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,6 +52,8 @@ import com.retro.cassetteplayer.MainViewModel
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.ui.components.AddToPlaylistSheet
+import com.retro.cassetteplayer.ui.components.FavoritesState
+import com.retro.cassetteplayer.ui.components.LocalFavorites
 import com.retro.cassetteplayer.ui.components.MiniPlayer
 import com.retro.cassetteplayer.ui.components.PlaylistNameDialog
 import com.retro.cassetteplayer.ui.components.QueueSheet
@@ -180,172 +183,177 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
         Box(Modifier.padding(bottom = barsHeight)) { content() }
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Ink)
-    ) {
-        AnimatedVisibility(
-            visible = currentRoute != Routes.PLAYER,
-            enter = slideInVertically(tween(PLAYER_ANIM_MS)) { it },
-            exit = slideOutVertically(tween(PLAYER_ANIM_MS)) { it },
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) {
-            Column(Modifier.onSizeChanged { barsHeight = with(density) { it.height.toDp() } }) {
-                if (playback.hasMedia) {
-                    MiniPlayer(
-                        state = playback,
-                        onOpen = openPlayer,
-                        onTogglePlay = viewModel::togglePlayPause,
-                        onNext = viewModel::skipNext,
-                    )
-                }
-                RetroBottomBar(
-                    destinations = Routes.bottomDestinations,
-                    currentRoute = currentRoute,
-                    onSelect = openTab,
-                )
-            }
-        }
+    val favoritesState = remember(favorites) {
+        FavoritesState(favorites.toSet()) { song -> viewModel.toggleFavorite(song.id) }
+    }
 
-        NavHost(
-            navController = navController,
-            startDestination = Routes.HOME,
-            modifier = Modifier.fillMaxSize(),
-            enterTransition = { fadeIn(tween(TAB_FADE_MS)) },
-            exitTransition = {
-                // Keep the screen fully visible underneath while the player slides over it.
-                if (targetState.destination.route == Routes.PLAYER) fadeOut(snap(PLAYER_ANIM_MS))
-                else fadeOut(tween(TAB_FADE_MS))
-            },
-            popEnterTransition = {
-                if (initialState.destination.route == Routes.PLAYER) fadeIn(snap())
-                else fadeIn(tween(TAB_FADE_MS))
-            },
-            popExitTransition = { fadeOut(tween(TAB_FADE_MS)) },
+    CompositionLocalProvider(LocalFavorites provides favoritesState) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Ink)
         ) {
-            composable(Routes.HOME) {
-                tabContent {
-                    HomeScreen(
-                        songs = songs,
-                        albums = library.albums,
-                        playlists = library.playlists,
-                        playback = playback,
-                        isLoading = isLoading,
-                        hasPermission = hasPermission,
-                        onRequestPermission = { permissionLauncher.launch(requestedPermissions) },
-                        onOpenSettings = {
-                            context.startActivity(
-                                Intent(
-                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                    Uri.fromParts("package", context.packageName, null),
+            AnimatedVisibility(
+                visible = currentRoute != Routes.PLAYER,
+                enter = slideInVertically(tween(PLAYER_ANIM_MS)) { it },
+                exit = slideOutVertically(tween(PLAYER_ANIM_MS)) { it },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            ) {
+                Column(Modifier.onSizeChanged { barsHeight = with(density) { it.height.toDp() } }) {
+                    if (playback.hasMedia) {
+                        MiniPlayer(
+                            state = playback,
+                            onOpen = openPlayer,
+                            onTogglePlay = viewModel::togglePlayPause,
+                            onNext = viewModel::skipNext,
+                        )
+                    }
+                    RetroBottomBar(
+                        destinations = Routes.bottomDestinations,
+                        currentRoute = currentRoute,
+                        onSelect = openTab,
+                    )
+                }
+            }
+
+            NavHost(
+                navController = navController,
+                startDestination = Routes.HOME,
+                modifier = Modifier.fillMaxSize(),
+                enterTransition = { fadeIn(tween(TAB_FADE_MS)) },
+                exitTransition = {
+                    // Keep the screen fully visible underneath while the player slides over it.
+                    if (targetState.destination.route == Routes.PLAYER) fadeOut(snap(PLAYER_ANIM_MS))
+                    else fadeOut(tween(TAB_FADE_MS))
+                },
+                popEnterTransition = {
+                    if (initialState.destination.route == Routes.PLAYER) fadeIn(snap())
+                    else fadeIn(tween(TAB_FADE_MS))
+                },
+                popExitTransition = { fadeOut(tween(TAB_FADE_MS)) },
+            ) {
+                composable(Routes.HOME) {
+                    tabContent {
+                        HomeScreen(
+                            songs = songs,
+                            albums = library.albums,
+                            playlists = library.playlists,
+                            playback = playback,
+                            isLoading = isLoading,
+                            hasPermission = hasPermission,
+                            onRequestPermission = { permissionLauncher.launch(requestedPermissions) },
+                            onOpenSettings = {
+                                context.startActivity(
+                                    Intent(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.fromParts("package", context.packageName, null),
+                                    )
                                 )
-                            )
-                        },
-                        onReload = viewModel::loadSongs,
-                        onOpenSearch = { openTab(Routes.SEARCH) },
-                        onOpenLibrary = { openTab(Routes.LIBRARY) },
-                        onOpenCollection = openCollection,
-                        onPlayAll = viewModel::playAll,
-                        onSongClick = viewModel::play,
-                        onPlayNext = viewModel::playNext,
-                        onAddToQueue = viewModel::addToQueue,
-                        onAddToPlaylist = saveSong,
-                    )
+                            },
+                            onReload = viewModel::loadSongs,
+                            onOpenSearch = { openTab(Routes.SEARCH) },
+                            onOpenLibrary = { openTab(Routes.LIBRARY) },
+                            onOpenCollection = openCollection,
+                            onPlayAll = viewModel::playAll,
+                            onSongClick = viewModel::play,
+                            onPlayNext = viewModel::playNext,
+                            onAddToQueue = viewModel::addToQueue,
+                            onAddToPlaylist = saveSong,
+                        )
+                    }
                 }
-            }
-            composable(Routes.SEARCH) {
-                tabContent {
-                    SearchScreen(
-                        query = query,
-                        onQueryChange = viewModel::onQueryChange,
-                        results = searchResults,
-                        playback = playback,
-                        onSongClick = { song -> viewModel.play(searchResults, song) },
-                        onPlayNext = viewModel::playNext,
-                        onAddToQueue = viewModel::addToQueue,
-                        onAddToPlaylist = saveSong,
-                    )
+                composable(Routes.SEARCH) {
+                    tabContent {
+                        SearchScreen(
+                            query = query,
+                            onQueryChange = viewModel::onQueryChange,
+                            results = searchResults,
+                            playback = playback,
+                            onSongClick = { song -> viewModel.play(searchResults, song) },
+                            onPlayNext = viewModel::playNext,
+                            onAddToQueue = viewModel::addToQueue,
+                            onAddToPlaylist = saveSong,
+                        )
+                    }
                 }
-            }
-            composable(Routes.LIBRARY) {
-                tabContent {
-                    LibraryScreen(
-                        songs = songs,
-                        library = library,
-                        playback = playback,
-                        onOpenSearch = { openTab(Routes.SEARCH) },
-                        onOpenCollection = openCollection,
-                        onShufflePlay = viewModel::shufflePlay,
-                        onSongClick = viewModel::play,
-                        onPlayNext = viewModel::playNext,
-                        onAddToQueue = viewModel::addToQueue,
-                        onAddToPlaylist = saveSong,
-                        onCreatePlaylist = { creatingPlaylist = true },
-                    )
+                composable(Routes.LIBRARY) {
+                    tabContent {
+                        LibraryScreen(
+                            songs = songs,
+                            library = library,
+                            playback = playback,
+                            onOpenSearch = { openTab(Routes.SEARCH) },
+                            onOpenCollection = openCollection,
+                            onShufflePlay = viewModel::shufflePlay,
+                            onSongClick = viewModel::play,
+                            onPlayNext = viewModel::playNext,
+                            onAddToQueue = viewModel::addToQueue,
+                            onAddToPlaylist = saveSong,
+                            onCreatePlaylist = { creatingPlaylist = true },
+                        )
+                    }
                 }
-            }
-            composable(
-                route = Routes.COLLECTION,
-                arguments = listOf(navArgument(Routes.COLLECTION_ARG) {
-                    type = NavType.StringType
-                    defaultValue = ""
-                }),
-            ) { entry ->
-                val id = entry.arguments?.getString(Routes.COLLECTION_ARG).orEmpty()
-                tabContent {
-                    CollectionScreen(
-                        collection = library.find(id),
+                composable(
+                    route = Routes.COLLECTION,
+                    arguments = listOf(navArgument(Routes.COLLECTION_ARG) {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }),
+                ) { entry ->
+                    val id = entry.arguments?.getString(Routes.COLLECTION_ARG).orEmpty()
+                    tabContent {
+                        CollectionScreen(
+                            collection = library.find(id),
+                            playback = playback,
+                            onBack = { navController.popBackStack() },
+                            onPlayAll = viewModel::playAll,
+                            onShufflePlay = viewModel::shufflePlay,
+                            onSongClick = viewModel::play,
+                            onPlayNext = viewModel::playNext,
+                            onAddToQueue = viewModel::addToQueue,
+                            onAddToPlaylist = saveSong,
+                            onSaveAll = saveToPlaylist,
+                            onRenamePlaylist = viewModel::renamePlaylist,
+                            onDeletePlaylist = viewModel::deletePlaylist,
+                            onRemoveFromPlaylist = viewModel::removeFromPlaylist,
+                            onReorderPlaylist = viewModel::reorderPlaylist,
+                        )
+                    }
+                }
+                composable(
+                    route = Routes.PLAYER,
+                    enterTransition = { slideInVertically(tween(PLAYER_ANIM_MS)) { it } },
+                    exitTransition = { slideOutVertically(tween(PLAYER_ANIM_MS)) { it } },
+                    popExitTransition = { slideOutVertically(tween(PLAYER_ANIM_MS)) { it } },
+                ) {
+                    PlayerScreen(
                         playback = playback,
                         onBack = { navController.popBackStack() },
-                        onPlayAll = viewModel::playAll,
-                        onShufflePlay = viewModel::shufflePlay,
-                        onSongClick = viewModel::play,
-                        onPlayNext = viewModel::playNext,
-                        onAddToQueue = viewModel::addToQueue,
-                        onAddToPlaylist = saveSong,
-                        onSaveAll = saveToPlaylist,
-                        onRenamePlaylist = viewModel::renamePlaylist,
-                        onDeletePlaylist = viewModel::deletePlaylist,
-                        onRemoveFromPlaylist = viewModel::removeFromPlaylist,
-                        onReorderPlaylist = viewModel::reorderPlaylist,
-                        onToggleFavorite = { song -> viewModel.toggleFavorite(song.id) },
+                        onTogglePlay = viewModel::togglePlayPause,
+                        onPrevious = viewModel::skipPrevious,
+                        onNext = viewModel::skipNext,
+                        onSeek = viewModel::seekTo,
+                        onToggleShuffle = viewModel::toggleShuffle,
+                        onCycleRepeat = viewModel::cycleRepeat,
+                        onOpenQueue = { showQueue = true },
+                        onSaveToPlaylist = {
+                            songs.firstOrNull { it.id.toString() == playback.mediaId }?.let(saveSong)
+                        },
+                        isFavorite = favorites.any { it.toString() == playback.mediaId },
+                        onToggleFavorite = {
+                            playback.mediaId?.toLongOrNull()?.let(viewModel::toggleFavorite)
+                        },
                     )
                 }
             }
-            composable(
-                route = Routes.PLAYER,
-                enterTransition = { slideInVertically(tween(PLAYER_ANIM_MS)) { it } },
-                exitTransition = { slideOutVertically(tween(PLAYER_ANIM_MS)) { it } },
-                popExitTransition = { slideOutVertically(tween(PLAYER_ANIM_MS)) { it } },
-            ) {
-                PlayerScreen(
-                    playback = playback,
-                    onBack = { navController.popBackStack() },
-                    onTogglePlay = viewModel::togglePlayPause,
-                    onPrevious = viewModel::skipPrevious,
-                    onNext = viewModel::skipNext,
-                    onSeek = viewModel::seekTo,
-                    onToggleShuffle = viewModel::toggleShuffle,
-                    onCycleRepeat = viewModel::cycleRepeat,
-                    onOpenQueue = { showQueue = true },
-                    onSaveToPlaylist = {
-                        songs.firstOrNull { it.id.toString() == playback.mediaId }?.let(saveSong)
-                    },
-                    isFavorite = favorites.any { it.toString() == playback.mediaId },
-                    onToggleFavorite = {
-                        playback.mediaId?.toLongOrNull()?.let(viewModel::toggleFavorite)
-                    },
-                )
-            }
-        }
 
-        SnackbarHost(
-            snackbarHostState,
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = barsHeight),
-        )
+            SnackbarHost(
+                snackbarHostState,
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = barsHeight),
+            )
+        }
     }
 }
 
