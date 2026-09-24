@@ -6,7 +6,7 @@ Reprodutor de áudio Android nativo com interface minimalista inspirada no YouTu
 - **Kotlin** + **Jetpack Compose** (Material 3)
 - **Media3 / ExoPlayer** rodando dentro de um `MediaSessionService` (tocar em segundo plano, notificação de mídia e tela de bloqueio)
 - **Navigation Compose** com barra de navegação inferior (Início, Buscar, Biblioteca)
-- **MediaStore** para ler as músicas locais (`READ_MEDIA_AUDIO` no Android 13+, `READ_EXTERNAL_STORAGE` em versões anteriores)
+- **MediaStore** para ler as músicas locais (ignora áudios de WhatsApp, Telegram e Messenger) (`READ_MEDIA_AUDIO` no Android 13+, `READ_EXTERNAL_STORAGE` em versões anteriores)
 - **Coil** para as capas dos álbuns
 
 ## Estrutura

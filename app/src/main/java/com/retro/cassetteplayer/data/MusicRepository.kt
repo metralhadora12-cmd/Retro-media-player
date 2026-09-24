@@ -27,11 +27,20 @@ class MusicRepository(private val context: Context) {
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATE_ADDED,
         )
-        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
+        // Skip voice notes and audio saved by messaging apps (WhatsApp, Telegram, …).
+        val pathColumn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Audio.Media.RELATIVE_PATH
+        } else {
+            @Suppress("DEPRECATION")
+            MediaStore.Audio.Media.DATA
+        }
+        val exclusions = EXCLUDED_PATH_FRAGMENTS.joinToString(" AND ") { "$pathColumn NOT LIKE ?" }
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0 AND ($pathColumn IS NULL OR ($exclusions))"
+        val selectionArgs = EXCLUDED_PATH_FRAGMENTS.map { "%$it%" }.toTypedArray()
         val sortOrder = "${MediaStore.Audio.Media.TITLE} COLLATE NOCASE ASC"
 
         val songs = mutableListOf<Song>()
-        context.contentResolver.query(collection, projection, selection, null, sortOrder)
+        context.contentResolver.query(collection, projection, selection, selectionArgs, sortOrder)
             ?.use { cursor ->
                 val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
@@ -65,5 +74,17 @@ class MusicRepository(private val context: Context) {
 
     private companion object {
         val ALBUM_ART_URI: Uri = Uri.parse("content://media/external/audio/albumart")
+
+        /**
+         * Folder fragments of messaging apps whose audio should not show up as music.
+         * SQLite LIKE is case-insensitive for ASCII, so "whatsapp" also matches
+         * "WhatsApp Audio", "WhatsApp Business" and "Android/media/com.whatsapp/…".
+         */
+        val EXCLUDED_PATH_FRAGMENTS = listOf(
+            "whatsapp",
+            "telegram",
+            "org.thunderdog.challegram",
+            "com.facebook.orca",
+        )
     }
 }
