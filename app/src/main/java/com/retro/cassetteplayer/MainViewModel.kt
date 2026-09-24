@@ -144,6 +144,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _messages.tryEmit(if (added == 0) "Já está em \"$name\"" else "Salvo em \"$name\"")
     }
 
+    fun reorderPlaylist(playlistId: String, songs: List<Song>) =
+        playlistRepository.reorder(playlistId, songs.map { it.id })
+
     fun removeFromPlaylist(playlistId: String, song: Song) = playlistRepository.removeSong(playlistId, song.id)
 
     override fun onCleared() {

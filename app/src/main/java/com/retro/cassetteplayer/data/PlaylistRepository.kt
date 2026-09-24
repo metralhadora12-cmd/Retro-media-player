@@ -51,6 +51,15 @@ class PlaylistRepository(context: Context) {
         playlist.copy(songIds = playlist.songIds - songId)
     }
 
+    /**
+     * Applies a new order. Ids missing from [orderedIds] (e.g. songs no longer on the
+     * device, which the UI can't show) are kept at the end instead of being dropped.
+     */
+    fun reorder(id: String, orderedIds: List<Long>) = edit(id) { playlist ->
+        val ordered = orderedIds.filter { it in playlist.songIds }.distinct()
+        playlist.copy(songIds = ordered + playlist.songIds.filterNot { it in ordered })
+    }
+
     private fun edit(id: String, transform: (UserPlaylist) -> UserPlaylist) = update { list ->
         list.map { if (it.id == id) transform(it).copy(updatedAt = System.currentTimeMillis()) else it }
     }

@@ -274,6 +274,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onRenamePlaylist = viewModel::renamePlaylist,
                     onDeletePlaylist = viewModel::deletePlaylist,
                     onRemoveFromPlaylist = viewModel::removeFromPlaylist,
+                    onReorderPlaylist = viewModel::reorderPlaylist,
                 )
             }
             composable(

@@ -1,6 +1,15 @@
 package com.retro.cassetteplayer.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.rounded.DragHandle
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.retro.cassetteplayer.ui.theme.InkRaised
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,8 +87,23 @@ fun CollectionScreen(
     onRenamePlaylist: (String, String) -> Unit,
     onDeletePlaylist: (String) -> Unit,
     onRemoveFromPlaylist: (String, Song) -> Unit,
+    onReorderPlaylist: (String, List<Song>) -> Unit,
 ) {
     val playlistId = collection?.userPlaylistId
+
+    // Local copy of the track order: updated live while dragging, saved when the drag ends.
+    var tracks by remember(collection?.songs) { mutableStateOf(collection?.songs.orEmpty()) }
+    val lazyListState = rememberLazyListState()
+    val haptics = LocalHapticFeedback.current
+    val reorderState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        // Header rows have no song key, so moves onto them are ignored.
+        val fromIndex = tracks.indexOfFirst { it.id == from.key }
+        val toIndex = tracks.indexOfFirst { it.id == to.key }
+        if (fromIndex >= 0 && toIndex >= 0) {
+            tracks = tracks.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+    }
     var menuOpen by remember { mutableStateOf(false) }
     var renaming by rememberSaveable { mutableStateOf(false) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
@@ -126,7 +150,7 @@ fun CollectionScreen(
                 .height(420.dp)
                 .background(TopGlow)
         )
-        LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
+        LazyColumn(state = lazyListState, contentPadding = PaddingValues(bottom = 24.dp)) {
             item {
                 Row(
                     Modifier
@@ -210,21 +234,48 @@ fun CollectionScreen(
                     StatusMessage("Playlist vazia. Use \"Salvar na playlist\" no menu ⋮ de uma música para adicioná-la aqui.")
                 }
             }
-            items(collection.songs, key = { it.id }) { song ->
-                SongRow(
-                    song = song,
-                    isCurrent = song.id.toString() == playback.mediaId,
-                    isPlaying = playback.isPlaying,
-                    onClick = { onSongClick(collection.songs, song) },
-                    onPlayNext = { onPlayNext(song) },
-                    onAddToQueue = { onAddToQueue(song) },
-                    onAddToPlaylist = { onAddToPlaylist(song) },
-                    onRemoveFromPlaylist = playlistId?.let { id -> { onRemoveFromPlaylist(id, song) } },
-                )
-                HorizontalDivider(
-                    modifier = Modifier.padding(start = 80.dp),
-                    color = Color.White.copy(alpha = 0.06f),
-                )
+            items(tracks, key = { it.id }) { song ->
+                ReorderableItem(reorderState, key = song.id, enabled = playlistId != null) { isDragging ->
+                    val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "dragElevation")
+                    Column(
+                        Modifier
+                            .shadow(elevation)
+                            .background(if (isDragging) InkRaised else Color.Transparent)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            SongRow(
+                                song = song,
+                                isCurrent = song.id.toString() == playback.mediaId,
+                                isPlaying = playback.isPlaying,
+                                onClick = { onSongClick(tracks, song) },
+                                onPlayNext = { onPlayNext(song) },
+                                onAddToQueue = { onAddToQueue(song) },
+                                onAddToPlaylist = { onAddToPlaylist(song) },
+                                onRemoveFromPlaylist = playlistId?.let { id -> { onRemoveFromPlaylist(id, song) } },
+                                modifier = Modifier.weight(1f),
+                            )
+                            if (playlistId != null) {
+                                Icon(
+                                    Icons.Rounded.DragHandle,
+                                    contentDescription = "Arrastar para reordenar",
+                                    tint = if (isDragging) TapeOrange else TextSecondary,
+                                    modifier = Modifier
+                                        .draggableHandle(
+                                            onDragStarted = {
+                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            },
+                                            onDragStopped = { onReorderPlaylist(playlistId, tracks) },
+                                        )
+                                        .padding(start = 4.dp, end = 16.dp, top = 16.dp, bottom = 16.dp),
+                                )
+                            }
+                        }
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 80.dp),
+                            color = Color.White.copy(alpha = 0.06f),
+                        )
+                    }
+                }
             }
         }
     }

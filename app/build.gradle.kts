@@ -70,5 +70,8 @@ dependencies {
     // Album art loading
     implementation(libs.coil.compose)
 
+    // Drag to reorder in lazy lists
+    implementation(libs.reorderable)
+
     implementation(libs.kotlinx.coroutines.android)
 }
