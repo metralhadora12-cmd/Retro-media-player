@@ -19,6 +19,12 @@ object Routes {
     const val SETTINGS = "settings"
     const val EQUALIZER = "equalizer"
     const val CHANGELOG = "changelog"
+    const val EDIT_SONG_ARG = "song"
+    const val EDIT_ALBUM_ARG = "album"
+    const val EDIT_TAGS = "edit?$EDIT_SONG_ARG={$EDIT_SONG_ARG}&$EDIT_ALBUM_ARG={$EDIT_ALBUM_ARG}"
+
+    fun editTags(songId: Long, wholeAlbum: Boolean = false) =
+        "edit?$EDIT_SONG_ARG=$songId&$EDIT_ALBUM_ARG=$wholeAlbum"
     const val COLLECTION_ARG = "id"
     const val COLLECTION = "collection?$COLLECTION_ARG={$COLLECTION_ARG}"
 

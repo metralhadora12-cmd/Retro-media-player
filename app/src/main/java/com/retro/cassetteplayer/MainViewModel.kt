@@ -187,6 +187,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _messages.tryEmit(UiMessage.Text(R.string.msg_song_deleted, song.title))
     }
 
+    /** Shows feedback coming from other screens (e.g. the tag editor). */
+    fun showMessage(message: UiMessage) {
+        _messages.tryEmit(message)
+    }
+
     // --- Favourites -----------------------------------------------------------------
 
     fun toggleFavorite(songId: Long) {

@@ -83,6 +83,10 @@ import com.retro.cassetteplayer.ui.components.titleLabel
 import com.retro.cassetteplayer.ui.screens.ChangelogScreen
 import com.retro.cassetteplayer.ui.screens.EqualizerScreen
 import com.retro.cassetteplayer.ui.screens.SettingsScreen
+import com.retro.cassetteplayer.UiMessage
+import com.retro.cassetteplayer.ui.components.LocalEditSong
+import com.retro.cassetteplayer.ui.screens.EditTagsScreen
+import com.retro.cassetteplayer.ui.screens.StatusMessage
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -247,9 +251,12 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
         FavoritesState(favorites.toSet()) { song -> viewModel.toggleFavorite(song.id) }
     }
 
+    val editSong: (Song) -> Unit = { song -> navController.navigate(Routes.editTags(song.id)) }
+
     CompositionLocalProvider(
         LocalFavorites provides favoritesState,
         LocalDeleteSong provides deleteSong,
+        LocalEditSong provides editSong,
     ) {
         Box(
             Modifier
@@ -360,7 +367,46 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onRenamePlaylist = viewModel::renamePlaylist,
                             onDeletePlaylist = viewModel::deletePlaylist,
                             onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                            onEditAlbumCover = { song -> navController.navigate(Routes.editTags(song.id, wholeAlbum = true)) },
                         )
+                    }
+                }
+                composable(
+                    route = Routes.EDIT_TAGS,
+                    arguments = listOf(
+                        navArgument(Routes.EDIT_SONG_ARG) {
+                            type = NavType.LongType
+                            defaultValue = -1L
+                        },
+                        navArgument(Routes.EDIT_ALBUM_ARG) {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        },
+                    ),
+                ) { entry ->
+                    val songId = entry.arguments?.getLong(Routes.EDIT_SONG_ARG) ?: -1L
+                    val wholeAlbum = entry.arguments?.getBoolean(Routes.EDIT_ALBUM_ARG) ?: false
+                    val song = remember(songId) { songs.firstOrNull { it.id == songId } }
+                    tabContent {
+                        if (song == null) {
+                            StatusMessage(stringResource(R.string.collection_not_found))
+                        } else {
+                            EditTagsScreen(
+                                song = song,
+                                albumSongs = remember(song) { songs.filter { it.albumId == song.albumId } },
+                                applyArtworkToAlbum = wholeAlbum,
+                                onBack = { navController.popBackStack() },
+                                onSaved = {
+                                    viewModel.showMessage(UiMessage.Text(R.string.msg_tags_saved))
+                                    viewModel.loadSongs()
+                                    navController.popBackStack()
+                                },
+                                onFailed = { viewModel.showMessage(UiMessage.Text(R.string.msg_tags_failed)) },
+                                onCoverDownloadFailed = {
+                                    viewModel.showMessage(UiMessage.Text(R.string.msg_cover_failed))
+                                },
+                            )
+                        }
                     }
                 }
                 composable(Routes.SETTINGS) {

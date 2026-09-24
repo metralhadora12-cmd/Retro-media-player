@@ -11,6 +11,7 @@ coil = "2.7.0"
 coroutines = "1.9.0"
 guava = "33.3.1-android"
 reorderable = "2.4.3"
+jaudiotagger = "3.0.1"
 # Prebuilt FFmpeg audio decoder for Media3 (ALAC and other codecs without a platform decoder)
 media3Ffmpeg = "1.5.0+1"
 
@@ -35,6 +36,7 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 media3-ffmpeg-decoder = { group = "org.jellyfin.media3", name = "media3-ffmpeg-decoder", version.ref = "media3Ffmpeg" }
+jaudiotagger = { group = "net.jthink", name = "jaudiotagger", version.ref = "jaudiotagger" }
 reorderable = { group = "sh.calvin.reorderable", name = "reorderable", version.ref = "reorderable" }
 
 [plugins]

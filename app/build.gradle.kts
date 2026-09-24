@@ -12,8 +12,8 @@ android {
         applicationId = "com.retro.cassetteplayer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.9.0"
+        versionCode = 11
+        versionName = "2.0.0"
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -70,6 +70,9 @@ dependencies {
 
     // Album art loading
     implementation(libs.coil.compose)
+
+    // Reading / writing tags and embedded artwork in audio files
+    implementation(libs.jaudiotagger)
 
     // Drag to reorder in lazy lists
     implementation(libs.reorderable)

@@ -82,6 +82,7 @@ import com.retro.cassetteplayer.R
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.outlined.Settings
 import com.retro.cassetteplayer.ui.theme.Hairline
+import androidx.compose.material.icons.outlined.Image
 
 enum class LibraryFilter(@StringRes val label: Int) {
     PLAYLISTS(R.string.filter_playlists),
@@ -116,6 +117,7 @@ fun LibraryScreen(
     onRenamePlaylist: (String, String) -> Unit,
     onDeletePlaylist: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    onEditAlbumCover: (Song) -> Unit,
 ) {
     // Long-press menu targets for the rename / delete dialogs
     var renameTarget by remember { mutableStateOf<SongCollection?>(null) }
@@ -160,6 +162,7 @@ fun LibraryScreen(
                 onEdit = { onOpenCollection(collection) },
                 onRename = { renameTarget = collection },
                 onDelete = { deleteTarget = collection },
+                onEditCover = { collection.songs.firstOrNull()?.let { onEditAlbumCover(it) } },
             )
         }
     }
@@ -420,6 +423,7 @@ private fun CollectionMenuItems(
     onEdit: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
+    onEditCover: () -> Unit,
 ) {
     fun closing(action: () -> Unit): () -> Unit = {
         dismiss()
@@ -430,6 +434,9 @@ private fun CollectionMenuItems(
         MenuItem(stringResource(R.string.menu_play_shuffled), Icons.Rounded.Shuffle, closing(onShuffle))
         MenuItem(stringResource(R.string.menu_add_to_queue), Icons.AutoMirrored.Rounded.PlaylistPlay, closing(onAddToQueue))
         MenuItem(stringResource(R.string.menu_save_to_playlist), Icons.AutoMirrored.Rounded.PlaylistAdd, closing(onSave))
+    }
+    if (collection.kind == CollectionKind.ALBUM) {
+        MenuItem(stringResource(R.string.menu_edit_album_cover), Icons.Outlined.Image, closing(onEditCover))
     }
     if (collection.userPlaylistId != null) {
         MenuItem(stringResource(R.string.menu_edit_playlist), Icons.Rounded.Edit, closing(onEdit))

@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Online cover art search -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Local audio access -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission

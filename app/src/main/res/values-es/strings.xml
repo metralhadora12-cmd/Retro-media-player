@@ -109,6 +109,32 @@
     <string name="badge_lossless">LOSSLESS</string>
     <string name="audio_bits">%1$d bits</string>
     <string name="audio_khz">%1$s kHz</string>
+    <string name="menu_edit_tags">Editar etiquetas</string>
+    <string name="menu_edit_album_cover">Editar portada del álbum</string>
+    <string name="tags_title">Editar etiquetas</string>
+    <string name="tags_field_title">Título</string>
+    <string name="tags_field_artist">Artista</string>
+    <string name="tags_field_album">Álbum</string>
+    <string name="tags_field_album_artist">Artista del álbum</string>
+    <string name="tags_field_year">Año</string>
+    <string name="tags_field_track">Pista n.º</string>
+    <string name="tags_field_genre">Género</string>
+    <string name="tags_cover">Portada</string>
+    <string name="tags_cover_search">Buscar en línea</string>
+    <string name="tags_cover_gallery">De la galería</string>
+    <string name="tags_cover_remove">Quitar</string>
+    <string name="tags_apply_album">Aplicar la portada a todo el álbum (%1$s)</string>
+    <string name="tags_save">Guardar en el archivo</string>
+    <string name="tags_loading">Leyendo etiquetas…</string>
+    <string name="tags_read_failed">No se pudieron leer las etiquetas de este archivo; los campos muestran lo que conoce la biblioteca.</string>
+    <string name="cover_search_title">Buscar portada</string>
+    <string name="cover_search_hint">Artista y álbum</string>
+    <string name="cover_search_empty">No se encontraron portadas.</string>
+    <string name="cover_search_failed">Sin conexión o búsqueda no disponible.</string>
+    <string name="cover_search_source">Portadas de iTunes y Deezer</string>
+    <string name="msg_tags_saved">Etiquetas guardadas en el archivo</string>
+    <string name="msg_tags_failed">No se pudieron guardar las etiquetas en este archivo</string>
+    <string name="msg_cover_failed">No se pudo descargar la portada</string>
     <string name="msg_language_changed">Idioma cambiado</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_audio">Audio</string>
@@ -161,6 +187,11 @@
         <item quantity="many">%d pistas añadidas a la cola</item>
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
+    <string-array name="changelog_2_0">
+        <item>Edición de etiquetas: título, artista, álbum, año, pista y género guardados en el archivo</item>
+        <item>Cambia la portada desde la galería o busca portadas en línea (iTunes y Deezer)</item>
+        <item>Aplica una portada a todas las pistas de un álbum a la vez</item>
+    </string-array>
     <string-array name="changelog_1_9">
         <item>Compatibilidad con audio lossless: FLAC, WAV y ALAC, con decodificador FFmpeg integrado</item>
         <item>Audio hi-res de 24 bits conservado en la salida</item>

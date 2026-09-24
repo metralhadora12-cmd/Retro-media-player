@@ -57,6 +57,7 @@ import com.retro.cassetteplayer.ui.theme.TapeAmber
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
+import androidx.compose.material.icons.rounded.Edit
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -75,6 +76,7 @@ fun SongRow(
     val haptics = LocalHapticFeedback.current
     val favorites = LocalFavorites.current
     val deleteSong = LocalDeleteSong.current
+    val editSong = LocalEditSong.current
     val isFavorite = favorites.isFavorite(song)
 
     // Where the finger went down (row coordinates) and the row size, used to open the
@@ -167,6 +169,10 @@ fun SongRow(
                     menuOpen = false
                     onRemoveFromPlaylist()
                 }
+            }
+            SongMenuItem(stringResource(R.string.menu_edit_tags), Icons.Rounded.Edit) {
+                menuOpen = false
+                editSong(song)
             }
             SongMenuItem(stringResource(R.string.menu_delete_from_device), Icons.Rounded.DeleteOutline) {
                 menuOpen = false

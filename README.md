@@ -46,6 +46,7 @@ app/src/main/java/com/retro/cassetteplayer/
 - **Playlists**: crie pelo "+" da Biblioteca ou por "Salvar na playlist" (toque longo nas músicas, botão no player, botão "Salvar" em álbuns/artistas); renomeie, exclua, remova faixas e arraste pela alça ⠿ para reordenar na página da playlist.
 - **Menu por toque longo**: nas músicas e nos itens da Biblioteca (tocar, aleatório, fila, salvar; nas suas playlists também editar, renomear e excluir). Nas músicas há também "Excluir do aparelho", com confirmação do sistema no Android 10+.
 - **Configurações** (engrenagem na Início e na Biblioteca): equalizador, idioma, recarregar biblioteca, novidades e versão.
+- **Edição de tags**: título, artista, álbum, artista do álbum, ano, faixa e gênero gravados no próprio arquivo (JAudioTagger); capa da galeria ou buscada online (iTunes e Deezer), com opção de aplicar ao álbum inteiro.
 - **Tema**: escuro (padrão), claro ou seguindo o sistema.
 - **Idiomas**: português (padrão), inglês e espanhol. No Android 13+ usa o idioma por app do sistema.
 - **Equalizador integrado**: bandas do aparelho em faders verticais, predefinições, reforço de graves; configurações salvas e reaplicadas à sessão de áudio do ExoPlayer.

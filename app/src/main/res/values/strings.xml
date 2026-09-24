@@ -111,6 +111,32 @@
     <string name="badge_lossless">LOSSLESS</string>
     <string name="audio_bits">%1$d-bit</string>
     <string name="audio_khz">%1$s kHz</string>
+    <string name="menu_edit_tags">Editar tags</string>
+    <string name="menu_edit_album_cover">Editar capa do álbum</string>
+    <string name="tags_title">Editar tags</string>
+    <string name="tags_field_title">Título</string>
+    <string name="tags_field_artist">Artista</string>
+    <string name="tags_field_album">Álbum</string>
+    <string name="tags_field_album_artist">Artista do álbum</string>
+    <string name="tags_field_year">Ano</string>
+    <string name="tags_field_track">Faixa nº</string>
+    <string name="tags_field_genre">Gênero</string>
+    <string name="tags_cover">Capa</string>
+    <string name="tags_cover_search">Buscar online</string>
+    <string name="tags_cover_gallery">Da galeria</string>
+    <string name="tags_cover_remove">Remover</string>
+    <string name="tags_apply_album">Aplicar a capa a todo o álbum (%1$s)</string>
+    <string name="tags_save">Salvar no arquivo</string>
+    <string name="tags_loading">Lendo tags…</string>
+    <string name="tags_read_failed">Não foi possível ler as tags deste arquivo; os campos mostram o que a biblioteca conhece.</string>
+    <string name="cover_search_title">Buscar capa</string>
+    <string name="cover_search_hint">Artista e álbum</string>
+    <string name="cover_search_empty">Nenhuma capa encontrada.</string>
+    <string name="cover_search_failed">Sem conexão ou busca indisponível.</string>
+    <string name="cover_search_source">Capas do iTunes e Deezer</string>
+    <string name="msg_tags_saved">Tags salvas no arquivo</string>
+    <string name="msg_tags_failed">Não foi possível gravar as tags neste arquivo</string>
+    <string name="msg_cover_failed">Não foi possível baixar a capa</string>
     <string name="msg_language_changed">Idioma alterado</string>
     <string name="settings_title">Configurações</string>
     <string name="settings_section_audio">Áudio</string>
@@ -163,6 +189,11 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_2_0">
+        <item>Edição de tags: título, artista, álbum, ano, faixa e gênero gravados direto no arquivo</item>
+        <item>Troque a capa pela galeria ou busque capas online (iTunes e Deezer)</item>
+        <item>Aplique uma capa a todas as faixas de um álbum de uma vez</item>
+    </string-array>
     <string-array name="changelog_1_9">
         <item>Suporte a áudio lossless: FLAC, WAV e ALAC, com decodificador FFmpeg integrado</item>
         <item>Áudio hi-res em 24 bits preservado na saída</item>

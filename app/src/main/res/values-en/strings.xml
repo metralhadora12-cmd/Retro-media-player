@@ -109,6 +109,32 @@
     <string name="badge_lossless">LOSSLESS</string>
     <string name="audio_bits">%1$d-bit</string>
     <string name="audio_khz">%1$s kHz</string>
+    <string name="menu_edit_tags">Edit tags</string>
+    <string name="menu_edit_album_cover">Edit album cover</string>
+    <string name="tags_title">Edit tags</string>
+    <string name="tags_field_title">Title</string>
+    <string name="tags_field_artist">Artist</string>
+    <string name="tags_field_album">Album</string>
+    <string name="tags_field_album_artist">Album artist</string>
+    <string name="tags_field_year">Year</string>
+    <string name="tags_field_track">Track no.</string>
+    <string name="tags_field_genre">Genre</string>
+    <string name="tags_cover">Cover</string>
+    <string name="tags_cover_search">Search online</string>
+    <string name="tags_cover_gallery">From gallery</string>
+    <string name="tags_cover_remove">Remove</string>
+    <string name="tags_apply_album">Apply the cover to the whole album (%1$s)</string>
+    <string name="tags_save">Save to file</string>
+    <string name="tags_loading">Reading tags…</string>
+    <string name="tags_read_failed">Couldn\'t read this file\'s tags; the fields show what the library knows.</string>
+    <string name="cover_search_title">Find cover</string>
+    <string name="cover_search_hint">Artist and album</string>
+    <string name="cover_search_empty">No covers found.</string>
+    <string name="cover_search_failed">No connection or search unavailable.</string>
+    <string name="cover_search_source">Covers from iTunes and Deezer</string>
+    <string name="msg_tags_saved">Tags saved to the file</string>
+    <string name="msg_tags_failed">Couldn\'t write tags to this file</string>
+    <string name="msg_cover_failed">Couldn\'t download the cover</string>
     <string name="msg_language_changed">Language changed</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_audio">Audio</string>
@@ -158,6 +184,11 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_2_0">
+        <item>Tag editing: title, artist, album, year, track and genre written straight into the file</item>
+        <item>Change the cover from your gallery or search covers online (iTunes and Deezer)</item>
+        <item>Apply one cover to every track of an album at once</item>
+    </string-array>
     <string-array name="changelog_1_9">
         <item>Lossless audio support: FLAC, WAV and ALAC, with a built-in FFmpeg decoder</item>
         <item>24-bit hi-res audio kept intact on output</item>
