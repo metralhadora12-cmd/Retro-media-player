@@ -1,0 +1,108 @@
+package com.retro.cassetteplayer.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.retro.cassetteplayer.data.Song
+import com.retro.cassetteplayer.playback.PlaybackState
+import com.retro.cassetteplayer.ui.components.SongRow
+import com.retro.cassetteplayer.ui.theme.Charcoal
+import com.retro.cassetteplayer.ui.theme.Cream
+import com.retro.cassetteplayer.ui.theme.CreamMuted
+import com.retro.cassetteplayer.ui.theme.DisplayFont
+import com.retro.cassetteplayer.ui.theme.LcdBackground
+import com.retro.cassetteplayer.ui.theme.MetalDark
+import com.retro.cassetteplayer.ui.theme.RetroAmber
+import com.retro.cassetteplayer.ui.theme.RetroOrange
+
+@Composable
+fun SearchScreen(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    results: List<Song>,
+    playback: PlaybackState,
+    onSongClick: (Song) -> Unit,
+    onPlayNext: (Song) -> Unit,
+    onAddToQueue: (Song) -> Unit,
+) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Charcoal)
+            .statusBarsPadding()
+    ) {
+        Text(
+            text = "SEARCH",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Cream,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+        )
+        OutlinedTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            singleLine = true,
+            placeholder = { Text("Título, artista ou álbum", color = CreamMuted) },
+            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = RetroAmber) },
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(Icons.Rounded.Close, contentDescription = "Limpar", tint = CreamMuted)
+                    }
+                }
+            },
+            textStyle = MaterialTheme.typography.titleMedium.copy(fontFamily = DisplayFont, color = RetroAmber),
+            shape = RoundedCornerShape(10.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = LcdBackground,
+                unfocusedContainerColor = LcdBackground,
+                focusedBorderColor = RetroOrange,
+                unfocusedBorderColor = MetalDark,
+                cursorColor = RetroOrange,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        )
+
+        if (results.isEmpty()) {
+            StatusMessage(if (query.isBlank()) "Biblioteca vazia." else "Nada encontrado para \"$query\".")
+        } else {
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(results, key = { it.id }) { song ->
+                    SongRow(
+                        song = song,
+                        isCurrent = song.id.toString() == playback.mediaId,
+                        isPlaying = playback.isPlaying,
+                        onClick = { onSongClick(song) },
+                        onPlayNext = { onPlayNext(song) },
+                        onAddToQueue = { onAddToQueue(song) },
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 80.dp),
+                        color = Color.White.copy(alpha = 0.06f),
+                    )
+                }
+            }
+        }
+    }
+}
