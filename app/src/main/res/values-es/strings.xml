@@ -286,4 +286,128 @@
         <item>Primera versión: reproductor de casete</item>
         <item>Música del dispositivo con reproducción en segundo plano</item>
     </string-array>
+    <string name="cassette_model_normal">Normal (Tipo I)</string>
+    <string name="cassette_model_chrome">Cromo (Tipo II)</string>
+    <string name="cassette_model_metal">Metal (Tipo IV)</string>
+    <string name="label_color_orange">Naranja</string>
+    <string name="label_color_red">Rojo</string>
+    <string name="label_color_blue">Azul</string>
+    <string name="label_color_green">Verde</string>
+    <string name="label_color_purple">Morado</string>
+    <string name="label_color_yellow">Amarillo</string>
+    <string name="replay_gain_track">Por pista</string>
+    <string name="replay_gain_album">Por álbum</string>
+    <string name="filter_folders">Carpetas</string>
+    <string name="playlist_most_played">Más escuchadas</string>
+    <string name="playlist_forgotten">Hace tiempo que no escucho</string>
+    <string name="subtitle_folder">Carpeta • %1$s • %2$s</string>
+    <string name="widget_idle">Pulsa play para seguir con la última cinta</string>
+    <string name="widget_description">Cinta en reproducción con portada y controles</string>
+    <string name="settings_section_playback">Reproducción</string>
+    <string name="settings_crossfade">Transición entre pistas</string>
+    <string name="crossfade_off">Sin fundido (gapless)</string>
+    <string name="crossfade_seconds">Fundido de %1$d s</string>
+    <string name="settings_crossfade_summary">%1$s · baja al final y sube al empezar la siguiente</string>
+    <string name="settings_replay_gain">Volumen uniforme (ReplayGain)</string>
+    <string name="settings_replay_gain_summary">%1$s · usa las etiquetas ReplayGain de los archivos</string>
+    <string name="settings_resume_connect">Seguir al conectar auriculares</string>
+    <string name="settings_resume_connect_summary">Reanuda al conectar auriculares con cable o Bluetooth (al desconectar, pausa)</string>
+    <string name="settings_hires">Salida de alta resolución (24 bits)</string>
+    <string name="settings_hires_summary">Conserva los archivos hi-res; en ellos no se aplican velocidad ni efectos de cinta. Se aplica al reiniciar el reproductor.</string>
+    <string name="settings_section_tape">Efectos de cinta</string>
+    <string name="settings_hiss">Siseo de cinta</string>
+    <string name="settings_hiss_summary">Un ligero siseo de fondo</string>
+    <string name="settings_wow">Wow &amp; flutter</string>
+    <string name="settings_wow_summary">Pequeña variación de velocidad, como una cinta gastada</string>
+    <string name="settings_clicks">Sonido de las teclas</string>
+    <string name="settings_clicks_summary">El \"clac\" mecánico de las teclas y al dar la vuelta a la cinta</string>
+    <string name="settings_cassette_model">Modelo de cinta</string>
+    <string name="settings_label_color">Color de la etiqueta</string>
+    <string name="settings_handwritten">Etiqueta escrita a mano</string>
+    <string name="settings_handwritten_summary">El nombre de la playlist o del álbum escrito a mano en la cinta</string>
+    <string name="settings_cover_colors">Colores de la portada en el reproductor</string>
+    <string name="settings_cover_colors_summary">El fondo del reproductor sigue la portada del álbum</string>
+    <string name="settings_side_ab">Lado A / Lado B</string>
+    <string name="settings_side_ab_summary">La cola se convierte en una cinta de dos caras que se voltea a la mitad</string>
+    <string name="settings_section_integrations">Integraciones</string>
+    <string name="settings_scrobbling">Scrobbling (Last.fm)</string>
+    <string name="settings_scrobbling_summary">Envía lo que escuchas a Pano Scrobbler o Simple Last.fm Scrobbler, que lo publican en tu Last.fm</string>
+    <string name="settings_auto">Android Auto y reloj</string>
+    <string name="settings_auto_summary">Tu biblioteca aparece en Android Auto. En un reloj Wear OS, los controles aparecen solos mientras suena.</string>
+    <string name="settings_section_you">Tú</string>
+    <string name="settings_stats">Estadísticas de escucha</string>
+    <string name="settings_stats_summary">Horas escuchadas, artistas y canciones favoritos, resumen del mes</string>
+    <string name="settings_lyrics_index">Descargar letras de la biblioteca</string>
+    <string name="settings_lyrics_index_summary">Para buscar dentro de las letras (%1$d de %2$d listas)</string>
+    <string name="settings_lyrics_index_running">Descargando letras… %1$d de %2$d (toca para parar)</string>
+    <string name="player_sleep_timer">Temporizador</string>
+    <string name="sleep_minutes">%1$d minutos</string>
+    <string name="sleep_end_of_track">Al final de esta pista</string>
+    <string name="sleep_off">Apagar temporizador</string>
+    <string name="sleep_remaining">Se detiene en %1$s</string>
+    <string name="sleep_end_of_track_active">Se detiene al final de la pista</string>
+    <string name="msg_sleep_set">La música se detiene en %1$d min</string>
+    <string name="msg_sleep_end_of_track">La música se detiene al final de esta pista</string>
+    <string name="msg_sleep_cancelled">Temporizador apagado</string>
+    <string name="player_speed">Velocidad y tono</string>
+    <string name="speed_label">Velocidad</string>
+    <string name="pitch_label">Tono</string>
+    <string name="speed_value">%1$s×</string>
+    <string name="pitch_semitones">%1$s semitonos</string>
+    <string name="speed_reset">Restablecer</string>
+    <string name="speed_hires_note">En archivos hi-res de 24 bits, la velocidad y el tono solo cambian con la salida de alta resolución desactivada (Ajustes).</string>
+    <string name="player_side">LADO %1$s</string>
+    <string name="menu_share_mixtape">Compartir mixtape</string>
+    <string name="mixtape_side_a">LADO A</string>
+    <string name="mixtape_side_b">LADO B</string>
+    <string name="mixtape_more">+ %1$d pistas</string>
+    <string name="mixtape_footer">Grabado en Retro Cassette</string>
+    <string name="msg_share_failed">No se pudo crear la imagen</string>
+    <string name="stats_title">Estadísticas</string>
+    <string name="stats_this_month">Este mes</string>
+    <string name="stats_all_time">Siempre</string>
+    <string name="stats_listened">Tiempo escuchado</string>
+    <string name="stats_plays">Reproducciones</string>
+    <string name="stats_songs">Canciones distintas</string>
+    <string name="stats_last_30_days">Últimos 30 días</string>
+    <string name="stats_top_artists">Artistas más escuchados</string>
+    <string name="stats_top_songs">Canciones más escuchadas</string>
+    <string name="stats_empty">Aún no hay estadísticas. Aparecen a medida que escuchas tus cintas.</string>
+    <string name="stats_hours_minutes">%1$d h %2$d min</string>
+    <string name="stats_minutes">%1$d min</string>
+    <string name="stats_month_recap">Resumen de %1$s</string>
+    <string name="stats_top_artist_line">Artista del mes: %1$s</string>
+    <string name="stats_top_song_line">Canción del mes: %1$s</string>
+    <string name="search_mode_songs">Canciones</string>
+    <string name="search_mode_lyrics">Letras</string>
+    <string name="search_lyrics_hint">Un verso de la letra</string>
+    <string name="search_lyrics_indexed">Letras de %1$d de %2$d canciones disponibles para buscar</string>
+    <string name="search_lyrics_download">Descargar todas</string>
+    <string name="search_lyrics_stop">Parar</string>
+    <string name="search_lyrics_empty">Ninguna letra contiene \"%1$s\".</string>
+    <string name="search_lyrics_prompt">Escribe un verso para encontrar la canción por su letra.</string>
+    <plurals name="plays_count">
+        <item quantity="one">%d reproducción</item>
+        <item quantity="many">%d reproducciones</item>
+        <item quantity="other">%d reproducciones</item>
+    </plurals>
+    <string-array name="changelog_3_0">
+        <item>Temporizador: de 15 a 90 minutos o al final de la pista, bajando el volumen poco a poco</item>
+        <item>Widget en la pantalla de inicio con portada, controles y carretes girando</item>
+        <item>Android Auto: explora playlists, álbumes, artistas y carpetas; controles en el reloj (Wear OS)</item>
+        <item>Biblioteca por carpetas</item>
+        <item>Playlists automáticas: Más escuchadas y Hace tiempo que no escucho</item>
+        <item>Seguir al conectar auriculares con cable o Bluetooth</item>
+        <item>Transiciones suaves entre pistas (fundido) y reproducción gapless</item>
+        <item>Volumen uniforme con ReplayGain (por pista o por álbum)</item>
+        <item>Velocidad (0,5× a 2×) y tono ajustables en el reproductor</item>
+        <item>Modelos de cinta (Normal, Cromo, Metal), color de la etiqueta y nombre escrito a mano</item>
+        <item>Lado A / Lado B: la cola es una cinta de dos caras que se voltea con animación</item>
+        <item>Efectos de cinta: siseo, wow &amp; flutter y el clac de las teclas</item>
+        <item>Compartir mixtape: imagen de la cinta con la lista de pistas</item>
+        <item>Fondo del reproductor con los colores de la portada</item>
+        <item>Estadísticas de escucha con resumen del mes</item>
+        <item>Scrobbling a Last.fm con Pano Scrobbler o Simple Last.fm Scrobbler</item>
+        <item>Búsqueda dentro de las letras</item>
+    </string-array>
 </resources>

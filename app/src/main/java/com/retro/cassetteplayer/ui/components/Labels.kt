@@ -40,10 +40,13 @@ fun SongCollection.titleLabel(): String = when (auto) {
     AutoPlaylist.FAVORITES -> stringResource(R.string.playlist_favorites)
     AutoPlaylist.ALL_SONGS -> stringResource(R.string.playlist_all_songs)
     AutoPlaylist.RECENTLY_ADDED -> stringResource(R.string.playlist_recently_added)
+    AutoPlaylist.MOST_PLAYED -> stringResource(R.string.playlist_most_played)
+    AutoPlaylist.FORGOTTEN -> stringResource(R.string.playlist_forgotten)
     null -> when (kind) {
         CollectionKind.ALBUM -> albumLabel(title)
         CollectionKind.ARTIST -> artistLabel(title)
         CollectionKind.PLAYLIST -> title
+        CollectionKind.FOLDER -> title.substringAfterLast('/')
     }
 }
 
@@ -54,6 +57,7 @@ fun SongCollection.subtitleLabel(): String {
         auto != null -> stringResource(R.string.subtitle_auto_playlist, tracks)
         kind == CollectionKind.ALBUM -> stringResource(R.string.subtitle_album, artistLabel(artist), tracks)
         kind == CollectionKind.ARTIST -> stringResource(R.string.subtitle_artist, tracks)
+        kind == CollectionKind.FOLDER -> stringResource(R.string.subtitle_folder, title, tracks)
         else -> stringResource(R.string.subtitle_playlist, tracks)
     }
 }

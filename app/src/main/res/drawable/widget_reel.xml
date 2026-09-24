@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cassette take-up spool: flange, dark well, three spokes and an orange marker -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF9EA2A9"
+        android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0" />
+    <path
+        android:fillColor="#FF1A1B1E"
+        android:pathData="M12,12m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+    <group android:pivotX="12" android:pivotY="12" android:rotation="0">
+        <path android:fillColor="#FFBFC2C8" android:pathData="M11,4.5h2v7.5h-2z" />
+    </group>
+    <group android:pivotX="12" android:pivotY="12" android:rotation="120">
+        <path android:fillColor="#FFBFC2C8" android:pathData="M11,4.5h2v7.5h-2z" />
+    </group>
+    <group android:pivotX="12" android:pivotY="12" android:rotation="240">
+        <path android:fillColor="#FFBFC2C8" android:pathData="M11,4.5h2v7.5h-2z" />
+    </group>
+    <path
+        android:fillColor="#FFE4E6EA"
+        android:pathData="M12,12m-2.2,0a2.2,2.2 0,1 1,4.4 0a2.2,2.2 0,1 1,-4.4 0" />
+    <path
+        android:fillColor="#FFD9621C"
+        android:pathData="M12,2.6m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+</vector>

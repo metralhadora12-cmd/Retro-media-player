@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import android.net.Uri
 import com.retro.cassetteplayer.data.Backup
+import com.retro.cassetteplayer.data.PlayStats
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -117,8 +118,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _songs,
         playlistRepository.playlists,
         favoritesRepository.favorites,
-    ) { songs, playlists, favoriteIds ->
-        buildLibrary(songs, playlists, favoriteIds)
+        PlayStats.state.map { it.songs }.distinctUntilChanged(),
+    ) { songs, playlists, favoriteIds, stats ->
+        buildLibrary(songs, playlists, favoriteIds, stats)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryCollections())
 

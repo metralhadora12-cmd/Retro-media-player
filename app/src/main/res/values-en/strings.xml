@@ -283,4 +283,127 @@
         <item>First release: cassette tape player</item>
         <item>On-device music with background playback</item>
     </string-array>
+    <string name="cassette_model_normal">Normal (Type I)</string>
+    <string name="cassette_model_chrome">Chrome (Type II)</string>
+    <string name="cassette_model_metal">Metal (Type IV)</string>
+    <string name="label_color_orange">Orange</string>
+    <string name="label_color_red">Red</string>
+    <string name="label_color_blue">Blue</string>
+    <string name="label_color_green">Green</string>
+    <string name="label_color_purple">Purple</string>
+    <string name="label_color_yellow">Yellow</string>
+    <string name="replay_gain_track">Per track</string>
+    <string name="replay_gain_album">Per album</string>
+    <string name="filter_folders">Folders</string>
+    <string name="playlist_most_played">Most played</string>
+    <string name="playlist_forgotten">Haven\'t heard in a while</string>
+    <string name="subtitle_folder">Folder • %1$s • %2$s</string>
+    <string name="widget_idle">Press play to resume your last tape</string>
+    <string name="widget_description">Now playing tape with cover and controls</string>
+    <string name="settings_section_playback">Playback</string>
+    <string name="settings_crossfade">Track transitions</string>
+    <string name="crossfade_off">No fade (gapless)</string>
+    <string name="crossfade_seconds">%1$d s fade</string>
+    <string name="settings_crossfade_summary">%1$s · fades out at the end and in at the start of the next song</string>
+    <string name="settings_replay_gain">Even volume (ReplayGain)</string>
+    <string name="settings_replay_gain_summary">%1$s · uses the files\' ReplayGain tags</string>
+    <string name="settings_resume_connect">Resume when headphones connect</string>
+    <string name="settings_resume_connect_summary">Resumes when wired or Bluetooth headphones connect (pauses when they disconnect)</string>
+    <string name="settings_hires">High-resolution output (24-bit)</string>
+    <string name="settings_hires_summary">Keeps hi-res files intact; speed and tape effects don\'t apply to them. Takes effect when the player restarts.</string>
+    <string name="settings_section_tape">Tape effects</string>
+    <string name="settings_hiss">Tape hiss</string>
+    <string name="settings_hiss_summary">A faint background hiss</string>
+    <string name="settings_wow">Wow &amp; flutter</string>
+    <string name="settings_wow_summary">A slight speed wobble, like a worn tape</string>
+    <string name="settings_clicks">Key sounds</string>
+    <string name="settings_clicks_summary">The mechanical \"clack\" of the player keys and when the tape flips</string>
+    <string name="settings_cassette_model">Cassette type</string>
+    <string name="settings_label_color">Label color</string>
+    <string name="settings_handwritten">Handwritten label</string>
+    <string name="settings_handwritten_summary">The playlist or album name handwritten on the tape</string>
+    <string name="settings_cover_colors">Cover colors in the player</string>
+    <string name="settings_cover_colors_summary">The player background follows the album cover</string>
+    <string name="settings_side_ab">Side A / Side B</string>
+    <string name="settings_side_ab_summary">The queue becomes a two-sided tape that flips halfway</string>
+    <string name="settings_section_integrations">Integrations</string>
+    <string name="settings_scrobbling">Scrobbling (Last.fm)</string>
+    <string name="settings_scrobbling_summary">Sends what you play to Pano Scrobbler or Simple Last.fm Scrobbler, which post it to your Last.fm</string>
+    <string name="settings_auto">Android Auto and watch</string>
+    <string name="settings_auto_summary">Your library shows up in Android Auto. On a Wear OS watch, the controls appear by themselves while playing.</string>
+    <string name="settings_section_you">You</string>
+    <string name="settings_stats">Listening stats</string>
+    <string name="settings_stats_summary">Hours played, top artists and songs, monthly recap</string>
+    <string name="settings_lyrics_index">Download lyrics for the library</string>
+    <string name="settings_lyrics_index_summary">To search inside lyrics (%1$d of %2$d ready)</string>
+    <string name="settings_lyrics_index_running">Downloading lyrics… %1$d of %2$d (tap to stop)</string>
+    <string name="player_sleep_timer">Sleep timer</string>
+    <string name="sleep_minutes">%1$d minutes</string>
+    <string name="sleep_end_of_track">At the end of this track</string>
+    <string name="sleep_off">Turn off timer</string>
+    <string name="sleep_remaining">Stops in %1$s</string>
+    <string name="sleep_end_of_track_active">Stops after this track</string>
+    <string name="msg_sleep_set">Music stops in %1$d min</string>
+    <string name="msg_sleep_end_of_track">Music stops after this track</string>
+    <string name="msg_sleep_cancelled">Sleep timer off</string>
+    <string name="player_speed">Speed and pitch</string>
+    <string name="speed_label">Speed</string>
+    <string name="pitch_label">Pitch</string>
+    <string name="speed_value">%1$s×</string>
+    <string name="pitch_semitones">%1$s semitones</string>
+    <string name="speed_reset">Reset</string>
+    <string name="speed_hires_note">For 24-bit hi-res files, speed and pitch only change with high-resolution output turned off (Settings).</string>
+    <string name="player_side">SIDE %1$s</string>
+    <string name="menu_share_mixtape">Share mixtape</string>
+    <string name="mixtape_side_a">SIDE A</string>
+    <string name="mixtape_side_b">SIDE B</string>
+    <string name="mixtape_more">+ %1$d tracks</string>
+    <string name="mixtape_footer">Recorded on Retro Cassette</string>
+    <string name="msg_share_failed">Couldn\'t create the image</string>
+    <string name="stats_title">Stats</string>
+    <string name="stats_this_month">This month</string>
+    <string name="stats_all_time">All time</string>
+    <string name="stats_listened">Time listened</string>
+    <string name="stats_plays">Plays</string>
+    <string name="stats_songs">Different songs</string>
+    <string name="stats_last_30_days">Last 30 days</string>
+    <string name="stats_top_artists">Top artists</string>
+    <string name="stats_top_songs">Top songs</string>
+    <string name="stats_empty">No stats yet. They show up as you play your tapes.</string>
+    <string name="stats_hours_minutes">%1$d h %2$d min</string>
+    <string name="stats_minutes">%1$d min</string>
+    <string name="stats_month_recap">%1$s recap</string>
+    <string name="stats_top_artist_line">Artist of the month: %1$s</string>
+    <string name="stats_top_song_line">Song of the month: %1$s</string>
+    <string name="search_mode_songs">Songs</string>
+    <string name="search_mode_lyrics">Lyrics</string>
+    <string name="search_lyrics_hint">A line from the lyrics</string>
+    <string name="search_lyrics_indexed">Lyrics of %1$d of %2$d songs available to search</string>
+    <string name="search_lyrics_download">Download all</string>
+    <string name="search_lyrics_stop">Stop</string>
+    <string name="search_lyrics_empty">No lyrics contain \"%1$s\".</string>
+    <string name="search_lyrics_prompt">Type a line to find a song by its lyrics.</string>
+    <plurals name="plays_count">
+        <item quantity="one">%d play</item>
+        <item quantity="other">%d plays</item>
+    </plurals>
+    <string-array name="changelog_3_0">
+        <item>Sleep timer: 15 to 90 minutes or at the end of the track, fading the volume out</item>
+        <item>Home-screen widget with cover, controls and spinning reels</item>
+        <item>Android Auto: browse playlists, albums, artists and folders; controls on your watch (Wear OS)</item>
+        <item>Browse the library by folder</item>
+        <item>Smart playlists: Most played and Haven\'t heard in a while</item>
+        <item>Resume when wired or Bluetooth headphones connect</item>
+        <item>Smooth fades between tracks and gapless playback</item>
+        <item>Even volume with ReplayGain (per track or per album)</item>
+        <item>Adjustable speed (0.5× to 2×) and pitch in the player</item>
+        <item>Cassette types (Normal, Chrome, Metal), label color and a handwritten name</item>
+        <item>Side A / Side B: the queue becomes a two-sided tape that flips with an animation</item>
+        <item>Tape effects: hiss, wow &amp; flutter and the clack of the keys</item>
+        <item>Share mixtape: an image of the tape with the track list</item>
+        <item>Player background in the cover\'s colors</item>
+        <item>Listening stats with a monthly recap</item>
+        <item>Last.fm scrobbling via Pano Scrobbler or Simple Last.fm Scrobbler</item>
+        <item>Search inside song lyrics</item>
+    </string-array>
 </resources>

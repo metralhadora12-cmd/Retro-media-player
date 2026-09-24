@@ -29,6 +29,13 @@ class SessionStore(context: Context) {
             .apply()
     }
 
+    /** Name of the playlist / album the queue came from, written on the cassette label. */
+    var tapeName: String?
+        get() = prefs.getString(KEY_TAPE_NAME, null)
+        set(value) {
+            prefs.edit().putString(KEY_TAPE_NAME, value).apply()
+        }
+
     fun load(): SavedSession? {
         val ids = prefs.getString(KEY_IDS, null)
             ?.split(',')?.mapNotNull { it.toLongOrNull() }
@@ -48,5 +55,6 @@ class SessionStore(context: Context) {
         const val KEY_POSITION = "position"
         const val KEY_SHUFFLE = "shuffle"
         const val KEY_REPEAT = "repeat"
+        const val KEY_TAPE_NAME = "tape_name"
     }
 }

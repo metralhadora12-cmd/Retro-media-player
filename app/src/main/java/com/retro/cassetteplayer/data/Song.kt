@@ -21,6 +21,8 @@ data class Song(
     val fileName: String = "",
     /** Set when the codec was found to be lossless by probing / playing the file (e.g. ALAC in .m4a). */
     val probedLossless: Boolean = false,
+    /** Folder relative to the storage root, e.g. "Music/Rock" ("" when unknown). */
+    val folder: String = "",
 ) {
     /** Short container/codec label for lossless files (FLAC, WAV, …), or null. */
     val losslessLabel: String?

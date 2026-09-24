@@ -52,7 +52,7 @@ class MusicRepository(private val context: Context) {
         val sortOrder = "${MediaStore.Audio.Media.TITLE} COLLATE NOCASE ASC"
 
         val songs = mutableListOf<Song>()
-        context.contentResolver.query(collection, projection, selection, selectionArgs, sortOrder)
+        context.contentResolver.query(collection, projection + pathColumn, selection, selectionArgs, sortOrder)
             ?.use { cursor ->
                 val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
@@ -63,6 +63,7 @@ class MusicRepository(private val context: Context) {
                 val dateAddedCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
                 val mimeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
                 val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                val pathCol = cursor.getColumnIndex(pathColumn)
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idCol)
@@ -79,6 +80,7 @@ class MusicRepository(private val context: Context) {
                         dateAdded = cursor.getLong(dateAddedCol),
                         mimeType = cursor.getString(mimeCol).orEmpty(),
                         fileName = cursor.getString(nameCol).orEmpty(),
+                        folder = if (pathCol >= 0) folderOf(cursor.getString(pathCol)) else "",
                     )
                 }
             }
@@ -105,6 +107,13 @@ class MusicRepository(private val context: Context) {
                 DeleteOutcome.Failed
             }
         }
+    }
+
+    /** "Music/Rock/" (RELATIVE_PATH) or "/storage/emulated/0/Music/Rock/a.mp3" (DATA) → "Music/Rock". */
+    private fun folderOf(path: String?): String {
+        if (path.isNullOrBlank()) return ""
+        val dir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) path else path.substringBeforeLast('/', "")
+        return dir.removePrefix("/storage/emulated/0/").trim('/')
     }
 
     /** Unknown values become "" and are shown with a localised label by the UI. */

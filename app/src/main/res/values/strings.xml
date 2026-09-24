@@ -288,4 +288,128 @@
         <item>Primeira versão: player de fita cassete</item>
         <item>Músicas do aparelho com reprodução em segundo plano</item>
     </string-array>
+    <string name="cassette_model_normal">Normal (Tipo I)</string>
+    <string name="cassette_model_chrome">Cromo (Tipo II)</string>
+    <string name="cassette_model_metal">Metal (Tipo IV)</string>
+    <string name="label_color_orange">Laranja</string>
+    <string name="label_color_red">Vermelho</string>
+    <string name="label_color_blue">Azul</string>
+    <string name="label_color_green">Verde</string>
+    <string name="label_color_purple">Roxo</string>
+    <string name="label_color_yellow">Amarelo</string>
+    <string name="replay_gain_track">Por faixa</string>
+    <string name="replay_gain_album">Por álbum</string>
+    <string name="filter_folders">Pastas</string>
+    <string name="playlist_most_played">Mais tocadas</string>
+    <string name="playlist_forgotten">Não ouço há tempo</string>
+    <string name="subtitle_folder">Pasta • %1$s • %2$s</string>
+    <string name="widget_idle">Toque em play para continuar a última fita</string>
+    <string name="widget_description">Fita tocando, com capa e controles</string>
+    <string name="settings_section_playback">Reprodução</string>
+    <string name="settings_crossfade">Transição entre faixas</string>
+    <string name="crossfade_off">Sem fade (gapless)</string>
+    <string name="crossfade_seconds">Fade de %1$d s</string>
+    <string name="settings_crossfade_summary">%1$s · a música baixa no fim e sobe no começo da próxima</string>
+    <string name="settings_replay_gain">Volume uniforme (ReplayGain)</string>
+    <string name="settings_replay_gain_summary">%1$s · usa as tags de ReplayGain dos arquivos</string>
+    <string name="settings_resume_connect">Continuar ao conectar fone</string>
+    <string name="settings_resume_connect_summary">Retoma a música ao conectar fone com fio ou Bluetooth (ao desconectar, pausa)</string>
+    <string name="settings_hires">Saída de alta resolução (24-bit)</string>
+    <string name="settings_hires_summary">Preserva arquivos hi-res; neles, velocidade e efeitos de fita ficam desligados. Vale ao reiniciar o player.</string>
+    <string name="settings_section_tape">Efeitos de fita</string>
+    <string name="settings_hiss">Chiado de fita</string>
+    <string name="settings_hiss_summary">Um leve chiado de fundo</string>
+    <string name="settings_wow">Wow &amp; flutter</string>
+    <string name="settings_wow_summary">Pequena variação de velocidade, como numa fita gasta</string>
+    <string name="settings_clicks">Som das teclas</string>
+    <string name="settings_clicks_summary">O \"clack\" mecânico das teclas do player e ao virar a fita</string>
+    <string name="settings_cassette_model">Modelo da fita</string>
+    <string name="settings_label_color">Cor do rótulo</string>
+    <string name="settings_handwritten">Rótulo escrito à mão</string>
+    <string name="settings_handwritten_summary">O nome da playlist ou do álbum escrito à mão na fita</string>
+    <string name="settings_cover_colors">Cores da capa no player</string>
+    <string name="settings_cover_colors_summary">O fundo do player acompanha a capa do álbum</string>
+    <string name="settings_side_ab">Lado A / Lado B</string>
+    <string name="settings_side_ab_summary">A fila vira uma fita de dois lados, virada no meio</string>
+    <string name="settings_section_integrations">Integrações</string>
+    <string name="settings_scrobbling">Scrobbling (Last.fm)</string>
+    <string name="settings_scrobbling_summary">Envia o que você ouve para o Pano Scrobbler ou o Simple Last.fm Scrobbler, que publicam no seu Last.fm</string>
+    <string name="settings_auto">Android Auto e relógio</string>
+    <string name="settings_auto_summary">Sua biblioteca aparece no Android Auto. No relógio (Wear OS), os controles aparecem sozinhos enquanto toca.</string>
+    <string name="settings_section_you">Você</string>
+    <string name="settings_stats">Estatísticas de escuta</string>
+    <string name="settings_stats_summary">Horas ouvidas, artistas e músicas favoritos, resumo do mês</string>
+    <string name="settings_lyrics_index">Baixar letras da biblioteca</string>
+    <string name="settings_lyrics_index_summary">Para buscar trechos de letras (%1$d de %2$d prontas)</string>
+    <string name="settings_lyrics_index_running">Baixando letras… %1$d de %2$d (toque para parar)</string>
+    <string name="player_sleep_timer">Timer de sono</string>
+    <string name="sleep_minutes">%1$d minutos</string>
+    <string name="sleep_end_of_track">No fim desta faixa</string>
+    <string name="sleep_off">Desligar timer</string>
+    <string name="sleep_remaining">Para em %1$s</string>
+    <string name="sleep_end_of_track_active">Para no fim da faixa</string>
+    <string name="msg_sleep_set">A música para em %1$d min</string>
+    <string name="msg_sleep_end_of_track">A música para no fim desta faixa</string>
+    <string name="msg_sleep_cancelled">Timer desligado</string>
+    <string name="player_speed">Velocidade e tom</string>
+    <string name="speed_label">Velocidade</string>
+    <string name="pitch_label">Tom</string>
+    <string name="speed_value">%1$s×</string>
+    <string name="pitch_semitones">%1$s semitons</string>
+    <string name="speed_reset">Restaurar</string>
+    <string name="speed_hires_note">Em arquivos hi-res de 24 bits, velocidade e tom só mudam com a saída de alta resolução desligada (Configurações).</string>
+    <string name="player_side">LADO %1$s</string>
+    <string name="menu_share_mixtape">Compartilhar mixtape</string>
+    <string name="mixtape_side_a">LADO A</string>
+    <string name="mixtape_side_b">LADO B</string>
+    <string name="mixtape_more">+ %1$d faixas</string>
+    <string name="mixtape_footer">Gravado no Retro Cassette</string>
+    <string name="msg_share_failed">Não foi possível criar a imagem</string>
+    <string name="stats_title">Estatísticas</string>
+    <string name="stats_this_month">Este mês</string>
+    <string name="stats_all_time">Sempre</string>
+    <string name="stats_listened">Tempo ouvido</string>
+    <string name="stats_plays">Reproduções</string>
+    <string name="stats_songs">Músicas diferentes</string>
+    <string name="stats_last_30_days">Últimos 30 dias</string>
+    <string name="stats_top_artists">Artistas mais ouvidos</string>
+    <string name="stats_top_songs">Músicas mais ouvidas</string>
+    <string name="stats_empty">Ainda não há estatísticas. Elas aparecem conforme você ouve suas fitas.</string>
+    <string name="stats_hours_minutes">%1$d h %2$d min</string>
+    <string name="stats_minutes">%1$d min</string>
+    <string name="stats_month_recap">Resumo de %1$s</string>
+    <string name="stats_top_artist_line">Artista do mês: %1$s</string>
+    <string name="stats_top_song_line">Música do mês: %1$s</string>
+    <string name="search_mode_songs">Músicas</string>
+    <string name="search_mode_lyrics">Letras</string>
+    <string name="search_lyrics_hint">Trecho da letra</string>
+    <string name="search_lyrics_indexed">Letras de %1$d de %2$d músicas disponíveis para busca</string>
+    <string name="search_lyrics_download">Baixar todas</string>
+    <string name="search_lyrics_stop">Parar</string>
+    <string name="search_lyrics_empty">Nenhuma letra contém \"%1$s\".</string>
+    <string name="search_lyrics_prompt">Digite um trecho para achar a música pela letra.</string>
+    <plurals name="plays_count">
+        <item quantity="one">%d reprodução</item>
+        <item quantity="many">%d reproduções</item>
+        <item quantity="other">%d reproduções</item>
+    </plurals>
+    <string-array name="changelog_3_0">
+        <item>Timer de sono: 15 a 90 minutos ou no fim da faixa, com o volume baixando aos poucos</item>
+        <item>Widget na tela inicial com capa, controles e carretéis girando</item>
+        <item>Android Auto: navegue por playlists, álbuns, artistas e pastas; controles no relógio (Wear OS)</item>
+        <item>Biblioteca por pastas</item>
+        <item>Playlists automáticas: Mais tocadas e Não ouço há tempo</item>
+        <item>Continuar ao conectar fone com fio ou Bluetooth</item>
+        <item>Transição suave entre faixas (fade) e reprodução gapless</item>
+        <item>Volume uniforme com ReplayGain (por faixa ou por álbum)</item>
+        <item>Velocidade (0,5× a 2×) e tom ajustáveis no player</item>
+        <item>Modelos de fita (Normal, Cromo, Metal), cor do rótulo e nome escrito à mão</item>
+        <item>Lado A / Lado B: a fila vira uma fita de dois lados, com animação ao virar</item>
+        <item>Efeitos de fita: chiado, wow &amp; flutter e o clack das teclas</item>
+        <item>Compartilhar mixtape: imagem da fita com a lista de faixas</item>
+        <item>Fundo do player com as cores da capa</item>
+        <item>Estatísticas de escuta com resumo do mês</item>
+        <item>Scrobbling para o Last.fm via Pano Scrobbler ou Simple Last.fm Scrobbler</item>
+        <item>Busca dentro das letras das músicas</item>
+    </string-array>
 </resources>

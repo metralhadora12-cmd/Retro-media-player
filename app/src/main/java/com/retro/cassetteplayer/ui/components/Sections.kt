@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Album
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -257,6 +258,7 @@ private fun SongCollection.kindIcon(): ImageVector = when (kind) {
     CollectionKind.PLAYLIST -> Icons.AutoMirrored.Rounded.QueueMusic
     CollectionKind.ALBUM -> Icons.Rounded.Album
     CollectionKind.ARTIST -> Icons.Rounded.Person
+    CollectionKind.FOLDER -> Icons.Rounded.Folder
 }
 
 /** Library grid cell: cover (round for artists), title and "Álbum • Artista • N faixas". */

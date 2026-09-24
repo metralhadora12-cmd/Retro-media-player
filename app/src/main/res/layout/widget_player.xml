@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen player: cover, title, a tiny cassette window whose reels spin while playing, and deck keys. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/widget_cover"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/widget_cover_bg"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/widget_idle"
+            android:textColor="#FFAAAAAA"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/widget_window"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="3dp">
+
+            <FrameLayout
+                android:layout_width="18dp"
+                android:layout_height="18dp">
+
+                <ImageView
+                    android:id="@+id/widget_reel_left"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:src="@drawable/widget_reel" />
+
+                <ProgressBar
+                    android:id="@+id/widget_reel_left_spin"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:indeterminateDrawable="@drawable/widget_reel_spin"
+                    android:indeterminateDuration="1800"
+                    android:indeterminateOnly="true"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="3dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="#FF3B2618"
+                android:contentDescription="@null" />
+
+            <FrameLayout
+                android:layout_width="18dp"
+                android:layout_height="18dp">
+
+                <ImageView
+                    android:id="@+id/widget_reel_right"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:src="@drawable/widget_reel" />
+
+                <ProgressBar
+                    android:id="@+id/widget_reel_right_spin"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:indeterminateDrawable="@drawable/widget_reel_spin"
+                    android:indeterminateDuration="1300"
+                    android:indeterminateOnly="true"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/widget_prev"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/player_previous"
+        android:src="@drawable/ic_widget_prev" />
+
+    <ImageButton
+        android:id="@+id/widget_play"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginHorizontal="2dp"
+        android:background="@drawable/widget_play_bg"
+        android:contentDescription="@string/action_play"
+        android:src="@drawable/ic_widget_play" />
+
+    <ImageButton
+        android:id="@+id/widget_next"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/player_next"
+        android:src="@drawable/ic_widget_next" />
+</LinearLayout>

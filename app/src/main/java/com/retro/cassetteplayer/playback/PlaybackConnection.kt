@@ -56,6 +56,9 @@ data class PlaybackState(
     /** Current item first, then what plays next. */
     val queue: List<QueueItem> = emptyList(),
     val audioFormat: AudioFormatInfo? = null,
+    /** 'A' or 'B' when the two-sided tape option is on, otherwise null. */
+    val side: Char? = null,
+    val speed: Float = 1f,
 ) {
     val hasMedia: Boolean get() = mediaId != null
     val progress: Float
@@ -241,6 +244,8 @@ class PlaybackConnection(context: Context) {
             repeatMode = player.repeatMode,
             queue = buildQueue(player),
             audioFormat = audioFormatOf(player),
+            side = TapeSides.of(player)?.sideOf(player.currentMediaItemIndex),
+            speed = player.playbackParameters.speed,
         )
     }
 
