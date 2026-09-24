@@ -58,6 +58,35 @@ import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.ThemeMode
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import androidx.compose.material.icons.rounded.Album
+import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.ColorLens
+import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.Draw
+import androidx.compose.material.icons.rounded.FlipCameraAndroid
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.Headphones
+import androidx.compose.material.icons.rounded.HighQuality
+import androidx.compose.material.icons.rounded.Lyrics
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Podcasts
+import androidx.compose.material.icons.rounded.SwapHoriz
+import androidx.compose.material.icons.rounded.TouchApp
+import androidx.compose.material.icons.rounded.Waves
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.Color
+import com.retro.cassetteplayer.data.AppSettings
+import com.retro.cassetteplayer.data.CassetteModel
+import com.retro.cassetteplayer.data.LabelColor
+import com.retro.cassetteplayer.data.ReplayGainMode
+import com.retro.cassetteplayer.ui.theme.InkRaised
+import com.retro.cassetteplayer.ui.theme.OutlineColor
 
 @Composable
 fun SettingsScreen(
@@ -68,7 +97,28 @@ fun SettingsScreen(
     onReloadLibrary: () -> Unit,
     onExportBackup: (Uri) -> Unit,
     onImportBackup: (Uri) -> Unit,
+    onOpenStats: () -> Unit,
+    lyricsIndexed: Int,
+    totalSongs: Int,
+    lyricsDownload: Pair<Int, Int>?,
+    onToggleLyricsDownload: () -> Unit,
+    onEnter: () -> Unit,
 ) {
+    LaunchedEffect(Unit) { onEnter() }
+    val crossfade by AppSettings.crossfadeSeconds.flow.collectAsState()
+    val replayGain by AppSettings.replayGain.flow.collectAsState()
+    val resumeOnConnect by AppSettings.resumeOnConnect.flow.collectAsState()
+    val hiRes by AppSettings.hiResOutput.flow.collectAsState()
+    val hiss by AppSettings.tapeHiss.flow.collectAsState()
+    val wow by AppSettings.wowFlutter.flow.collectAsState()
+    val clicks by AppSettings.keyClicks.flow.collectAsState()
+    val model by AppSettings.cassetteModel.flow.collectAsState()
+    val labelColor by AppSettings.labelColor.flow.collectAsState()
+    val handwritten by AppSettings.handwrittenLabel.flow.collectAsState()
+    val coverColors by AppSettings.coverColors.flow.collectAsState()
+    val sideAB by AppSettings.sideAB.flow.collectAsState()
+    val scrobbling by AppSettings.scrobbling.flow.collectAsState()
+    var dialog by remember { mutableStateOf<SettingsDialog?>(null) }
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri -> uri?.let(onExportBackup) }
@@ -108,6 +158,39 @@ fun SettingsScreen(
         )
     }
 
+    when (dialog) {
+        SettingsDialog.CROSSFADE -> ChoiceDialog(
+            title = stringResource(R.string.settings_crossfade),
+            options = CROSSFADE_OPTIONS.map { it to crossfadeLabel(it) },
+            selected = crossfade,
+            onSelect = { AppSettings.crossfadeSeconds.set(it); dialog = null },
+            onDismiss = { dialog = null },
+        )
+        SettingsDialog.REPLAY_GAIN -> ChoiceDialog(
+            title = stringResource(R.string.settings_replay_gain),
+            options = ReplayGainMode.entries.map { it to stringResource(it.label) },
+            selected = replayGain,
+            onSelect = { AppSettings.replayGain.set(it); dialog = null },
+            onDismiss = { dialog = null },
+        )
+        SettingsDialog.MODEL -> ChoiceDialog(
+            title = stringResource(R.string.settings_cassette_model),
+            options = CassetteModel.entries.map { it to stringResource(it.label) },
+            selected = model,
+            onSelect = { AppSettings.cassetteModel.set(it); dialog = null },
+            onDismiss = { dialog = null },
+        )
+        SettingsDialog.LABEL_COLOR -> ChoiceDialog(
+            title = stringResource(R.string.settings_label_color),
+            options = LabelColor.entries.map { it to stringResource(it.label) },
+            selected = labelColor,
+            onSelect = { AppSettings.labelColor.set(it); dialog = null },
+            onDismiss = { dialog = null },
+            swatch = { Color(it.argb) },
+        )
+        null -> Unit
+    }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -116,6 +199,16 @@ fun SettingsScreen(
     ) {
         ScreenTopBar(stringResource(R.string.settings_title), onBack)
         LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
+            item { SectionTitle(stringResource(R.string.settings_section_you)) }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.BarChart,
+                    title = stringResource(R.string.settings_stats),
+                    summary = stringResource(R.string.settings_stats_summary),
+                    onClick = onOpenStats,
+                    showChevron = true,
+                )
+            }
             item { SectionTitle(stringResource(R.string.settings_section_audio)) }
             item {
                 SettingsRow(
@@ -126,6 +219,48 @@ fun SettingsScreen(
                     showChevron = true,
                 )
             }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.SwapHoriz,
+                    title = stringResource(R.string.settings_crossfade),
+                    summary = stringResource(R.string.settings_crossfade_summary, crossfadeLabel(crossfade)),
+                    onClick = { dialog = SettingsDialog.CROSSFADE },
+                )
+            }
+            item {
+                SettingsRow(
+                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                    title = stringResource(R.string.settings_replay_gain),
+                    summary = stringResource(R.string.settings_replay_gain_summary, stringResource(replayGain.label)),
+                    onClick = { dialog = SettingsDialog.REPLAY_GAIN },
+                )
+            }
+            item {
+                SwitchRow(Icons.Rounded.Headphones, stringResource(R.string.settings_resume_connect), stringResource(R.string.settings_resume_connect_summary), resumeOnConnect) {
+                    AppSettings.resumeOnConnect.set(it)
+                }
+            }
+            item {
+                SwitchRow(Icons.Rounded.HighQuality, stringResource(R.string.settings_hires), stringResource(R.string.settings_hires_summary), hiRes) {
+                    AppSettings.hiResOutput.set(it)
+                }
+            }
+            item { SectionTitle(stringResource(R.string.settings_section_tape)) }
+            item {
+                SwitchRow(Icons.Rounded.GraphicEq, stringResource(R.string.settings_hiss), stringResource(R.string.settings_hiss_summary), hiss) {
+                    AppSettings.tapeHiss.set(it)
+                }
+            }
+            item {
+                SwitchRow(Icons.Rounded.Waves, stringResource(R.string.settings_wow), stringResource(R.string.settings_wow_summary), wow) {
+                    AppSettings.wowFlutter.set(it)
+                }
+            }
+            item {
+                SwitchRow(Icons.Rounded.TouchApp, stringResource(R.string.settings_clicks), stringResource(R.string.settings_clicks_summary), clicks) {
+                    AppSettings.keyClicks.set(it)
+                }
+            }
             item { SectionTitle(stringResource(R.string.settings_section_appearance)) }
             item {
                 SettingsRow(
@@ -133,6 +268,64 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_theme),
                     summary = stringResource(AppTheme.mode.label),
                     onClick = { choosingTheme = true },
+                )
+            }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.Album,
+                    title = stringResource(R.string.settings_cassette_model),
+                    summary = stringResource(model.label),
+                    onClick = { dialog = SettingsDialog.MODEL },
+                )
+            }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.Palette,
+                    title = stringResource(R.string.settings_label_color),
+                    summary = stringResource(labelColor.label),
+                    onClick = { dialog = SettingsDialog.LABEL_COLOR },
+                    swatch = Color(labelColor.argb),
+                )
+            }
+            item {
+                SwitchRow(Icons.Rounded.Draw, stringResource(R.string.settings_handwritten), stringResource(R.string.settings_handwritten_summary), handwritten) {
+                    AppSettings.handwrittenLabel.set(it)
+                }
+            }
+            item {
+                SwitchRow(Icons.Rounded.ColorLens, stringResource(R.string.settings_cover_colors), stringResource(R.string.settings_cover_colors_summary), coverColors) {
+                    AppSettings.coverColors.set(it)
+                }
+            }
+            item {
+                SwitchRow(Icons.Rounded.FlipCameraAndroid, stringResource(R.string.settings_side_ab), stringResource(R.string.settings_side_ab_summary), sideAB) {
+                    AppSettings.sideAB.set(it)
+                }
+            }
+            item { SectionTitle(stringResource(R.string.settings_section_integrations)) }
+            item {
+                SwitchRow(Icons.Rounded.Podcasts, stringResource(R.string.settings_scrobbling), stringResource(R.string.settings_scrobbling_summary), scrobbling) {
+                    AppSettings.scrobbling.set(it)
+                }
+            }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.Lyrics,
+                    title = stringResource(R.string.settings_lyrics_index),
+                    summary = if (lyricsDownload != null) {
+                        stringResource(R.string.settings_lyrics_index_running, lyricsDownload.first, lyricsDownload.second)
+                    } else {
+                        stringResource(R.string.settings_lyrics_index_summary, lyricsIndexed, totalSongs)
+                    },
+                    onClick = onToggleLyricsDownload,
+                )
+            }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.DirectionsCar,
+                    title = stringResource(R.string.settings_auto),
+                    summary = stringResource(R.string.settings_auto_summary),
+                    onClick = null,
                 )
             }
             item { SectionTitle(stringResource(R.string.settings_section_general)) }
@@ -231,6 +424,7 @@ private fun SettingsRow(
     summary: String,
     onClick: (() -> Unit)?,
     showChevron: Boolean = false,
+    swatch: Color? = null,
 ) {
     Row(
         modifier = Modifier
@@ -250,11 +444,64 @@ private fun SettingsRow(
                 Text(summary, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
             }
         }
+        if (swatch != null) {
+            Box(
+                Modifier
+                    .size(22.dp)
+                    .background(swatch, CircleShape)
+            )
+        }
         if (showChevron) {
             Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = TextSecondary)
         }
     }
 }
+
+@Composable
+private fun SwitchRow(
+    icon: ImageVector,
+    title: String,
+    summary: String,
+    checked: Boolean,
+    onChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onChange(!checked) }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(24.dp))
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(start = 20.dp, end = 12.dp)
+        ) {
+            Text(title, style = MaterialTheme.typography.bodyLarge, color = TextPrimary)
+            Text(summary, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = TapeOrange,
+                uncheckedThumbColor = TextSecondary,
+                uncheckedTrackColor = InkRaised,
+                uncheckedBorderColor = OutlineColor,
+            ),
+        )
+    }
+}
+
+private enum class SettingsDialog { CROSSFADE, REPLAY_GAIN, MODEL, LABEL_COLOR }
+
+private val CROSSFADE_OPTIONS = listOf(0, 2, 4, 6, 8, 12)
+
+@Composable
+private fun crossfadeLabel(seconds: Int): String =
+    if (seconds == 0) stringResource(R.string.crossfade_off) else stringResource(R.string.crossfade_seconds, seconds)
 
 @Composable
 private fun LanguageDialog(current: String, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
@@ -275,6 +522,7 @@ private fun <T> ChoiceDialog(
     selected: T,
     onSelect: (T) -> Unit,
     onDismiss: () -> Unit,
+    swatch: ((T) -> Color)? = null,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -295,6 +543,14 @@ private fun <T> ChoiceDialog(
                             onClick = { onSelect(value) },
                             colors = RadioButtonDefaults.colors(selectedColor = TapeOrange),
                         )
+                        if (swatch != null) {
+                            Box(
+                                Modifier
+                                    .padding(end = 10.dp)
+                                    .size(18.dp)
+                                    .background(swatch(value), CircleShape)
+                            )
+                        }
                         Text(
                             label,
                             style = MaterialTheme.typography.bodyLarge,

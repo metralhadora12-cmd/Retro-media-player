@@ -19,6 +19,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val EQUALIZER = "equalizer"
     const val CHANGELOG = "changelog"
+    const val STATS = "stats"
     const val EDIT_SONG_ARG = "song"
     const val EDIT_ALBUM_ARG = "album"
     const val EDIT_TAGS = "edit?$EDIT_SONG_ARG={$EDIT_SONG_ARG}&$EDIT_ALBUM_ARG={$EDIT_ALBUM_ARG}"

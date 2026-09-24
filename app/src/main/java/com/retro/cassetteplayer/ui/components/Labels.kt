@@ -61,3 +61,18 @@ fun SongCollection.subtitleLabel(): String {
         else -> stringResource(R.string.subtitle_playlist, tracks)
     }
 }
+
+/** Same as [titleLabel] outside composition (click handlers, sharing). */
+fun SongCollection.displayName(context: android.content.Context): String = when (auto) {
+    AutoPlaylist.FAVORITES -> context.getString(R.string.playlist_favorites)
+    AutoPlaylist.ALL_SONGS -> context.getString(R.string.playlist_all_songs)
+    AutoPlaylist.RECENTLY_ADDED -> context.getString(R.string.playlist_recently_added)
+    AutoPlaylist.MOST_PLAYED -> context.getString(R.string.playlist_most_played)
+    AutoPlaylist.FORGOTTEN -> context.getString(R.string.playlist_forgotten)
+    null -> when (kind) {
+        CollectionKind.ALBUM -> title.ifBlank { context.getString(R.string.unknown_album) }
+        CollectionKind.ARTIST -> title.ifBlank { context.getString(R.string.unknown_artist) }
+        CollectionKind.PLAYLIST -> title
+        CollectionKind.FOLDER -> title.substringAfterLast('/')
+    }
+}

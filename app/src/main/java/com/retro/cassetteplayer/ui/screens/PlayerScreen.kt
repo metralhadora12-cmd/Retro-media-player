@@ -67,7 +67,6 @@ import com.retro.cassetteplayer.ui.components.PianoKeys
 import com.retro.cassetteplayer.ui.components.RetroSeekBar
 import com.retro.cassetteplayer.ui.components.VERTICAL_CASSETTE_ASPECT
 import com.retro.cassetteplayer.ui.components.VerticalCassette
-import com.retro.cassetteplayer.ui.theme.PlayerGlow
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
@@ -78,6 +77,21 @@ import com.retro.cassetteplayer.ui.components.artistLabel
 import com.retro.cassetteplayer.ui.components.titleLabel
 import com.retro.cassetteplayer.playback.AudioFormatInfo
 import com.retro.cassetteplayer.ui.components.HqBadge
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
+import com.retro.cassetteplayer.data.AppSettings
+import com.retro.cassetteplayer.playback.SleepTimer
+import com.retro.cassetteplayer.ui.components.KeyClick
+import com.retro.cassetteplayer.ui.components.rememberCoverColor
+import com.retro.cassetteplayer.ui.components.sleepTimerLabel
+import com.retro.cassetteplayer.ui.theme.AppTheme
+import com.retro.cassetteplayer.ui.theme.Ink
 
 @Composable
 fun PlayerScreen(
@@ -94,11 +108,51 @@ fun PlayerScreen(
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
     onOpenLyrics: () -> Unit,
+    sleepTimer: SleepTimer.State,
+    onOpenSleepTimer: () -> Unit,
+    onOpenSpeed: () -> Unit,
+    tapeName: String?,
 ) {
+    val context = LocalContext.current
+    val model by AppSettings.cassetteModel.flow.collectAsState()
+    val labelColor by AppSettings.labelColor.flow.collectAsState()
+    val handwritten by AppSettings.handwrittenLabel.flow.collectAsState()
+    val coverColors by AppSettings.coverColors.flow.collectAsState()
+    LaunchedEffect(Unit) { KeyClick.preload(context) }
+    val click: (() -> Unit) -> () -> Unit = { action -> { KeyClick.play(context); action() } }
+
+    // Backdrop tinted with the cover's colour (or the default warm tape glow)
+    val coverColor = rememberCoverColor(playback.artworkUri, coverColors && playback.hasMedia)
+    val glowTop by animateColorAsState(
+        coverColor?.let { lerp(Ink, it, if (AppTheme.isDark) 0.42f else 0.3f) } ?: AppTheme.palette.playerGlow[0],
+        animationSpec = tween(600),
+        label = "glowTop",
+    )
+    val backdrop = Brush.verticalGradient(0f to glowTop, 0.55f to lerp(Ink, glowTop, 0.35f), 1f to Ink)
+
+    // Flip the cassette when playback moves to the other side of the tape
+    val flip = remember { Animatable(0f) }
+    var shownSide by remember { mutableStateOf(playback.side) }
+    LaunchedEffect(playback.side) {
+        val target = playback.side
+        if (shownSide != null && target != null && target != shownSide) {
+            KeyClick.playFlip(context)
+            flip.animateTo(90f, tween(380))
+            shownSide = target
+            flip.snapTo(-90f)
+            flip.animateTo(0f, tween(380))
+        } else {
+            shownSide = target
+        }
+    }
+
+    val labelTitle = if (handwritten && !tapeName.isNullOrBlank()) tapeName else titleLabel(playback.title)
+    val labelSubtitle = if (handwritten && !tapeName.isNullOrBlank()) titleLabel(playback.title) else artistLabel(playback.artist)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PlayerGlow)
+            .background(backdrop)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp),
@@ -113,13 +167,37 @@ fun PlayerScreen(
             IconButton(onClick = onBack) {
                 Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = stringResource(R.string.action_back), tint = TextPrimary)
             }
-            Text(
-                text = stringResource(R.string.player_now_playing),
-                style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 2.sp),
-                color = TextSecondary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f),
-            )
+            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = playback.side?.let { stringResource(R.string.player_side, it.toString()) }
+                        ?: stringResource(R.string.player_now_playing),
+                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 2.sp),
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                )
+                sleepTimerLabel(sleepTimer)?.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont),
+                        color = TapeOrange,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+            IconButton(onClick = onOpenSleepTimer) {
+                Icon(
+                    Icons.Rounded.Bedtime,
+                    contentDescription = stringResource(R.string.player_sleep_timer),
+                    tint = if (sleepTimer.active) TapeOrange else TextPrimary,
+                )
+            }
+            IconButton(onClick = onOpenSpeed) {
+                Icon(
+                    Icons.Rounded.Speed,
+                    contentDescription = stringResource(R.string.player_speed),
+                    tint = if (playback.speed != 1f) TapeOrange else TextPrimary,
+                )
+            }
             IconButton(onClick = onSaveToPlaylist, enabled = playback.hasMedia) {
                 Icon(
                     Icons.AutoMirrored.Rounded.PlaylistAdd,
@@ -140,12 +218,20 @@ fun PlayerScreen(
             VerticalCassette(
                 isPlaying = playback.isPlaying,
                 progress = playback.progress,
-                title = if (playback.hasMedia) titleLabel(playback.title) else "",
-                subtitle = if (playback.hasMedia) artistLabel(playback.artist) else "",
+                title = if (playback.hasMedia) labelTitle else "",
+                subtitle = if (playback.hasMedia) labelSubtitle else "",
+                model = model,
+                bandColor = Color(labelColor.argb),
+                handwritten = handwritten,
+                side = shownSide,
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(VERTICAL_CASSETTE_ASPECT, matchHeightConstraintsFirst = true)
-                    .shadow(28.dp, RoundedCornerShape(percent = 3), spotColor = TapeOrange.copy(alpha = 0.5f)),
+                    .graphicsLayer {
+                        rotationY = flip.value
+                        cameraDistance = 14f * density
+                    }
+                    .shadow(28.dp, RoundedCornerShape(percent = 3), spotColor = Color(labelColor.argb).copy(alpha = 0.5f)),
             )
         }
 
@@ -161,15 +247,15 @@ fun PlayerScreen(
             )
             PianoKeys(
                 keys = listOf(
-                    PianoKey(Icons.Rounded.SkipPrevious, stringResource(R.string.player_previous), onPrevious),
+                    PianoKey(Icons.Rounded.SkipPrevious, stringResource(R.string.player_previous), click(onPrevious)),
                     PianoKey(
                         icon = if (playback.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                         description = stringResource(if (playback.isPlaying) R.string.action_pause else R.string.action_play),
-                        onClick = onTogglePlay,
+                        onClick = click(onTogglePlay),
                         latched = playback.isPlaying,
                         weight = 1.3f,
                     ),
-                    PianoKey(Icons.Rounded.SkipNext, stringResource(R.string.player_next), onNext),
+                    PianoKey(Icons.Rounded.SkipNext, stringResource(R.string.player_next), click(onNext)),
                 ),
                 modifier = Modifier
                     .weight(1f)

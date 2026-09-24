@@ -158,6 +158,19 @@ class LyricsRepository(private val context: Context) {
         }
     }
 
+    /** Every lyric already saved on the device, as plain text by song id (for lyrics search). */
+    suspend fun cachedTexts(): Map<Long, String> = withContext(Dispatchers.IO) {
+        cacheDir.listFiles().orEmpty().mapNotNull { file ->
+            val id = file.nameWithoutExtension.toLongOrNull() ?: return@mapNotNull null
+            val text = runCatching {
+                val o = JSONObject(file.readText())
+                o.optJSONArray("synced")?.let { a -> List(a.length()) { a.getJSONObject(it).getString("x") }.joinToString("\n") }
+                    ?: o.optString("plain")
+            }.getOrNull()
+            text?.takeIf { it.isNotBlank() }?.let { id to it }
+        }.toMap()
+    }
+
     private fun cacheFile(song: Song) = File(cacheDir, "${song.id}.json")
 
     private fun readCache(song: Song): Lyrics? = runCatching {

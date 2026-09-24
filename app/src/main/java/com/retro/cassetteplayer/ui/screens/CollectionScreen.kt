@@ -41,6 +41,7 @@ import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.getValue
@@ -92,6 +93,7 @@ fun CollectionScreen(
     onDeletePlaylist: (String) -> Unit,
     onRemoveFromPlaylist: (String, Song) -> Unit,
     onReorderPlaylist: (String, List<Song>) -> Unit,
+    onShareMixtape: () -> Unit,
 ) {
     val isFavorites = collection?.isFavorites == true
     val playlistId = collection?.userPlaylistId
@@ -160,6 +162,11 @@ fun CollectionScreen(
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back), tint = TextPrimary)
                     }
                     Spacer(Modifier.weight(1f))
+                    if (collection != null && collection.songs.isNotEmpty()) {
+                        IconButton(onClick = onShareMixtape) {
+                            Icon(Icons.Rounded.Share, contentDescription = stringResource(R.string.menu_share_mixtape), tint = TextPrimary)
+                        }
+                    }
                     if (playlistId != null) {
                         Box {
                             IconButton(onClick = { menuOpen = true }) {

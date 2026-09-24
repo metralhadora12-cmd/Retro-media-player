@@ -91,6 +91,15 @@ import com.retro.cassetteplayer.LyricsState
 import com.retro.cassetteplayer.ui.components.LyricsSheet
 import com.retro.cassetteplayer.ui.components.LocalRenameSong
 import com.retro.cassetteplayer.ui.components.RenameSongDialog
+import androidx.compose.runtime.rememberCoroutineScope
+import com.retro.cassetteplayer.data.AppSettings
+import com.retro.cassetteplayer.data.PlayStats
+import com.retro.cassetteplayer.playback.SleepTimer
+import com.retro.cassetteplayer.ui.components.SleepTimerSheet
+import com.retro.cassetteplayer.ui.components.SpeedSheet
+import com.retro.cassetteplayer.ui.components.displayName
+import com.retro.cassetteplayer.ui.screens.StatsScreen
+import kotlinx.coroutines.launch
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -119,6 +128,24 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
     val library by viewModel.library.collectAsStateWithLifecycle()
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
+    val tapeName by viewModel.tapeName.collectAsStateWithLifecycle()
+    val sleepTimer by SleepTimer.state.collectAsStateWithLifecycle()
+    val lyricsIndex by viewModel.lyricsIndex.collectAsStateWithLifecycle()
+    val lyricsDownload by viewModel.lyricsDownload.collectAsStateWithLifecycle()
+    val lyricsQuery by viewModel.lyricsQuery.collectAsStateWithLifecycle()
+    val lyricsResults by viewModel.lyricsResults.collectAsStateWithLifecycle()
+    val speed by AppSettings.speed.flow.collectAsStateWithLifecycle()
+    val pitch by AppSettings.pitch.flow.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    val shareMixtape: (String, List<Song>) -> Unit = { name, tracks ->
+        scope.launch {
+            if (!Mixtape.share(context, name, tracks)) viewModel.showMessage(UiMessage.Text(R.string.msg_share_failed))
+        }
+    }
+    val playCollection: (SongCollection, Boolean) -> Unit = { collection, shuffle ->
+        val name = collection.displayName(context)
+        if (shuffle) viewModel.shufflePlay(collection.songs, name) else viewModel.playAll(collection.songs, name)
+    }
 
     // --- Permissions (READ_MEDIA_AUDIO on Android 13+) ----------------------------------
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -197,6 +224,27 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
             onSeek = viewModel::seekTo,
             onRetry = { currentSong?.let { viewModel.requestLyrics(it, forceRefresh = true) } },
             onDismiss = { showLyrics = false },
+        )
+    }
+
+    var showSleepTimer by rememberSaveable { mutableStateOf(false) }
+    if (showSleepTimer) {
+        SleepTimerSheet(
+            state = sleepTimer,
+            onStart = { viewModel.startSleepTimer(it); showSleepTimer = false },
+            onEndOfTrack = { viewModel.sleepAtEndOfTrack(); showSleepTimer = false },
+            onCancel = { viewModel.cancelSleepTimer(); showSleepTimer = false },
+            onDismiss = { showSleepTimer = false },
+        )
+    }
+    var showSpeed by rememberSaveable { mutableStateOf(false) }
+    if (showSpeed) {
+        SpeedSheet(
+            speed = speed,
+            pitch = pitch,
+            onSpeedChange = { AppSettings.speed.set(it) },
+            onPitchChange = { AppSettings.pitch.set(it) },
+            onDismiss = { showSpeed = false },
         )
     }
 
@@ -388,6 +436,15 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onPlayNext = viewModel::playNext,
                             onAddToQueue = viewModel::addToQueue,
                             onAddToPlaylist = saveSong,
+                            lyricsQuery = lyricsQuery,
+                            onLyricsQueryChange = viewModel::onLyricsQueryChange,
+                            lyricsResults = lyricsResults,
+                            lyricsIndexed = lyricsIndex.size,
+                            totalSongs = songs.size,
+                            lyricsDownload = lyricsDownload,
+                            onToggleLyricsDownload = viewModel::toggleLyricsDownload,
+                            onEnterLyricsMode = viewModel::refreshLyricsIndex,
+                            onLyricsResultClick = { song -> viewModel.play(lyricsResults.map { it.song }, song) },
                         )
                     }
                 }
@@ -412,6 +469,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onDeletePlaylist = viewModel::deletePlaylist,
                             onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                             onEditAlbumCover = { song -> navController.navigate(Routes.editTags(song.id, wholeAlbum = true)) },
+                            onPlayCollection = playCollection,
+                            onShareMixtape = { collection -> shareMixtape(collection.displayName(context), collection.songs) },
                         )
                     }
                 }
@@ -464,6 +523,23 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onReloadLibrary = viewModel::loadSongs,
                             onExportBackup = viewModel::exportBackup,
                             onImportBackup = viewModel::importBackup,
+                            onOpenStats = { navController.navigate(Routes.STATS) },
+                            lyricsIndexed = lyricsIndex.size,
+                            totalSongs = songs.size,
+                            lyricsDownload = lyricsDownload,
+                            onToggleLyricsDownload = viewModel::toggleLyricsDownload,
+                            onEnter = viewModel::refreshLyricsIndex,
+                        )
+                    }
+                }
+                composable(Routes.STATS) {
+                    val stats by PlayStats.state.collectAsStateWithLifecycle()
+                    tabContent {
+                        StatsScreen(
+                            songs = songs,
+                            stats = stats,
+                            onBack = { navController.popBackStack() },
+                            onSongClick = { list, song -> viewModel.play(list, song) },
                         )
                     }
                 }
@@ -481,14 +557,16 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     }),
                 ) { entry ->
                     val id = entry.arguments?.getString(Routes.COLLECTION_ARG).orEmpty()
+                    val collection = library.find(id)
+                    val name = collection?.displayName(context)
                     tabContent {
                         CollectionScreen(
-                            collection = library.find(id),
+                            collection = collection,
                             playback = playback,
                             onBack = { navController.popBackStack() },
-                            onPlayAll = viewModel::playAll,
-                            onShufflePlay = viewModel::shufflePlay,
-                            onSongClick = viewModel::play,
+                            onPlayAll = { list -> viewModel.playAll(list, name) },
+                            onShufflePlay = { list -> viewModel.shufflePlay(list, name) },
+                            onSongClick = { list, song -> viewModel.play(list, song, name) },
                             onPlayNext = viewModel::playNext,
                             onAddToQueue = viewModel::addToQueue,
                             onAddToPlaylist = saveSong,
@@ -497,6 +575,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onDeletePlaylist = viewModel::deletePlaylist,
                             onRemoveFromPlaylist = viewModel::removeFromPlaylist,
                             onReorderPlaylist = viewModel::reorderPlaylist,
+                            onShareMixtape = { if (collection != null && name != null) shareMixtape(name, collection.songs) },
                         )
                     }
                 }
@@ -524,6 +603,10 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             playback.mediaId?.toLongOrNull()?.let(viewModel::toggleFavorite)
                         },
                         onOpenLyrics = { showLyrics = true },
+                        sleepTimer = sleepTimer,
+                        onOpenSleepTimer = { showSleepTimer = true },
+                        onOpenSpeed = { showSpeed = true },
+                        tapeName = tapeName,
                     )
                 }
             }

@@ -38,6 +38,8 @@ import com.retro.cassetteplayer.ui.theme.TapeBrown
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
+import androidx.compose.ui.text.font.Font
+import com.retro.cassetteplayer.data.CassetteModel
 
 /** Width / height of the upright cassette. */
 const val VERTICAL_CASSETTE_ASPECT = 0.6f
@@ -81,10 +83,28 @@ private fun rememberReelAngles(isPlaying: Boolean, progress: Float): ReelAngles 
     return angles
 }
 
+/** Colours of each cassette type's label. */
+private class Skin(
+    val label: List<Color>,
+    val ink: Color,
+    val pinstripe: Color,
+    val typeText: String,
+)
+
+private fun skinFor(model: CassetteModel) = when (model) {
+    CassetteModel.NORMAL -> Skin(listOf(LabelCream, Color(0xFFDDD7CB)), Color(0xFF26282C), LabelCream, "TYPE I · NORMAL")
+    CassetteModel.CHROME -> Skin(listOf(Color(0xFFE6EAEF), Color(0xFFAAB2BC)), Color(0xFF1E2A3A), Color(0xFFE6EAEF), "TYPE II · CrO₂ HIGH BIAS")
+    CassetteModel.METAL -> Skin(listOf(Color(0xFF2B2C30), Color(0xFF121315)), Color(0xFFD8B56A), Color(0xFFD8B56A), "TYPE IV · METAL")
+}
+
+private val MarkerFont = FontFamily(Font(R.font.permanent_marker))
+
 /**
- * A cassette standing upright: cream label with
- * the title printed sideways, an orange stripe band, and a dark centre window where the
- * two reels spin. Tape winds from the top reel to the bottom one following [progress].
+ * A cassette standing upright: printed label with the title sideways, a coloured
+ * stripe band, and a dark centre window where the two reels spin. Tape winds from the
+ * top reel to the bottom one following [progress]. [model] picks the label style
+ * (normal, chrome, metal), [handwritten] writes the title with a marker and [side]
+ * prints the side letter.
  */
 @Composable
 fun VerticalCassette(
@@ -93,6 +113,10 @@ fun VerticalCassette(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
+    model: CassetteModel = CassetteModel.NORMAL,
+    bandColor: Color = TapeOrange,
+    handwritten: Boolean = false,
+    side: Char? = null,
 ) {
     val angles = rememberReelAngles(isPlaying, progress)
     val textMeasurer = rememberTextMeasurer()
@@ -107,6 +131,10 @@ fun VerticalCassette(
             title = title.ifBlank { defaultTitle },
             subtitle = subtitle.ifBlank { defaultSubtitle },
             textMeasurer = textMeasurer,
+            skin = skinFor(model),
+            band = bandColor,
+            handwritten = handwritten,
+            side = side,
         )
     }
 }
@@ -119,6 +147,10 @@ private fun DrawScope.drawCassette(
     title: String,
     subtitle: String,
     textMeasurer: TextMeasurer,
+    skin: Skin,
+    band: Color,
+    handwritten: Boolean,
+    side: Char?,
 ) {
     val w = area.width
     val h = area.height
@@ -127,41 +159,65 @@ private fun DrawScope.drawCassette(
 
     // --- Label -------------------------------------------------------------------
     drawRoundRect(
-        brush = Brush.horizontalGradient(listOf(LabelCream, Color(0xFFDDD7CB))),
+        brush = Brush.horizontalGradient(skin.label),
         topLeft = area.topLeft,
         size = area.size,
         cornerRadius = CornerRadius(w * 0.03f),
     )
 
-    // Orange band on the right with two thin cream pinstripes
-    val band = Rect(x(0.56f), area.top, x(0.9f), area.bottom)
-    drawRect(TapeOrange, band.topLeft, band.size)
-    drawRect(LabelCream.copy(alpha = 0.7f), Offset(band.left + w * 0.035f, area.top), Size(w * 0.01f, h))
-    drawRect(LabelCream.copy(alpha = 0.7f), Offset(band.right - w * 0.045f, area.top), Size(w * 0.01f, h))
+    // Coloured band on the right with two thin pinstripes
+    val bandRect = Rect(x(0.56f), area.top, x(0.9f), area.bottom)
+    drawRect(band, bandRect.topLeft, bandRect.size)
+    drawRect(skin.pinstripe.copy(alpha = 0.7f), Offset(bandRect.left + w * 0.035f, area.top), Size(w * 0.01f, h))
+    drawRect(skin.pinstripe.copy(alpha = 0.7f), Offset(bandRect.right - w * 0.045f, area.top), Size(w * 0.01f, h))
 
-    // Thin orange rule next to the title
-    drawLine(TapeOrange, Offset(x(0.2f), y(0.2f)), Offset(x(0.2f), y(0.72f)), w * 0.012f)
+    // Thin rule next to the title
+    drawLine(band, Offset(x(0.2f), y(0.2f)), Offset(x(0.2f), y(0.72f)), w * 0.012f)
 
-    // Title printed sideways on the cream part, artist sideways on the band
+    // Side letter in the top corner of the label
+    if (side != null) {
+        val letter = textMeasurer.measure(
+            side.toString(),
+            TextStyle(color = skin.ink, fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Black, fontSize = (w * 0.13f).toSp()),
+        )
+        val center = Offset(x(0.1f), y(0.075f))
+        drawCircle(skin.ink, w * 0.085f, center, style = Stroke(w * 0.012f))
+        drawText(letter, topLeft = Offset(center.x - letter.size.width / 2f, center.y - letter.size.height / 2f))
+    }
+
+    // Title sideways on the label (printed, or written with a marker), artist / tape name on the band
+    val titleTop = if (side != null) 0.17f else 0.07f
     drawSidewaysText(
         textMeasurer = textMeasurer,
-        text = title.uppercase(),
-        center = Offset(x(0.1f), y(0.5f)),
-        maxLength = h * 0.86f,
-        fontSize = (w * 0.1f).toSp(),
-        color = Color(0xFF26282C),
-        fontWeight = FontWeight.Black,
-        letterSpacing = 1.sp,
+        text = if (handwritten) title else title.uppercase(),
+        center = Offset(x(0.1f), y((titleTop + 0.93f) / 2f)),
+        maxLength = h * (0.93f - titleTop),
+        fontSize = (w * if (handwritten) 0.115f else 0.1f).toSp(),
+        color = skin.ink,
+        fontWeight = if (handwritten) FontWeight.Normal else FontWeight.Black,
+        letterSpacing = if (handwritten) 0.sp else 1.sp,
+        fontFamily = if (handwritten) MarkerFont else FontFamily.SansSerif,
     )
     drawSidewaysText(
         textMeasurer = textMeasurer,
         text = subtitle.uppercase(),
-        center = Offset(band.center.x + w * 0.005f, y(0.5f)),
+        center = Offset(bandRect.center.x + w * 0.005f, y(0.5f)),
         maxLength = h * 0.7f,
         fontSize = (w * 0.055f).toSp(),
         color = LabelCream,
         fontWeight = FontWeight.Bold,
         letterSpacing = 4.sp,
+    )
+    // Tape type printed small along the right edge
+    drawSidewaysText(
+        textMeasurer = textMeasurer,
+        text = skin.typeText,
+        center = Offset(x(0.95f), y(0.5f)),
+        maxLength = h * 0.8f,
+        fontSize = (w * 0.035f).toSp(),
+        color = skin.ink.copy(alpha = 0.7f),
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 2.sp,
     )
 
     // --- Dark centre window with the reels ---------------------------------------------
@@ -216,12 +272,13 @@ private fun DrawScope.drawSidewaysText(
     color: Color,
     fontWeight: FontWeight,
     letterSpacing: TextUnit,
+    fontFamily: FontFamily = FontFamily.SansSerif,
 ) {
     val layout = textMeasurer.measure(
         text = text,
         style = TextStyle(
             color = color,
-            fontFamily = FontFamily.SansSerif,
+            fontFamily = fontFamily,
             fontWeight = fontWeight,
             fontSize = fontSize,
             letterSpacing = letterSpacing,

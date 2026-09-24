@@ -43,8 +43,12 @@ import kotlinx.coroutines.launch
 import android.net.Uri
 import com.retro.cassetteplayer.data.Backup
 import com.retro.cassetteplayer.data.PlayStats
+import com.retro.cassetteplayer.playback.SleepTimer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+/** A song whose lyrics contain the searched words, with the matching line. */
+data class LyricsMatch(val song: Song, val line: String)
 
 sealed interface LyricsState {
     val songId: Long?
@@ -225,14 +229,116 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _query.value = value
     }
 
-    fun play(songs: List<Song>, song: Song) =
+    /** Name written on the cassette label: the playlist / album the queue came from. */
+    private val _tapeName = MutableStateFlow(sessionStore.tapeName)
+    val tapeName: StateFlow<String?> = _tapeName.asStateFlow()
+
+    private fun setTapeName(name: String?) {
+        _tapeName.value = name
+        sessionStore.tapeName = name
+    }
+
+    fun play(songs: List<Song>, song: Song, tapeName: String? = null) {
+        setTapeName(tapeName)
         connection.playSongs(songs, songs.indexOf(song).coerceAtLeast(0))
+    }
 
-    fun playAll(songs: List<Song>) = connection.playSongs(songs, 0)
+    fun playAll(songs: List<Song>, tapeName: String? = null) {
+        setTapeName(tapeName)
+        connection.playSongs(songs, 0)
+    }
 
-    fun shufflePlay(songs: List<Song> = _songs.value) {
+    fun shufflePlay(songs: List<Song> = _songs.value, tapeName: String? = null) {
         if (songs.isEmpty()) return
+        setTapeName(tapeName)
         connection.playSongs(songs, songs.indices.random(), shuffle = true)
+    }
+
+    // --- Sleep timer --------------------------------------------------------------------
+
+    fun startSleepTimer(minutes: Int) {
+        SleepTimer.start(minutes)
+        _messages.tryEmit(UiMessage.Text(R.string.msg_sleep_set, minutes))
+    }
+
+    fun sleepAtEndOfTrack() {
+        SleepTimer.stopAtEndOfTrack()
+        _messages.tryEmit(UiMessage.Text(R.string.msg_sleep_end_of_track))
+    }
+
+    fun cancelSleepTimer() {
+        SleepTimer.cancel()
+        _messages.tryEmit(UiMessage.Text(R.string.msg_sleep_cancelled))
+    }
+
+    // --- Lyrics search ------------------------------------------------------------------
+
+    /** Lyrics saved on the device (song id → text), searchable from the Search tab. */
+    private val _lyricsIndex = MutableStateFlow<Map<Long, String>>(emptyMap())
+    val lyricsIndex: StateFlow<Map<Long, String>> = _lyricsIndex.asStateFlow()
+
+    /** Progress of "download all lyrics" (done, total), null when not running. */
+    private val _lyricsDownload = MutableStateFlow<Pair<Int, Int>?>(null)
+    val lyricsDownload: StateFlow<Pair<Int, Int>?> = _lyricsDownload.asStateFlow()
+    private var lyricsDownloadJob: Job? = null
+
+    private val _lyricsQuery = MutableStateFlow("")
+    val lyricsQuery: StateFlow<String> = _lyricsQuery.asStateFlow()
+
+    fun onLyricsQueryChange(value: String) {
+        _lyricsQuery.value = value
+    }
+
+    val lyricsResults: StateFlow<List<LyricsMatch>> = combine(_songs, _lyricsIndex, _lyricsQuery) { songs, index, query ->
+        val q = query.trim()
+        if (q.length < 2) return@combine emptyList()
+        songs.mapNotNull { song ->
+            val text = index[song.id] ?: return@mapNotNull null
+            val at = text.indexOf(q, ignoreCase = true)
+            if (at < 0) return@mapNotNull null
+            // The matching line, for context
+            val start = text.lastIndexOf('\n', at).let { if (it < 0) 0 else it + 1 }
+            val end = text.indexOf('\n', at).let { if (it < 0) text.length else it }
+            LyricsMatch(song, text.substring(start, end).trim())
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun refreshLyricsIndex() {
+        viewModelScope.launch { _lyricsIndex.value = lyricsRepository.cachedTexts() }
+    }
+
+    /** Looks up the lyrics of every song that has none saved yet (embedded, .lrc or online). */
+    fun toggleLyricsDownload() {
+        if (lyricsDownloadJob?.isActive == true) {
+            lyricsDownloadJob?.cancel()
+            _lyricsDownload.value = null
+            return
+        }
+        lyricsDownloadJob = viewModelScope.launch {
+            val songs = _songs.value
+            val known = lyricsRepository.cachedTexts()
+            _lyricsIndex.value = known
+            var done = songs.count { it.id in known }
+            var offlineInARow = 0
+            _lyricsDownload.value = done to songs.size
+            for (song in songs) {
+                if (song.id in _lyricsIndex.value) continue
+                when (lyricsRepository.lyricsFor(song)) {
+                    is LyricsResult.Found -> offlineInARow = 0
+                    LyricsResult.NotFound -> offlineInARow = 0
+                    LyricsResult.Offline -> offlineInARow++
+                }
+                if (offlineInARow >= 3) {
+                    _messages.tryEmit(UiMessage.Text(R.string.lyrics_offline))
+                    break
+                }
+                done++
+                _lyricsDownload.value = done to songs.size
+                if (done % 10 == 0) _lyricsIndex.value = lyricsRepository.cachedTexts()
+            }
+            _lyricsIndex.value = lyricsRepository.cachedTexts()
+            _lyricsDownload.value = null
+        }
     }
 
     fun playNext(song: Song) = connection.playNext(song)
@@ -363,12 +469,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _lyrics.value = LyricsState.Loading(song.id)
         lyricsJob = viewModelScope.launch {
             _lyrics.value = when (val result = lyricsRepository.lyricsFor(song, forceRefresh)) {
-                is LyricsResult.Found -> LyricsState.Found(song.id, result.lyrics)
+                is LyricsResult.Found -> {
+                    _lyricsIndex.value = _lyricsIndex.value + (song.id to result.lyrics.searchText())
+                    LyricsState.Found(song.id, result.lyrics)
+                }
                 LyricsResult.NotFound -> LyricsState.NotFound(song.id)
                 LyricsResult.Offline -> LyricsState.Offline(song.id)
             }
         }
     }
+
+    private fun Lyrics.searchText(): String = synced?.joinToString("\n") { it.text } ?: plain.orEmpty()
 
     // --- Backup -----------------------------------------------------------------
 

@@ -83,11 +83,13 @@ import androidx.annotation.StringRes
 import androidx.compose.material.icons.outlined.Settings
 import com.retro.cassetteplayer.ui.theme.Hairline
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.rounded.Share
 
 enum class LibraryFilter(@StringRes val label: Int) {
     PLAYLISTS(R.string.filter_playlists),
     ALBUMS(R.string.filter_albums),
     ARTISTS(R.string.filter_artists),
+    FOLDERS(R.string.filter_folders),
     SONGS(R.string.filter_songs),
     LOSSLESS(R.string.filter_lossless),
 }
@@ -118,6 +120,8 @@ fun LibraryScreen(
     onDeletePlaylist: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onEditAlbumCover: (Song) -> Unit,
+    onPlayCollection: (SongCollection, Boolean) -> Unit,
+    onShareMixtape: (SongCollection) -> Unit,
 ) {
     // Long-press menu targets for the rename / delete dialogs
     var renameTarget by remember { mutableStateOf<SongCollection?>(null) }
@@ -155,8 +159,9 @@ fun LibraryScreen(
             CollectionMenuItems(
                 collection = collection,
                 dismiss = dismiss,
-                onPlay = { onPlayAll(collection.songs) },
-                onShuffle = { onShufflePlay(collection.songs) },
+                onPlay = { onPlayCollection(collection, false) },
+                onShuffle = { onPlayCollection(collection, true) },
+                onShare = { onShareMixtape(collection) },
                 onAddToQueue = { onAddAllToQueue(collection.songs) },
                 onSave = { onSaveAll(collection.songs) },
                 onEdit = { onOpenCollection(collection) },
@@ -176,6 +181,7 @@ fun LibraryScreen(
             LibraryFilter.PLAYLISTS -> library.playlists
             LibraryFilter.ALBUMS -> library.albums
             LibraryFilter.ARTISTS -> library.artists
+            LibraryFilter.FOLDERS -> library.folders
             LibraryFilter.SONGS, LibraryFilter.LOSSLESS -> emptyList()
             null -> library.playlists + library.albums
         }
@@ -424,6 +430,7 @@ private fun CollectionMenuItems(
     onRename: () -> Unit,
     onDelete: () -> Unit,
     onEditCover: () -> Unit,
+    onShare: () -> Unit,
 ) {
     fun closing(action: () -> Unit): () -> Unit = {
         dismiss()
@@ -434,6 +441,7 @@ private fun CollectionMenuItems(
         MenuItem(stringResource(R.string.menu_play_shuffled), Icons.Rounded.Shuffle, closing(onShuffle))
         MenuItem(stringResource(R.string.menu_add_to_queue), Icons.AutoMirrored.Rounded.PlaylistPlay, closing(onAddToQueue))
         MenuItem(stringResource(R.string.menu_save_to_playlist), Icons.AutoMirrored.Rounded.PlaylistAdd, closing(onSave))
+        MenuItem(stringResource(R.string.menu_share_mixtape), Icons.Rounded.Share, closing(onShare))
     }
     if (collection.kind == CollectionKind.ALBUM) {
         MenuItem(stringResource(R.string.menu_edit_album_cover), Icons.Outlined.Image, closing(onEditCover))

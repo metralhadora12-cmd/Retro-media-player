@@ -352,7 +352,7 @@ class PlaybackService : MediaLibraryService() {
         val mode = AppSettings.replayGain.value
         val item = player.currentMediaItem
         val uri = item?.localConfiguration?.uri ?: item?.requestMetadata?.mediaUri
-        if (mode == ReplayGainMode.OFF || uri == null) {
+        if (mode == ReplayGainMode.OFF || item == null || uri == null) {
             gainVolume = 1f
             applyVolume(player)
             return
