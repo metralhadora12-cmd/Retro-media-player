@@ -1,12 +1,13 @@
 package com.retro.cassetteplayer.ui.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -38,25 +39,44 @@ import com.retro.cassetteplayer.ui.theme.TapeOrange
 
 /** Width / height of the upright cassette. */
 const val VERTICAL_CASSETTE_ASPECT = 0.6f
-private const val REEL_TURN_MS = 1_800
+// Pack radii as fractions of the centre-window width (shared by drawing and physics).
+private const val PACK_MIN = 0.26f
+private const val PACK_MAX = 0.62f
+
+/** Tape pack radius (fraction of window width) of the supply (top) and take-up (bottom) reels. */
+private fun supplyPack(progress: Float) = PACK_MAX + (PACK_MIN - PACK_MAX) * progress
+private fun takeUpPack(progress: Float) = PACK_MIN + (PACK_MAX - PACK_MIN) * progress
 
 /**
- * Keeps turning while [isPlaying] is true and holds its angle when paused,
- * so the reels stop exactly where they were.
+ * Tape runs past the heads at constant speed, so each reel's angular speed is inversely
+ * proportional to how much tape it holds: the emptier reel spins faster. Angles only
+ * advance while [isPlaying] and hold still when paused.
  */
+private const val TAPE_SPEED = 110f // degrees per second at a pack radius of 1 window width
+
+private class ReelAngles {
+    var top by mutableFloatStateOf(0f)
+    var bottom by mutableFloatStateOf(0f)
+}
+
 @Composable
-fun rememberReelRotation(isPlaying: Boolean): State<Float> {
-    val rotation = remember { Animatable(0f) }
+private fun rememberReelAngles(isPlaying: Boolean, progress: Float): ReelAngles {
+    val angles = remember { ReelAngles() }
+    val currentProgress by rememberUpdatedState(progress)
     LaunchedEffect(isPlaying) {
-        while (isPlaying) {
-            rotation.animateTo(
-                targetValue = rotation.value + 360f,
-                animationSpec = tween(REEL_TURN_MS, easing = LinearEasing),
-            )
-            rotation.snapTo(rotation.value % 360f)
+        if (!isPlaying) return@LaunchedEffect
+        var last = withFrameNanos { it }
+        while (true) {
+            withFrameNanos { now ->
+                val dt = (now - last) / 1_000_000_000f
+                last = now
+                val p = currentProgress.coerceIn(0f, 1f)
+                angles.top = (angles.top + dt * TAPE_SPEED / supplyPack(p)) % 360f
+                angles.bottom = (angles.bottom + dt * TAPE_SPEED / takeUpPack(p)) % 360f
+            }
         }
     }
-    return rotation.asState()
+    return angles
 }
 
 /**
@@ -72,12 +92,13 @@ fun VerticalCassette(
     subtitle: String,
     modifier: Modifier = Modifier,
 ) {
-    val rotation = rememberReelRotation(isPlaying)
+    val angles = rememberReelAngles(isPlaying, progress)
     val textMeasurer = rememberTextMeasurer()
     Canvas(modifier) {
         drawCassette(
             area = Rect(Offset.Zero, size),
-            angle = rotation.value,
+            topAngle = angles.top,
+            bottomAngle = angles.bottom,
             progress = progress.coerceIn(0f, 1f),
             title = title,
             subtitle = subtitle,
@@ -88,7 +109,8 @@ fun VerticalCassette(
 
 private fun DrawScope.drawCassette(
     area: Rect,
-    angle: Float,
+    topAngle: Float,
+    bottomAngle: Float,
     progress: Float,
     title: String,
     subtitle: String,
@@ -150,11 +172,9 @@ private fun DrawScope.drawCassette(
     val bottomHub = Offset(window.center.x, window.bottom - window.width * 0.52f)
 
     clipPath(windowPath) {
-        // Tape packs: supply (top) shrinks, take-up (bottom) grows
-        val minPack = hubRadius * 1.3f
-        val maxPack = window.width * 0.62f
-        drawCircle(TapeBrown, maxPack + (minPack - maxPack) * progress, topHub)
-        drawCircle(TapeBrown, minPack + (maxPack - minPack) * progress, bottomHub)
+        // Tape packs: supply (top) shrinks, take-up (bottom) grows with the song position
+        drawTapePack(topHub, window.width * supplyPack(progress), hubRadius)
+        drawTapePack(bottomHub, window.width * takeUpPack(progress), hubRadius)
         // Small viewing slot in the middle with the tape running through
         val slot = Rect(
             Offset(window.center.x - window.width * 0.17f, window.center.y - h * 0.09f),
@@ -167,8 +187,8 @@ private fun DrawScope.drawCassette(
             Offset(slot.center.x, slot.bottom),
             slot.width * 0.2f,
         )
-        drawReelHub(topHub, hubRadius, angle)
-        drawReelHub(bottomHub, hubRadius, angle)
+        drawReelHub(topHub, hubRadius, topAngle)
+        drawReelHub(bottomHub, hubRadius, bottomAngle)
     }
     drawPath(windowPath, Color.Black.copy(alpha = 0.5f), style = Stroke(w * 0.012f))
 
@@ -215,25 +235,143 @@ private fun DrawScope.drawSidewaysText(
     }
 }
 
-/** Dark reel with a three-spoke hub, like the one on the reference cassette. */
+/**
+ * Wound tape seen from above: a drop shadow on the window floor, a radial gradient for
+ * the curved edge, faint winding grooves and a fixed specular highlight (light from the
+ * top-left), so the pack reads as a solid disc.
+ */
+private fun DrawScope.drawTapePack(center: Offset, radius: Float, hubRadius: Float) {
+    drawCircle(Color.Black.copy(alpha = 0.55f), radius * 1.02f, center + Offset(radius * 0.05f, radius * 0.07f))
+    drawCircle(
+        brush = Brush.radialGradient(
+            0f to Color(0xFF1C120B),
+            (hubRadius / radius).coerceIn(0f, 0.9f) to Color(0xFF2A1A10),
+            0.8f to Color(0xFF4A2E1C),
+            0.95f to Color(0xFF3A2416),
+            1f to Color(0xFF1A100A),
+            center = center,
+            radius = radius,
+        ),
+        radius = radius,
+        center = center,
+    )
+    var r = radius * 0.94f
+    while (r > hubRadius * 1.1f) {
+        drawCircle(Color.Black.copy(alpha = 0.12f), r, center, style = Stroke(1f))
+        r -= radius * 0.06f
+    }
+    drawArc(
+        brush = Brush.sweepGradient(
+            listOf(Color.Transparent, Color.White.copy(alpha = 0.16f), Color.Transparent),
+            center = center,
+        ),
+        startAngle = 190f,
+        sweepAngle = 80f,
+        useCenter = false,
+        topLeft = center - Offset(radius * 0.86f, radius * 0.86f),
+        size = Size(radius * 1.72f, radius * 1.72f),
+        style = Stroke(radius * 0.08f, cap = StrokeCap.Round),
+    )
+}
+
+/**
+ * Plastic take-up spool with depth: a raised glossy flange, a recessed dark well with
+ * teeth, three bevelled spokes and a metal cap. Only the spool itself rotates; lighting
+ * (highlights and shadows) stays fixed, which is what sells the 3D look.
+ */
 private fun DrawScope.drawReelHub(center: Offset, radius: Float, angle: Float) {
-    drawCircle(Color(0xFF3B3D42), radius, center)
-    drawCircle(Color(0xFF0D0E10), radius * 0.78f, center)
+    // Shadow cast by the flange
+    drawCircle(Color.Black.copy(alpha = 0.5f), radius * 1.02f, center + Offset(radius * 0.08f, radius * 0.12f))
+    // Convex flange
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color(0xFFE4E6EA), Color(0xFFA3A7AE), Color(0xFF5E6269)),
+            center = center - Offset(radius * 0.35f, radius * 0.35f),
+            radius = radius * 1.6f,
+        ),
+        radius = radius,
+        center = center,
+    )
+    // Recessed well (darker towards the centre, lit edge at the bottom-right)
+    val well = radius * 0.74f
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color(0xFF050506), Color(0xFF15161A), Color(0xFF34363C)),
+            center = center + Offset(radius * 0.08f, radius * 0.08f),
+            radius = well,
+        ),
+        radius = well,
+        center = center,
+    )
+    drawArc(
+        color = Color.Black.copy(alpha = 0.6f),
+        startAngle = 180f,
+        sweepAngle = 110f,
+        useCenter = false,
+        topLeft = center - Offset(well, well),
+        size = Size(well * 2, well * 2),
+        style = Stroke(radius * 0.1f),
+    )
+
     rotate(angle, pivot = center) {
+        // Teeth around the inside of the well
+        repeat(6) { i ->
+            rotate(i * 60f + 30f, pivot = center) {
+                drawRoundRect(
+                    color = Color(0xFF8B8F96),
+                    topLeft = Offset(center.x - radius * 0.07f, center.y - well),
+                    size = Size(radius * 0.14f, radius * 0.16f),
+                    cornerRadius = CornerRadius(radius * 0.04f),
+                )
+            }
+        }
+        // Three bevelled spokes: dark shadow side, then a lighter face
         repeat(3) { i ->
             rotate(i * 120f, pivot = center) {
                 drawLine(
-                    color = Color(0xFFBFC2C8),
+                    color = Color.Black.copy(alpha = 0.7f),
+                    start = center + Offset(radius * 0.04f, radius * 0.04f),
+                    end = Offset(center.x + radius * 0.04f, center.y - well * 0.92f + radius * 0.04f),
+                    strokeWidth = radius * 0.2f,
+                    cap = StrokeCap.Round,
+                )
+                drawLine(
+                    brush = Brush.linearGradient(
+                        listOf(Color(0xFFD8DADF), Color(0xFF8A8E95)),
+                        start = center,
+                        end = Offset(center.x, center.y - well),
+                    ),
                     start = center,
-                    end = Offset(center.x, center.y - radius * 0.7f),
+                    end = Offset(center.x, center.y - well * 0.92f),
                     strokeWidth = radius * 0.16f,
                     cap = StrokeCap.Round,
                 )
             }
         }
-        // Tooth on the rim makes the rotation visible
-        drawCircle(TapeOrange, radius * 0.1f, Offset(center.x, center.y - radius * 0.9f))
+        // Orange marker on the flange makes the rotation easy to follow
+        drawCircle(TapeOrange, radius * 0.08f, Offset(center.x, center.y - radius * 0.87f))
     }
-    drawCircle(Color(0xFF8E9197), radius * 0.16f, center)
-    drawCircle(Color.White.copy(alpha = 0.15f), radius, center, style = Stroke(1.5f))
+
+    // Metal cap with a specular dot
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color(0xFFF2F3F5), Color(0xFF9A9EA5), Color(0xFF4A4D52)),
+            center = center - Offset(radius * 0.06f, radius * 0.06f),
+            radius = radius * 0.24f,
+        ),
+        radius = radius * 0.2f,
+        center = center,
+    )
+    drawCircle(Color.White.copy(alpha = 0.8f), radius * 0.05f, center - Offset(radius * 0.07f, radius * 0.07f))
+
+    // Fixed glossy highlight on the flange (top-left)
+    drawArc(
+        color = Color.White.copy(alpha = 0.55f),
+        startAngle = 200f,
+        sweepAngle = 70f,
+        useCenter = false,
+        topLeft = center - Offset(radius * 0.87f, radius * 0.87f),
+        size = Size(radius * 1.74f, radius * 1.74f),
+        style = Stroke(radius * 0.09f, cap = StrokeCap.Round),
+    )
 }
