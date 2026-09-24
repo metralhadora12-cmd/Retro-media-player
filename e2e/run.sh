@@ -5,7 +5,8 @@
 set -u
 APP=com.retro.cassetteplayer
 # Never hang on a dead emulator
-adb() { timeout 60 command adb "$@"; }
+ADB=$(command -v adb)
+adb() { timeout 60 "$ADB" "$@"; }
 OUT=e2e-out
 mkdir -p "$OUT"
 
