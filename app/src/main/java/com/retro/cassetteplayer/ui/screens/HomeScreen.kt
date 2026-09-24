@@ -32,7 +32,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,6 +75,10 @@ import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.InkRaised
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import kotlin.random.Random
+import androidx.compose.ui.res.stringResource
+import androidx.compose.material.icons.outlined.Settings
+import com.retro.cassetteplayer.ui.components.artistLabel
+import com.retro.cassetteplayer.ui.components.titleLabel
 
 private const val TILES_PER_PAGE = 9
 private const val QUICK_PICK_ROWS = 4
@@ -89,8 +92,8 @@ fun HomeScreen(
     isLoading: Boolean,
     hasPermission: Boolean?,
     onRequestPermission: () -> Unit,
+    onOpenSystemSettings: () -> Unit,
     onOpenSettings: () -> Unit,
-    onReload: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenCollection: (SongCollection) -> Unit,
@@ -140,7 +143,7 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 24.dp),
         ) {
-            item { HomeTopBar(onReload = onReload, onOpenSearch = onOpenSearch) }
+            item { HomeTopBar(onOpenSettings = onOpenSettings, onOpenSearch = onOpenSearch) }
 
             if (topArtists.isNotEmpty()) {
                 item {
@@ -150,11 +153,11 @@ fun HomeScreen(
                         modifier = Modifier.padding(vertical = 8.dp),
                     ) {
                         item {
-                            RetroChip("Tudo", selectedArtist == null, onClick = { selectedArtist = null })
+                            RetroChip(stringResource(R.string.home_chip_all), selectedArtist == null, onClick = { selectedArtist = null })
                         }
                         items(topArtists) { artist ->
                             RetroChip(
-                                text = artist,
+                                text = artistLabel(artist),
                                 selected = artist == selectedArtist,
                                 onClick = { selectedArtist = if (artist == selectedArtist) null else artist },
                             )
@@ -164,24 +167,24 @@ fun HomeScreen(
             }
 
             when {
-                hasPermission == false -> item { PermissionCard(onRequestPermission, onOpenSettings) }
-                isLoading -> item { StatusMessage("REBOBINANDO…", showProgress = true) }
+                hasPermission == false -> item { PermissionCard(onRequestPermission, onOpenSystemSettings) }
+                isLoading -> item { StatusMessage(stringResource(R.string.home_loading), showProgress = true) }
                 hasPermission == true && songs.isEmpty() -> item {
-                    StatusMessage("Nenhuma música encontrada no dispositivo.")
+                    StatusMessage(stringResource(R.string.home_no_songs))
                 }
                 songs.isNotEmpty() -> {
                     if (jukebox.isNotEmpty()) {
                         item {
                             Column {
                                 SectionHeader(
-                                    title = "Jukebox de fitas",
-                                    overline = selectedArtist ?: "Sua coleção",
+                                    title = stringResource(R.string.home_jukebox),
+                                    overline = selectedArtist?.let { artistLabel(it) } ?: stringResource(R.string.home_your_collection),
                                     leading = { CassetteAvatar() },
                                     action = {
                                         IconButton(onClick = onOpenLibrary) {
                                             Icon(
                                                 Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                                                contentDescription = "Abrir biblioteca",
+                                                contentDescription = stringResource(R.string.home_open_library),
                                                 tint = TextPrimary,
                                             )
                                         }
@@ -197,8 +200,8 @@ fun HomeScreen(
                         item {
                             Column {
                                 SectionHeader(
-                                    title = "Escolha a dedo",
-                                    action = { PillButton("Tocar tudo", onClick = { onPlayAll(quickPicks) }) },
+                                    title = stringResource(R.string.home_quick_picks),
+                                    action = { PillButton(stringResource(R.string.home_play_all), onClick = { onPlayAll(quickPicks) }) },
                                     modifier = Modifier.padding(top = 20.dp),
                                 )
                                 QuickPicks(
@@ -217,7 +220,7 @@ fun HomeScreen(
                         item {
                             Column {
                                 SectionHeader(
-                                    title = "Adicionadas recentemente",
+                                    title = stringResource(R.string.home_recently_added),
                                     modifier = Modifier.padding(top = 20.dp),
                                 )
                                 LazyRow(
@@ -238,7 +241,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeTopBar(onReload: () -> Unit, onOpenSearch: () -> Unit) {
+private fun HomeTopBar(onOpenSettings: () -> Unit, onOpenSearch: () -> Unit) {
     Row(
         modifier = Modifier
             .statusBarsPadding()
@@ -252,16 +255,16 @@ private fun HomeTopBar(onReload: () -> Unit, onOpenSearch: () -> Unit) {
             modifier = Modifier.size(52.dp),
         )
         Text(
-            text = "Cassette",
+            text = stringResource(R.string.brand),
             style = MaterialTheme.typography.headlineSmall,
             color = TextPrimary,
         )
         Spacer(Modifier.weight(1f))
-        IconButton(onClick = onReload) {
-            Icon(Icons.Rounded.Refresh, contentDescription = "Recarregar biblioteca", tint = TextPrimary)
-        }
         IconButton(onClick = onOpenSearch) {
-            Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = TextPrimary)
+            Icon(Icons.Rounded.Search, contentDescription = stringResource(R.string.action_search), tint = TextPrimary)
+        }
+        IconButton(onClick = onOpenSettings) {
+            Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.action_settings), tint = TextPrimary)
         }
     }
 }
@@ -368,7 +371,7 @@ private fun AlbumCard(album: SongCollection, onClick: () -> Unit) {
             RoundedCornerShape(8.dp),
         )
         Text(
-            album.title,
+            album.titleLabel(),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = TextPrimary,
@@ -377,7 +380,7 @@ private fun AlbumCard(album: SongCollection, onClick: () -> Unit) {
             modifier = Modifier.padding(top = 6.dp),
         )
         Text(
-            album.songs.first().artist,
+            artistLabel(album.artist),
             style = MaterialTheme.typography.bodySmall,
             color = TextSecondary,
             maxLines = 1,
@@ -396,14 +399,14 @@ private fun PermissionCard(onRequestPermission: () -> Unit, onOpenSettings: () -
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "Para tocar suas fitas, o app precisa de acesso aos arquivos de áudio do dispositivo.",
+            text = stringResource(R.string.permission_rationale),
             style = MaterialTheme.typography.bodyLarge,
             color = TextPrimary,
             textAlign = TextAlign.Center,
         )
-        PillButton("Permitir acesso", onClick = onRequestPermission, filled = true)
+        PillButton(stringResource(R.string.permission_allow), onClick = onRequestPermission, filled = true)
         TextButton(onClick = onOpenSettings) {
-            Text("Abrir configurações do app", color = TextSecondary)
+            Text(stringResource(R.string.permission_open_settings), color = TextSecondary)
         }
     }
 }

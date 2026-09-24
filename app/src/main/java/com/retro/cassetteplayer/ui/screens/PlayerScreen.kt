@@ -71,6 +71,10 @@ import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.ui.components.artistLabel
+import com.retro.cassetteplayer.ui.components.titleLabel
 
 @Composable
 fun PlayerScreen(
@@ -103,10 +107,10 @@ fun PlayerScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Voltar", tint = TextPrimary)
+                Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = stringResource(R.string.action_back), tint = TextPrimary)
             }
             Text(
-                text = "TOCANDO AGORA",
+                text = stringResource(R.string.player_now_playing),
                 style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 2.sp),
                 color = TextSecondary,
                 textAlign = TextAlign.Center,
@@ -115,7 +119,7 @@ fun PlayerScreen(
             IconButton(onClick = onSaveToPlaylist, enabled = playback.hasMedia) {
                 Icon(
                     Icons.AutoMirrored.Rounded.PlaylistAdd,
-                    contentDescription = "Salvar na playlist",
+                    contentDescription = stringResource(R.string.menu_save_to_playlist),
                     tint = if (playback.hasMedia) TextPrimary else TextSecondary,
                 )
             }
@@ -132,8 +136,8 @@ fun PlayerScreen(
             VerticalCassette(
                 isPlaying = playback.isPlaying,
                 progress = playback.progress,
-                title = playback.title,
-                subtitle = playback.artist,
+                title = if (playback.hasMedia) titleLabel(playback.title) else "",
+                subtitle = if (playback.hasMedia) artistLabel(playback.artist) else "",
                 modifier = Modifier
                     .fillMaxHeight()
                     .aspectRatio(VERTICAL_CASSETTE_ASPECT, matchHeightConstraintsFirst = true)
@@ -147,21 +151,21 @@ fun PlayerScreen(
         ) {
             ModeToggle(
                 icon = Icons.Rounded.Shuffle,
-                description = "Aleatório",
+                description = stringResource(R.string.action_shuffle),
                 active = playback.shuffleEnabled,
                 onClick = onToggleShuffle,
             )
             PianoKeys(
                 keys = listOf(
-                    PianoKey(Icons.Rounded.SkipPrevious, "Faixa anterior", onPrevious),
+                    PianoKey(Icons.Rounded.SkipPrevious, stringResource(R.string.player_previous), onPrevious),
                     PianoKey(
                         icon = if (playback.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                        description = if (playback.isPlaying) "Pausar" else "Tocar",
+                        description = stringResource(if (playback.isPlaying) R.string.action_pause else R.string.action_play),
                         onClick = onTogglePlay,
                         latched = playback.isPlaying,
                         weight = 1.3f,
                     ),
-                    PianoKey(Icons.Rounded.SkipNext, "Próxima faixa", onNext),
+                    PianoKey(Icons.Rounded.SkipNext, stringResource(R.string.player_next), onNext),
                 ),
                 modifier = Modifier
                     .weight(1f)
@@ -169,7 +173,7 @@ fun PlayerScreen(
             )
             ModeToggle(
                 icon = if (playback.repeatMode == Player.REPEAT_MODE_ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
-                description = "Repetir",
+                description = stringResource(R.string.player_repeat),
                 active = playback.repeatMode != Player.REPEAT_MODE_OFF,
                 onClick = onCycleRepeat,
             )
@@ -178,7 +182,7 @@ fun PlayerScreen(
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = playback.title.ifBlank { "Nenhuma fita inserida" },
+            text = if (playback.hasMedia) titleLabel(playback.title) else stringResource(R.string.player_no_tape),
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
             color = TextPrimary,
             textAlign = TextAlign.Center,
@@ -192,7 +196,7 @@ fun PlayerScreen(
                 .background(TapeOrange, RoundedCornerShape(1.dp))
         )
         Text(
-            text = playback.artist,
+            text = if (playback.hasMedia) artistLabel(playback.artist) else "",
             style = MaterialTheme.typography.bodyLarge,
             color = TextSecondary,
             textAlign = TextAlign.Center,
@@ -237,7 +241,7 @@ fun PlayerScreen(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "A SEGUIR",
+                    stringResource(R.string.player_up_next),
                     style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp),
                     color = TextPrimary,
                 )
@@ -271,7 +275,7 @@ private fun FavoriteButton(isFavorite: Boolean, enabled: Boolean, onClick: () ->
     ) {
         Icon(
             imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-            contentDescription = if (isFavorite) "Remover das favoritas" else "Adicionar às favoritas",
+            contentDescription = stringResource(if (isFavorite) R.string.menu_remove_favorite else R.string.menu_add_favorite),
             tint = when {
                 !enabled -> TextSecondary.copy(alpha = 0.4f)
                 isFavorite -> TapeOrange

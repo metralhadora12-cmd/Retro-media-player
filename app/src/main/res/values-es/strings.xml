@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_library">Biblioteca</string>
+    <string name="action_play">Reproducir</string>
+    <string name="action_pause">Pausar</string>
+    <string name="action_next">Siguiente</string>
+    <string name="action_back">Volver</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_create">Crear</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_rename">Renombrar</string>
+    <string name="action_open">Abrir</string>
+    <string name="action_clear">Borrar</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_shuffle">Aleatorio</string>
+    <string name="action_options">Opciones</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_reload_library">Recargar biblioteca</string>
+    <string name="menu_play_next">Reproducir a continuación</string>
+    <string name="menu_add_to_queue">Añadir a la cola</string>
+    <string name="menu_add_favorite">Añadir a favoritas</string>
+    <string name="menu_remove_favorite">Quitar de favoritas</string>
+    <string name="menu_save_to_playlist">Guardar en playlist</string>
+    <string name="menu_remove_from_playlist">Quitar de la playlist</string>
+    <string name="menu_delete_from_device">Eliminar del dispositivo</string>
+    <string name="menu_play_shuffled">Reproducir en aleatorio</string>
+    <string name="menu_edit_playlist">Editar playlist</string>
+    <string name="menu_delete_playlist">Eliminar playlist</string>
+    <string name="unknown_title">Pista sin título</string>
+    <string name="unknown_artist">Artista desconocido</string>
+    <string name="unknown_album">Álbum desconocido</string>
+    <string name="song_subtitle">%1$s • %2$s</string>
+    <string name="subtitle_album">Álbum • %1$s • %2$s</string>
+    <string name="subtitle_artist">Artista • %1$s</string>
+    <string name="subtitle_playlist">Playlist • %1$s</string>
+    <string name="subtitle_auto_playlist">Playlist automática • %1$s</string>
+    <string name="playlist_favorites">Favoritas</string>
+    <string name="playlist_all_songs">Todas las canciones</string>
+    <string name="playlist_recently_added">Añadidas recientemente</string>
+    <string name="cassette_default_title">MIX TAPE</string>
+    <string name="cassette_default_subtitle">PLAYLIST</string>
+    <string name="home_chip_all">Todo</string>
+    <string name="home_loading">REBOBINANDO…</string>
+    <string name="home_no_songs">No se encontró música en el dispositivo.</string>
+    <string name="home_jukebox">Jukebox de cintas</string>
+    <string name="home_your_collection">Tu colección</string>
+    <string name="home_open_library">Abrir biblioteca</string>
+    <string name="home_quick_picks">Selección rápida</string>
+    <string name="home_play_all">Reproducir todo</string>
+    <string name="home_recently_added">Añadidas recientemente</string>
+    <string name="permission_rationale">Para reproducir tus cintas, la app necesita acceso a los archivos de audio del dispositivo.</string>
+    <string name="permission_allow">Permitir acceso</string>
+    <string name="permission_open_settings">Abrir ajustes de la app</string>
+    <string name="search_title">Buscar</string>
+    <string name="search_hint">Título, artista o álbum</string>
+    <string name="search_empty_library">Biblioteca vacía.</string>
+    <string name="search_no_results">No se encontró nada para \"%1$s\".</string>
+    <string name="library_title">Biblioteca</string>
+    <string name="filter_playlists">Playlists</string>
+    <string name="filter_albums">Álbumes</string>
+    <string name="filter_artists">Artistas</string>
+    <string name="filter_songs">Canciones</string>
+    <string name="filter_clear">Quitar filtro</string>
+    <string name="sort_recent">Actividad reciente</string>
+    <string name="sort_alphabetical">Orden alfabético</string>
+    <string name="sort_size">Más pistas</string>
+    <string name="sort_label">Ordenar</string>
+    <string name="view_as_list">Ver como lista</string>
+    <string name="view_as_grid">Ver como cuadrícula</string>
+    <string name="library_empty">Aún no hay nada en la biblioteca.</string>
+    <string name="library_shuffle_all">Modo aleatorio</string>
+    <string name="new_playlist">Nueva playlist</string>
+    <string name="collection_not_found">Colección no encontrada.</string>
+    <string name="collection_options">Opciones de la playlist</string>
+    <string name="rename_playlist">Renombrar playlist</string>
+    <string name="favorites_empty">Aún no hay favoritas. Toca el corazón en el reproductor o mantén pulsada una canción y elige \"Añadir a favoritas\".</string>
+    <string name="playlist_empty">Playlist vacía. Mantén pulsada una canción y elige \"Guardar en playlist\" para añadirla aquí.</string>
+    <string name="drag_to_reorder">Arrastrar para reordenar</string>
+    <string name="playlist_name_hint">Nombre de la playlist</string>
+    <string name="delete_playlist_title">¿Eliminar playlist?</string>
+    <string name="delete_playlist_message">\"%1$s\" se eliminará. Las canciones seguirán en el dispositivo.</string>
+    <string name="delete_song_title">¿Eliminar canción?</string>
+    <string name="delete_song_message">\"%1$s\" se borrará del dispositivo.</string>
+    <string name="player_now_playing">REPRODUCIENDO</string>
+    <string name="player_no_tape">Ninguna cinta insertada</string>
+    <string name="player_previous">Pista anterior</string>
+    <string name="player_next">Pista siguiente</string>
+    <string name="player_repeat">Repetir</string>
+    <string name="player_up_next">A CONTINUACIÓN</string>
+    <string name="player_progress">Barra de progreso</string>
+    <string name="queue_title">A continuación</string>
+    <string name="queue_nothing_after">Ninguna pista después de esta</string>
+    <string name="queue_empty">La cola está vacía.</string>
+    <string name="queue_now_playing">Reproduciendo • %1$s</string>
+    <string name="queue_remove">Quitar de la cola</string>
+    <string name="msg_playlist_created">Playlist \"%1$s\" creada</string>
+    <string name="msg_saved_to">Guardado en \"%1$s\"</string>
+    <string name="msg_already_in">Ya está en \"%1$s\"</string>
+    <string name="msg_playlist_deleted">Playlist eliminada</string>
+    <string name="msg_added_favorite">Añadida a favoritas</string>
+    <string name="msg_removed_favorite">Quitada de favoritas</string>
+    <string name="msg_delete_failed">No se pudo eliminar la canción</string>
+    <string name="msg_song_deleted">\"%1$s\" eliminada</string>
+    <string name="msg_language_changed">Idioma cambiado</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_section_audio">Audio</string>
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_about">Acerca de</string>
+    <string name="settings_equalizer">Ecualizador</string>
+    <string name="settings_on">Activado</string>
+    <string name="settings_off">Desactivado</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_reload_summary">Buscar música nueva en el dispositivo</string>
+    <string name="settings_whats_new">Novedades</string>
+    <string name="settings_whats_new_summary">Historial de versiones</string>
+    <string name="settings_version">Versión</string>
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="language_pt">Português (Brasil)</string>
+    <string name="language_en">English</string>
+    <string name="language_es">Español</string>
+    <string name="eq_title">Ecualizador</string>
+    <string name="eq_enabled">Ecualizador activado</string>
+    <string name="eq_presets">Preajustes</string>
+    <string name="eq_custom">Personalizado</string>
+    <string name="eq_flat">Plano</string>
+    <string name="eq_bass_boost">Refuerzo de graves</string>
+    <string name="eq_reset">Restablecer</string>
+    <string name="eq_unavailable">El ecualizador no está disponible en este dispositivo.</string>
+    <string name="eq_waiting">Reproduce una canción para activar el ecualizador.</string>
+    <string name="eq_band_hz">%1$d Hz</string>
+    <string name="eq_band_khz">%1$s kHz</string>
+    <string name="eq_db">%1$s dB</string>
+    <string name="changelog_title">Novedades</string>
+    <string name="changelog_version">Versión %1$s</string>
+    <string name="changelog_current">ACTUAL</string>
+    <plurals name="tracks_count">
+        <item quantity="one">%d pista</item>
+        <item quantity="many">%d pistas</item>
+        <item quantity="other">%d pistas</item>
+    </plurals>
+    <plurals name="queue_count">
+        <item quantity="one">%d pista en la cola</item>
+        <item quantity="many">%d pistas en la cola</item>
+        <item quantity="other">%d pistas en la cola</item>
+    </plurals>
+    <plurals name="msg_added_to_queue">
+        <item quantity="one">%d pista añadida a la cola</item>
+        <item quantity="many">%d pistas añadidas a la cola</item>
+        <item quantity="other">%d pistas añadidas a la cola</item>
+    </plurals>
+    <string-array name="changelog_1_7">
+        <item>Pantalla de ajustes (engranaje en Inicio y Biblioteca)</item>
+        <item>Idiomas: portugués, inglés y español</item>
+        <item>Ecualizador integrado con preajustes y refuerzo de graves</item>
+        <item>Esta pantalla de novedades</item>
+    </string-array>
+    <string-array name="changelog_1_6">
+        <item>Pulsación larga en la Biblioteca: reproducir, cola, renombrar y eliminar playlists</item>
+        <item>Eliminar canciones del dispositivo</item>
+        <item>Audios de WhatsApp, Telegram y Messenger ocultos</item>
+        <item>El botón Inicio siempre vuelve a la pantalla inicial</item>
+    </string-array>
+    <string-array name="changelog_1_5">
+        <item>Carretes 3D que giran según la posición de la canción</item>
+        <item>El menú se abre donde tocaste</item>
+        <item>Marcar favoritas desde el menú</item>
+        <item>Sin tres puntos: opciones con pulsación larga</item>
+    </string-array>
+    <string-array name="changelog_1_4">
+        <item>Favoritas con el corazón en el reproductor</item>
+        <item>Mini casete para canciones sin carátula</item>
+        <item>Transición del reproductor más fluida</item>
+    </string-array>
+    <string-array name="changelog_1_3">
+        <item>Playlists: crear, renombrar, eliminar y guardar canciones</item>
+        <item>Arrastrar para reordenar pistas</item>
+        <item>Pulsación larga para abrir opciones</item>
+    </string-array>
+    <string-array name="changelog_1_2">
+        <item>Aspecto minimalista</item>
+        <item>Reproductor con cinta vertical, teclas de piano y regla 0–9</item>
+        <item>Cola \"A continuación\" y repetir</item>
+    </string-array>
+    <string-array name="changelog_1_1">
+        <item>Inicio y Biblioteca inspirados en YouTube Music</item>
+        <item>Páginas de álbum, artista y playlist</item>
+    </string-array>
+    <string-array name="changelog_1_0">
+        <item>Primera versión: reproductor de casete</item>
+        <item>Música del dispositivo con reproducción en segundo plano</item>
+    </string-array>
+</resources>

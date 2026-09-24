@@ -76,6 +76,13 @@ import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.playback.EqualizerManager
+import com.retro.cassetteplayer.ui.components.titleLabel
+import com.retro.cassetteplayer.ui.screens.ChangelogScreen
+import com.retro.cassetteplayer.ui.screens.EqualizerScreen
+import com.retro.cassetteplayer.ui.screens.SettingsScreen
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -151,8 +158,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     }
     if (creatingPlaylist) {
         PlaylistNameDialog(
-            title = "Nova playlist",
-            confirmLabel = "Criar",
+            title = stringResource(R.string.new_playlist),
+            confirmLabel = stringResource(R.string.action_create),
             onConfirm = { name ->
                 viewModel.createPlaylist(name, songsToSave.orEmpty())
                 songsToSave = null
@@ -164,7 +171,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
-        viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
+        viewModel.messages.collect { snackbarHostState.showSnackbar(it.resolve(context)) }
     }
 
     var showQueue by rememberSaveable { mutableStateOf(false) }
@@ -222,16 +229,16 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
         AlertDialog(
             onDismissRequest = { songToConfirmDelete = null },
             containerColor = InkSurface,
-            title = { Text("Excluir música?", color = TextPrimary) },
-            text = { Text("\"${song.title}\" será apagada do aparelho.", color = TextSecondary) },
+            title = { Text(stringResource(R.string.delete_song_title), color = TextPrimary) },
+            text = { Text(stringResource(R.string.delete_song_message, titleLabel(song.title)), color = TextSecondary) },
             confirmButton = {
                 TextButton(onClick = {
                     songToConfirmDelete = null
                     startDelete(song)
-                }) { Text("Excluir", color = TapeOrange) }
+                }) { Text(stringResource(R.string.action_delete), color = TapeOrange) }
             },
             dismissButton = {
-                TextButton(onClick = { songToConfirmDelete = null }) { Text("Cancelar", color = TextPrimary) }
+                TextButton(onClick = { songToConfirmDelete = null }) { Text(stringResource(R.string.action_cancel), color = TextPrimary) }
             },
         )
     }
@@ -299,7 +306,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             isLoading = isLoading,
                             hasPermission = hasPermission,
                             onRequestPermission = { permissionLauncher.launch(requestedPermissions) },
-                            onOpenSettings = {
+                            onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                            onOpenSystemSettings = {
                                 context.startActivity(
                                     Intent(
                                         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -307,7 +315,6 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                                     )
                                 )
                             },
-                            onReload = viewModel::loadSongs,
                             onOpenSearch = { openTab(Routes.SEARCH) },
                             onOpenLibrary = { openTab(Routes.LIBRARY) },
                             onOpenCollection = openCollection,
@@ -347,13 +354,32 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onAddToQueue = viewModel::addToQueue,
                             onAddToPlaylist = saveSong,
                             onCreatePlaylist = { creatingPlaylist = true },
-                        onPlayAll = viewModel::playAll,
-                        onAddAllToQueue = viewModel::addAllToQueue,
-                        onSaveAll = saveToPlaylist,
-                        onRenamePlaylist = viewModel::renamePlaylist,
-                        onDeletePlaylist = viewModel::deletePlaylist,
+                            onPlayAll = viewModel::playAll,
+                            onAddAllToQueue = viewModel::addAllToQueue,
+                            onSaveAll = saveToPlaylist,
+                            onRenamePlaylist = viewModel::renamePlaylist,
+                            onDeletePlaylist = viewModel::deletePlaylist,
+                            onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                         )
                     }
+                }
+                composable(Routes.SETTINGS) {
+                    val equalizer by EqualizerManager.state.collectAsStateWithLifecycle()
+                    tabContent {
+                        SettingsScreen(
+                            equalizerEnabled = equalizer.enabled,
+                            onBack = { navController.popBackStack() },
+                            onOpenEqualizer = { navController.navigate(Routes.EQUALIZER) },
+                            onOpenChangelog = { navController.navigate(Routes.CHANGELOG) },
+                            onReloadLibrary = viewModel::loadSongs,
+                        )
+                    }
+                }
+                composable(Routes.EQUALIZER) {
+                    tabContent { EqualizerScreen(onBack = { navController.popBackStack() }) }
+                }
+                composable(Routes.CHANGELOG) {
+                    tabContent { ChangelogScreen(onBack = { navController.popBackStack() }) }
                 }
                 composable(
                     route = Routes.COLLECTION,

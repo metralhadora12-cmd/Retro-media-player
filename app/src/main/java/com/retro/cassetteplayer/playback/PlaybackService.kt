@@ -7,6 +7,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.google.common.util.concurrent.Futures
@@ -42,6 +43,15 @@ class PlaybackService : MediaSessionService() {
             )
         }
 
+        // Built-in equalizer follows the player's audio session.
+        EqualizerManager.init(this)
+        EqualizerManager.attach(player.audioSessionId)
+        player.addAnalyticsListener(object : AnalyticsListener {
+            override fun onAudioSessionIdChanged(eventTime: AnalyticsListener.EventTime, audioSessionId: Int) {
+                EqualizerManager.attach(audioSessionId)
+            }
+        })
+
         mediaSession = MediaSession.Builder(this, player)
             .setCallback(SessionCallback)
             .apply { if (sessionActivity != null) setSessionActivity(sessionActivity) }
@@ -61,6 +71,7 @@ class PlaybackService : MediaSessionService() {
     }
 
     override fun onDestroy() {
+        EqualizerManager.release()
         mediaSession?.run {
             player.release()
             release()

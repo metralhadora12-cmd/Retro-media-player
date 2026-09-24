@@ -1,4 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Retro Cassette</string>
+    <string name="app_name" translatable="false">Retro Cassette</string>
+    <string name="nav_home">Início</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_library">Biblioteca</string>
+    <string name="brand" translatable="false">Cassette</string>
+    <string name="action_play">Tocar</string>
+    <string name="action_pause">Pausar</string>
+    <string name="action_next">Próxima</string>
+    <string name="action_back">Voltar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Salvar</string>
+    <string name="action_create">Criar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_rename">Renomear</string>
+    <string name="action_open">Abrir</string>
+    <string name="action_clear">Limpar</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_shuffle">Aleatório</string>
+    <string name="action_options">Opções</string>
+    <string name="action_settings">Configurações</string>
+    <string name="action_reload_library">Recarregar biblioteca</string>
+    <string name="menu_play_next">Tocar a seguir</string>
+    <string name="menu_add_to_queue">Adicionar à fila</string>
+    <string name="menu_add_favorite">Adicionar às favoritas</string>
+    <string name="menu_remove_favorite">Remover das favoritas</string>
+    <string name="menu_save_to_playlist">Salvar na playlist</string>
+    <string name="menu_remove_from_playlist">Remover da playlist</string>
+    <string name="menu_delete_from_device">Excluir do aparelho</string>
+    <string name="menu_play_shuffled">Tocar em ordem aleatória</string>
+    <string name="menu_edit_playlist">Editar playlist</string>
+    <string name="menu_delete_playlist">Excluir playlist</string>
+    <string name="unknown_title">Faixa sem título</string>
+    <string name="unknown_artist">Artista desconhecido</string>
+    <string name="unknown_album">Álbum desconhecido</string>
+    <string name="song_subtitle">%1$s • %2$s</string>
+    <string name="subtitle_album">Álbum • %1$s • %2$s</string>
+    <string name="subtitle_artist">Artista • %1$s</string>
+    <string name="subtitle_playlist">Playlist • %1$s</string>
+    <string name="subtitle_auto_playlist">Playlist automática • %1$s</string>
+    <string name="playlist_favorites">Favoritas</string>
+    <string name="playlist_all_songs">Todas as músicas</string>
+    <string name="playlist_recently_added">Adicionadas recentemente</string>
+    <string name="cassette_default_title">MIX TAPE</string>
+    <string name="cassette_default_subtitle">PLAYLIST</string>
+    <string name="home_chip_all">Tudo</string>
+    <string name="home_loading">REBOBINANDO…</string>
+    <string name="home_no_songs">Nenhuma música encontrada no dispositivo.</string>
+    <string name="home_jukebox">Jukebox de fitas</string>
+    <string name="home_your_collection">Sua coleção</string>
+    <string name="home_open_library">Abrir biblioteca</string>
+    <string name="home_quick_picks">Escolha a dedo</string>
+    <string name="home_play_all">Tocar tudo</string>
+    <string name="home_recently_added">Adicionadas recentemente</string>
+    <string name="permission_rationale">Para tocar suas fitas, o app precisa de acesso aos arquivos de áudio do dispositivo.</string>
+    <string name="permission_allow">Permitir acesso</string>
+    <string name="permission_open_settings">Abrir configurações do app</string>
+    <string name="search_title">Buscar</string>
+    <string name="search_hint">Título, artista ou álbum</string>
+    <string name="search_empty_library">Biblioteca vazia.</string>
+    <string name="search_no_results">Nada encontrado para \"%1$s\".</string>
+    <string name="library_title">Biblioteca</string>
+    <string name="filter_playlists">Playlists</string>
+    <string name="filter_albums">Álbuns</string>
+    <string name="filter_artists">Artistas</string>
+    <string name="filter_songs">Músicas</string>
+    <string name="filter_clear">Limpar filtro</string>
+    <string name="sort_recent">Atividade recente</string>
+    <string name="sort_alphabetical">Ordem alfabética</string>
+    <string name="sort_size">Mais faixas</string>
+    <string name="sort_label">Ordenar</string>
+    <string name="view_as_list">Ver em lista</string>
+    <string name="view_as_grid">Ver em grade</string>
+    <string name="library_empty">Nada na biblioteca ainda.</string>
+    <string name="library_shuffle_all">Modo aleatório</string>
+    <string name="new_playlist">Nova playlist</string>
+    <string name="collection_not_found">Coleção não encontrada.</string>
+    <string name="collection_options">Opções da playlist</string>
+    <string name="rename_playlist">Renomear playlist</string>
+    <string name="favorites_empty">Nenhuma favorita ainda. Toque no coração no player ou segure uma música e escolha \"Adicionar às favoritas\".</string>
+    <string name="playlist_empty">Playlist vazia. Segure uma música e escolha \"Salvar na playlist\" para adicioná-la aqui.</string>
+    <string name="drag_to_reorder">Arrastar para reordenar</string>
+    <string name="playlist_name_hint">Nome da playlist</string>
+    <string name="delete_playlist_title">Excluir playlist?</string>
+    <string name="delete_playlist_message">\"%1$s\" será excluída. As músicas continuam no aparelho.</string>
+    <string name="delete_song_title">Excluir música?</string>
+    <string name="delete_song_message">\"%1$s\" será apagada do aparelho.</string>
+    <string name="player_now_playing">TOCANDO AGORA</string>
+    <string name="player_no_tape">Nenhuma fita inserida</string>
+    <string name="player_previous">Faixa anterior</string>
+    <string name="player_next">Próxima faixa</string>
+    <string name="player_repeat">Repetir</string>
+    <string name="player_up_next">A SEGUIR</string>
+    <string name="player_progress">Barra de progresso</string>
+    <string name="queue_title">A seguir</string>
+    <string name="queue_nothing_after">Nenhuma faixa depois desta</string>
+    <string name="queue_empty">A fila está vazia.</string>
+    <string name="queue_now_playing">Tocando agora • %1$s</string>
+    <string name="queue_remove">Remover da fila</string>
+    <string name="msg_playlist_created">Playlist \"%1$s\" criada</string>
+    <string name="msg_saved_to">Salvo em \"%1$s\"</string>
+    <string name="msg_already_in">Já está em \"%1$s\"</string>
+    <string name="msg_playlist_deleted">Playlist excluída</string>
+    <string name="msg_added_favorite">Adicionada às favoritas</string>
+    <string name="msg_removed_favorite">Removida das favoritas</string>
+    <string name="msg_delete_failed">Não foi possível excluir a música</string>
+    <string name="msg_song_deleted">\"%1$s\" excluída</string>
+    <string name="msg_language_changed">Idioma alterado</string>
+    <string name="settings_title">Configurações</string>
+    <string name="settings_section_audio">Áudio</string>
+    <string name="settings_section_general">Geral</string>
+    <string name="settings_section_about">Sobre</string>
+    <string name="settings_equalizer">Equalizador</string>
+    <string name="settings_on">Ativado</string>
+    <string name="settings_off">Desativado</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_reload_summary">Procurar novas músicas no aparelho</string>
+    <string name="settings_whats_new">Novidades</string>
+    <string name="settings_whats_new_summary">Histórico de versões</string>
+    <string name="settings_version">Versão</string>
+    <string name="language_system">Padrão do sistema</string>
+    <string name="language_pt">Português (Brasil)</string>
+    <string name="language_en">English</string>
+    <string name="language_es">Español</string>
+    <string name="eq_title">Equalizador</string>
+    <string name="eq_enabled">Equalizador ativado</string>
+    <string name="eq_presets">Predefinições</string>
+    <string name="eq_custom">Personalizado</string>
+    <string name="eq_flat">Neutro</string>
+    <string name="eq_bass_boost">Reforço de graves</string>
+    <string name="eq_reset">Zerar</string>
+    <string name="eq_unavailable">O equalizador não está disponível neste aparelho.</string>
+    <string name="eq_waiting">Toque uma música para ativar o equalizador.</string>
+    <string name="eq_band_hz">%1$d Hz</string>
+    <string name="eq_band_khz">%1$s kHz</string>
+    <string name="eq_db">%1$s dB</string>
+    <string name="changelog_title">Novidades</string>
+    <string name="changelog_version">Versão %1$s</string>
+    <string name="changelog_current">ATUAL</string>
+    <plurals name="tracks_count">
+        <item quantity="one">%d faixa</item>
+        <item quantity="many">%d faixas</item>
+        <item quantity="other">%d faixas</item>
+    </plurals>
+    <plurals name="queue_count">
+        <item quantity="one">%d faixa na fila</item>
+        <item quantity="many">%d faixas na fila</item>
+        <item quantity="other">%d faixas na fila</item>
+    </plurals>
+    <plurals name="msg_added_to_queue">
+        <item quantity="one">%d faixa adicionada à fila</item>
+        <item quantity="many">%d faixas adicionadas à fila</item>
+        <item quantity="other">%d faixas adicionadas à fila</item>
+    </plurals>
+    <string-array name="changelog_1_7">
+        <item>Tela de configurações (engrenagem na Início e na Biblioteca)</item>
+        <item>Idiomas: português, inglês e espanhol</item>
+        <item>Equalizador integrado com predefinições e reforço de graves</item>
+        <item>Esta tela de novidades</item>
+    </string-array>
+    <string-array name="changelog_1_6">
+        <item>Toque longo nos itens da Biblioteca: tocar, fila, renomear e excluir playlists</item>
+        <item>Excluir músicas do aparelho</item>
+        <item>Áudios de WhatsApp, Telegram e Messenger ocultos</item>
+        <item>Botão Início volta sempre para a tela inicial</item>
+    </string-array>
+    <string-array name="changelog_1_5">
+        <item>Carretéis em 3D que giram de acordo com a minutagem</item>
+        <item>Menu abre onde você tocou</item>
+        <item>Favoritar pelo menu das músicas</item>
+        <item>Sem os três pontos: opções pelo toque longo</item>
+    </string-array>
+    <string-array name="changelog_1_4">
+        <item>Favoritas com o coração no player</item>
+        <item>Mini fita cassete para músicas sem capa</item>
+        <item>Transição do player mais suave</item>
+    </string-array>
+    <string-array name="changelog_1_3">
+        <item>Playlists: criar, renomear, excluir e salvar músicas</item>
+        <item>Arrastar para reordenar faixas</item>
+        <item>Toque longo para abrir opções</item>
+    </string-array>
+    <string-array name="changelog_1_2">
+        <item>Visual minimalista</item>
+        <item>Player com fita vertical, teclas de piano e régua 0–9</item>
+        <item>Fila \"A seguir\" e repetir</item>
+    </string-array>
+    <string-array name="changelog_1_1">
+        <item>Início e Biblioteca inspirados no YouTube Music</item>
+        <item>Páginas de álbum, artista e playlist</item>
+    </string-array>
+    <string-array name="changelog_1_0">
+        <item>Primeira versão: player de fita cassete</item>
+        <item>Músicas do aparelho com reprodução em segundo plano</item>
+    </string-array>
 </resources>

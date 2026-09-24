@@ -30,6 +30,8 @@ import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 /** Fixed mini-player shown above the bottom navigation bar. */
 @Composable
@@ -57,14 +59,14 @@ fun MiniPlayer(
                     .padding(horizontal = 12.dp)
             ) {
                 Text(
-                    text = state.title.ifBlank { "—" },
+                    text = titleLabel(state.title),
                     style = MaterialTheme.typography.titleMedium,
                     color = TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = state.artist,
+                    text = artistLabel(state.artist),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                     maxLines = 1,
@@ -74,13 +76,13 @@ fun MiniPlayer(
             IconButton(onClick = onTogglePlay) {
                 Icon(
                     imageVector = if (state.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                    contentDescription = if (state.isPlaying) "Pausar" else "Tocar",
+                    contentDescription = stringResource(if (state.isPlaying) R.string.action_pause else R.string.action_play),
                     tint = TextPrimary,
                     modifier = Modifier.size(32.dp),
                 )
             }
             IconButton(onClick = onNext) {
-                Icon(Icons.Rounded.SkipNext, contentDescription = "Próxima", tint = TextPrimary)
+                Icon(Icons.Rounded.SkipNext, contentDescription = stringResource(R.string.action_next), tint = TextPrimary)
             }
         }
         Box(

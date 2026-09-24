@@ -55,6 +55,8 @@ import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeAmber
 import com.retro.cassetteplayer.ui.theme.TapeOrange
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -102,7 +104,7 @@ fun SongRow(
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         menuOpen = true
                     },
-                    onLongClickLabel = "Opções",
+                    onLongClickLabel = stringResource(R.string.action_options),
                 )
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -111,14 +113,14 @@ fun SongRow(
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = song.title,
+                    text = song.titleLabel(),
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (isCurrent) TapeAmber else TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "${song.artist} • ${song.album}",
+                    text = stringResource(R.string.song_subtitle, song.artistLabel(), song.albumLabel()),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                     maxLines = 1,
@@ -140,30 +142,30 @@ fun SongRow(
             },
             modifier = Modifier.background(InkSurface),
         ) {
-            SongMenuItem("Tocar", Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
-            SongMenuItem("Tocar a seguir", Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
-            SongMenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay) {
+            SongMenuItem(stringResource(R.string.action_play), Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
+            SongMenuItem(stringResource(R.string.menu_play_next), Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
+            SongMenuItem(stringResource(R.string.menu_add_to_queue), Icons.AutoMirrored.Rounded.PlaylistPlay) {
                 menuOpen = false
                 onAddToQueue()
             }
             SongMenuItem(
-                if (isFavorite) "Remover das favoritas" else "Adicionar às favoritas",
+                stringResource(if (isFavorite) R.string.menu_remove_favorite else R.string.menu_add_favorite),
                 if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
             ) {
                 menuOpen = false
                 favorites.toggle(song)
             }
-            SongMenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd) {
+            SongMenuItem(stringResource(R.string.menu_save_to_playlist), Icons.AutoMirrored.Rounded.PlaylistAdd) {
                 menuOpen = false
                 onAddToPlaylist()
             }
             if (onRemoveFromPlaylist != null) {
-                SongMenuItem("Remover da playlist", Icons.Rounded.RemoveCircleOutline) {
+                SongMenuItem(stringResource(R.string.menu_remove_from_playlist), Icons.Rounded.RemoveCircleOutline) {
                     menuOpen = false
                     onRemoveFromPlaylist()
                 }
             }
-            SongMenuItem("Excluir do aparelho", Icons.Rounded.DeleteOutline) {
+            SongMenuItem(stringResource(R.string.menu_delete_from_device), Icons.Rounded.DeleteOutline) {
                 menuOpen = false
                 deleteSong(song)
             }

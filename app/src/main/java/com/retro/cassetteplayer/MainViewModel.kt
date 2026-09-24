@@ -39,9 +39,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /** Favourite song ids, most recent first. */
     val favorites: StateFlow<List<Long>> = favoritesRepository.favorites
 
-    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 4)
-    /** One-off feedback shown as a snackbar ("Adicionada a …"). */
-    val messages: SharedFlow<String> = _messages.asSharedFlow()
+    private val _messages = MutableSharedFlow<UiMessage>(extraBufferCapacity = 4)
+    /** One-off feedback shown as a snackbar. */
+    val messages: SharedFlow<UiMessage> = _messages.asSharedFlow()
 
     val playback: StateFlow<PlaybackState> = connection.state
 
@@ -123,7 +123,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun addAllToQueue(songs: List<Song>) {
         if (songs.isEmpty()) return
         connection.addAllToQueue(songs)
-        _messages.tryEmit(if (songs.size == 1) "1 faixa adicionada à fila" else "${songs.size} faixas adicionadas à fila")
+        _messages.tryEmit(UiMessage.Plural(R.plurals.msg_added_to_queue, songs.size))
     }
     fun togglePlayPause() = connection.togglePlayPause()
     fun skipNext() = connection.skipNext()
@@ -155,7 +155,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 outcome.intentSender
             }
             DeleteOutcome.Failed -> {
-                _messages.tryEmit("Não foi possível excluir a música")
+                _messages.tryEmit(UiMessage.Text(R.string.msg_delete_failed))
                 null
             }
         }
@@ -170,7 +170,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         } else if (repository.requestDelete(song) == DeleteOutcome.Deleted) {
             onSongDeleted(song)
         } else {
-            _messages.tryEmit("Não foi possível excluir a música")
+            _messages.tryEmit(UiMessage.Text(R.string.msg_delete_failed))
         }
     }
 
@@ -179,14 +179,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         connection.removeFromQueue(song.id.toString())
         favoritesRepository.remove(song.id)
         playlistRepository.removeSongEverywhere(song.id)
-        _messages.tryEmit("\"${song.title}\" excluída")
+        _messages.tryEmit(UiMessage.Text(R.string.msg_song_deleted, song.title))
     }
 
     // --- Favourites -----------------------------------------------------------------
 
     fun toggleFavorite(songId: Long) {
         val nowFavorite = favoritesRepository.toggle(songId)
-        _messages.tryEmit(if (nowFavorite) "Adicionada às favoritas" else "Removida das favoritas")
+        _messages.tryEmit(
+            UiMessage.Text(if (nowFavorite) R.string.msg_added_favorite else R.string.msg_removed_favorite)
+        )
     }
 
     // --- User playlists -------------------------------------------------------------
@@ -195,8 +197,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (name.isBlank()) return
         val playlist = playlistRepository.create(name, songs.map { it.id })
         _messages.tryEmit(
-            if (songs.isEmpty()) "Playlist \"${playlist.name}\" criada"
-            else "Salvo em \"${playlist.name}\""
+            UiMessage.Text(if (songs.isEmpty()) R.string.msg_playlist_created else R.string.msg_saved_to, playlist.name)
         )
     }
 
@@ -206,13 +207,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deletePlaylist(id: String) {
         playlistRepository.delete(id)
-        _messages.tryEmit("Playlist excluída")
+        _messages.tryEmit(UiMessage.Text(R.string.msg_playlist_deleted))
     }
 
     fun addToPlaylist(playlistId: String, songs: List<Song>) {
         val name = playlistRepository.playlists.value.firstOrNull { it.id == playlistId }?.name ?: return
         val added = playlistRepository.addSongs(playlistId, songs.map { it.id })
-        _messages.tryEmit(if (added == 0) "Já está em \"$name\"" else "Salvo em \"$name\"")
+        _messages.tryEmit(UiMessage.Text(if (added == 0) R.string.msg_already_in else R.string.msg_saved_to, name))
     }
 
     fun reorderPlaylist(playlistId: String, songs: List<Song>) =

@@ -47,6 +47,8 @@ import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 /** Dialog asking for a playlist name; used to create and to rename. */
 @Composable
@@ -70,7 +72,7 @@ fun PlaylistNameDialog(
                 value = name,
                 onValueChange = { name = it.take(MAX_NAME_LENGTH) },
                 singleLine = true,
-                placeholder = { Text("Nome da playlist", color = TextSecondary) },
+                placeholder = { Text(stringResource(R.string.playlist_name_hint), color = TextSecondary) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Done,
@@ -96,7 +98,7 @@ fun PlaylistNameDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = TextPrimary) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = TextPrimary) }
         },
     )
     LaunchedEffect(Unit) { runCatching { focusRequester.requestFocus() } }
@@ -118,7 +120,7 @@ fun AddToPlaylistSheet(
     ) {
         Column(Modifier.navigationBarsPadding()) {
             Text(
-                "Salvar na playlist",
+                stringResource(R.string.menu_save_to_playlist),
                 style = MaterialTheme.typography.titleLarge,
                 color = TextPrimary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -141,7 +143,7 @@ fun AddToPlaylistSheet(
                             Icon(Icons.Rounded.Add, contentDescription = null, tint = TextPrimary)
                         }
                         Text(
-                            "Nova playlist",
+                            stringResource(R.string.new_playlist),
                             style = MaterialTheme.typography.bodyLarge,
                             color = TextPrimary,
                             modifier = Modifier.padding(start = 14.dp),
@@ -162,13 +164,13 @@ fun DeletePlaylistDialog(name: String, onConfirm: () -> Unit, onDismiss: () -> U
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = InkSurface,
-        title = { Text("Excluir playlist?", color = TextPrimary) },
-        text = { Text("\"$name\" será excluída. As músicas continuam no aparelho.", color = TextSecondary) },
+        title = { Text(stringResource(R.string.delete_playlist_title), color = TextPrimary) },
+        text = { Text(stringResource(R.string.delete_playlist_message, name), color = TextSecondary) },
         confirmButton = {
-            TextButton(onClick = onConfirm) { Text("Excluir", color = TapeOrange) }
+            TextButton(onClick = onConfirm) { Text(stringResource(R.string.action_delete), color = TapeOrange) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar", color = TextPrimary) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = TextPrimary) }
         },
     )
 }

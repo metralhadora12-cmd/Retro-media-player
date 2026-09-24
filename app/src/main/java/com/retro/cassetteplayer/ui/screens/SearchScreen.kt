@@ -31,6 +31,8 @@ import com.retro.cassetteplayer.ui.theme.InkRaised
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.TapeOrange
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 @Composable
 fun SearchScreen(
@@ -50,7 +52,7 @@ fun SearchScreen(
             .statusBarsPadding()
     ) {
         Text(
-            text = "Buscar",
+            text = stringResource(R.string.search_title),
             style = MaterialTheme.typography.headlineSmall,
             color = TextPrimary,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
@@ -59,12 +61,12 @@ fun SearchScreen(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
-            placeholder = { Text("Título, artista ou álbum", color = TextSecondary) },
+            placeholder = { Text(stringResource(R.string.search_hint), color = TextSecondary) },
             leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = TextSecondary) },
             trailingIcon = {
                 if (query.isNotEmpty()) {
                     IconButton(onClick = { onQueryChange("") }) {
-                        Icon(Icons.Rounded.Close, contentDescription = "Limpar", tint = TextSecondary)
+                        Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.action_clear), tint = TextSecondary)
                     }
                 }
             },
@@ -83,7 +85,10 @@ fun SearchScreen(
         )
 
         if (results.isEmpty()) {
-            StatusMessage(if (query.isBlank()) "Biblioteca vazia." else "Nada encontrado para \"$query\".")
+            StatusMessage(
+                if (query.isBlank()) stringResource(R.string.search_empty_library)
+                else stringResource(R.string.search_no_results, query)
+            )
         } else {
             LazyColumn(Modifier.fillMaxSize()) {
                 items(results, key = { it.id }) { song ->

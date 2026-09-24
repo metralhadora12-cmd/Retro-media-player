@@ -69,6 +69,10 @@ import com.retro.cassetteplayer.ui.components.SongRow
 import com.retro.cassetteplayer.ui.components.TopGlow
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.ui.components.subtitleLabel
+import com.retro.cassetteplayer.ui.components.titleLabel
 
 /** Album / artist / playlist page: big cover, play & shuffle keys and the track list. */
 @Composable
@@ -110,8 +114,8 @@ fun CollectionScreen(
 
     if (renaming && collection != null && playlistId != null) {
         PlaylistNameDialog(
-            title = "Renomear playlist",
-            confirmLabel = "Salvar",
+            title = stringResource(R.string.rename_playlist),
+            confirmLabel = stringResource(R.string.action_save),
             initialName = collection.title,
             onConfirm = { name ->
                 onRenamePlaylist(playlistId, name)
@@ -152,13 +156,13 @@ fun CollectionScreen(
                         .padding(4.dp)
                 ) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar", tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back), tint = TextPrimary)
                     }
                     Spacer(Modifier.weight(1f))
                     if (playlistId != null) {
                         Box {
                             IconButton(onClick = { menuOpen = true }) {
-                                Icon(Icons.Rounded.MoreVert, contentDescription = "Opções da playlist", tint = TextPrimary)
+                                Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.collection_options), tint = TextPrimary)
                             }
                             DropdownMenu(
                                 expanded = menuOpen,
@@ -166,12 +170,12 @@ fun CollectionScreen(
                                 modifier = Modifier.background(InkSurface),
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Renomear", color = TextPrimary) },
+                                    text = { Text(stringResource(R.string.action_rename), color = TextPrimary) },
                                     leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null, tint = TextSecondary) },
                                     onClick = { menuOpen = false; renaming = true },
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Excluir playlist", color = TextPrimary) },
+                                    text = { Text(stringResource(R.string.menu_delete_playlist), color = TextPrimary) },
                                     leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null, tint = TextSecondary) },
                                     onClick = { menuOpen = false; confirmDelete = true },
                                 )
@@ -181,7 +185,7 @@ fun CollectionScreen(
                 }
             }
             if (collection == null) {
-                item { StatusMessage("Coleção não encontrada.") }
+                item { StatusMessage(stringResource(R.string.collection_not_found)) }
                 return@LazyColumn
             }
             item {
@@ -198,13 +202,13 @@ fun CollectionScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        collection.title,
+                        collection.titleLabel(),
                         style = MaterialTheme.typography.headlineSmall,
                         color = TextPrimary,
                         textAlign = TextAlign.Center,
                     )
                     Text(
-                        collection.subtitle,
+                        collection.subtitleLabel(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextSecondary,
                         textAlign = TextAlign.Center,
@@ -214,10 +218,10 @@ fun CollectionScreen(
                         modifier = Modifier.padding(vertical = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        PillButton("Tocar", onClick = { onPlayAll(collection.songs) }, icon = Icons.Rounded.PlayArrow, filled = true)
-                        PillButton("Aleatório", onClick = { onShufflePlay(collection.songs) }, icon = Icons.Rounded.Shuffle)
+                        PillButton(stringResource(R.string.action_play), onClick = { onPlayAll(collection.songs) }, icon = Icons.Rounded.PlayArrow, filled = true)
+                        PillButton(stringResource(R.string.action_shuffle), onClick = { onShufflePlay(collection.songs) }, icon = Icons.Rounded.Shuffle)
                         if (playlistId == null) {
-                            PillButton("Salvar", onClick = { onSaveAll(collection.songs) }, icon = Icons.AutoMirrored.Rounded.PlaylistAdd)
+                            PillButton(stringResource(R.string.action_save), onClick = { onSaveAll(collection.songs) }, icon = Icons.AutoMirrored.Rounded.PlaylistAdd)
                         }
                     }
                 }
@@ -225,8 +229,7 @@ fun CollectionScreen(
             if (collection.songs.isEmpty()) {
                 item {
                     StatusMessage(
-                        if (isFavorites) "Nenhuma favorita ainda. Toque no coração no player ou segure uma música e escolha \"Adicionar às favoritas\"."
-                        else "Playlist vazia. Segure uma música e escolha \"Salvar na playlist\" para adicioná-la aqui."
+                        stringResource(if (isFavorites) R.string.favorites_empty else R.string.playlist_empty)
                     )
                 }
             }
@@ -258,7 +261,7 @@ fun CollectionScreen(
                             if (playlistId != null) {
                                 Icon(
                                     Icons.Rounded.DragHandle,
-                                    contentDescription = "Arrastar para reordenar",
+                                    contentDescription = stringResource(R.string.drag_to_reorder),
                                     tint = if (isDragging) TapeOrange else TextSecondary,
                                     modifier = Modifier
                                         .draggableHandle(

@@ -65,9 +65,9 @@ class MusicRepository(private val context: Context) {
                     val albumId = cursor.getLong(albumIdCol)
                     songs += Song(
                         id = id,
-                        title = cursor.getString(titleCol).orUnknown("Faixa sem título"),
-                        artist = cursor.getString(artistCol).orUnknown("Artista desconhecido"),
-                        album = cursor.getString(albumCol).orUnknown("Álbum desconhecido"),
+                        title = cursor.getString(titleCol).orEmptyIfUnknown(),
+                        artist = cursor.getString(artistCol).orEmptyIfUnknown(),
+                        album = cursor.getString(albumCol).orEmptyIfUnknown(),
                         albumId = albumId,
                         durationMs = cursor.getLong(durationCol),
                         uri = ContentUris.withAppendedId(collection, id),
@@ -101,8 +101,9 @@ class MusicRepository(private val context: Context) {
         }
     }
 
-    private fun String?.orUnknown(fallback: String): String =
-        if (isNullOrBlank() || this == MediaStore.UNKNOWN_STRING) fallback else this
+    /** Unknown values become "" and are shown with a localised label by the UI. */
+    private fun String?.orEmptyIfUnknown(): String =
+        if (isNullOrBlank() || this == MediaStore.UNKNOWN_STRING) "" else this
 
     private companion object {
         val ALBUM_ART_URI: Uri = Uri.parse("content://media/external/audio/albumart")

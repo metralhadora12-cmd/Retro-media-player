@@ -1,5 +1,6 @@
 package com.retro.cassetteplayer
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,6 +14,10 @@ import com.retro.cassetteplayer.ui.theme.RetroCassetteTheme
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLanguage.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -221,7 +221,7 @@ fun CoverTile(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = collection.title,
+                text = collection.titleLabel(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary,
@@ -285,7 +285,7 @@ fun CollectionGridItem(
                 shape = collection.artShape(),
             )
             Text(
-                text = collection.title,
+                text = collection.titleLabel(),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary,
@@ -303,7 +303,7 @@ fun CollectionGridItem(
                         .size(14.dp),
                 )
                 Text(
-                    text = collection.subtitle,
+                    text = collection.subtitleLabel(),
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary,
                     maxLines = 2,
@@ -335,7 +335,7 @@ fun CollectionListItem(
                     .padding(start = 14.dp)
             ) {
                 Text(
-                    collection.title,
+                    collection.titleLabel(),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary,
@@ -343,7 +343,7 @@ fun CollectionListItem(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    collection.subtitle,
+                    collection.subtitleLabel(),
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary,
                     maxLines = 1,

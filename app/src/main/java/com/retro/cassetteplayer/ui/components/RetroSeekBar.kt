@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 private val TickColor = Color.White.copy(alpha = 0.25f)
 
@@ -61,12 +63,13 @@ fun RetroSeekBar(
         fontSize = 11.sp,
     )
 
+    val progressDescription = stringResource(R.string.player_progress)
     Column(modifier) {
         Canvas(
             Modifier
                 .fillMaxWidth()
                 .height(44.dp)
-                .semantics { contentDescription = "Barra de progresso" }
+                .semantics { contentDescription = progressDescription }
                 .pointerInput(durationMs) {
                     detectTapGestures { offset ->
                         if (durationMs > 0) {

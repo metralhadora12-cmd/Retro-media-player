@@ -77,18 +77,22 @@ import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeAmber
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
+import androidx.annotation.StringRes
+import androidx.compose.material.icons.outlined.Settings
 
-enum class LibraryFilter(val label: String) {
-    PLAYLISTS("Playlists"),
-    ALBUMS("Álbuns"),
-    ARTISTS("Artistas"),
-    SONGS("Músicas"),
+enum class LibraryFilter(@StringRes val label: Int) {
+    PLAYLISTS(R.string.filter_playlists),
+    ALBUMS(R.string.filter_albums),
+    ARTISTS(R.string.filter_artists),
+    SONGS(R.string.filter_songs),
 }
 
-enum class LibrarySort(val label: String) {
-    RECENT("Atividade recente"),
-    ALPHABETICAL("Ordem alfabética"),
-    SIZE("Mais faixas"),
+enum class LibrarySort(@StringRes val label: Int) {
+    RECENT(R.string.sort_recent),
+    ALPHABETICAL(R.string.sort_alphabetical),
+    SIZE(R.string.sort_size),
 }
 
 @Composable
@@ -109,6 +113,7 @@ fun LibraryScreen(
     onSaveAll: (List<Song>) -> Unit,
     onRenamePlaylist: (String, String) -> Unit,
     onDeletePlaylist: (String) -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     // Long-press menu targets for the rename / delete dialogs
     var renameTarget by remember { mutableStateOf<SongCollection?>(null) }
@@ -117,8 +122,8 @@ fun LibraryScreen(
         val id = target.userPlaylistId
         if (id != null) {
             PlaylistNameDialog(
-                title = "Renomear playlist",
-                confirmLabel = "Salvar",
+                title = stringResource(R.string.rename_playlist),
+                confirmLabel = stringResource(R.string.action_save),
                 initialName = target.title,
                 onConfirm = { name ->
                     onRenamePlaylist(id, name)
@@ -198,16 +203,19 @@ fun LibraryScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Biblioteca",
+                    text = stringResource(R.string.library_title),
                     style = MaterialTheme.typography.headlineSmall.copy(fontSize = 30.sp),
                     color = TextPrimary,
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(onClick = onCreatePlaylist) {
-                    Icon(Icons.Rounded.Add, contentDescription = "Nova playlist", tint = TextPrimary)
+                    Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.new_playlist), tint = TextPrimary)
                 }
                 IconButton(onClick = onOpenSearch) {
-                    Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = TextPrimary)
+                    Icon(Icons.Rounded.Search, contentDescription = stringResource(R.string.action_search), tint = TextPrimary)
+                }
+                IconButton(onClick = onOpenSettings) {
+                    Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.action_settings), tint = TextPrimary)
                 }
             }
 
@@ -219,12 +227,12 @@ fun LibraryScreen(
             ) {
                 if (filter != null) {
                     item {
-                        RetroIconChip(Icons.Rounded.Close, "Limpar filtro", onClick = { filter = null })
+                        RetroIconChip(Icons.Rounded.Close, stringResource(R.string.filter_clear), onClick = { filter = null })
                     }
                 }
                 items(LibraryFilter.entries) { option ->
                     RetroChip(
-                        text = option.label,
+                        text = stringResource(option.label),
                         selected = option == filter,
                         onClick = { filter = if (option == filter) null else option },
                     )
@@ -243,7 +251,7 @@ fun LibraryScreen(
                     IconButton(onClick = { gridMode = !gridMode }) {
                         Icon(
                             if (gridMode) Icons.AutoMirrored.Rounded.ViewList else Icons.Rounded.GridView,
-                            contentDescription = if (gridMode) "Ver em lista" else "Ver em grade",
+                            contentDescription = stringResource(if (gridMode) R.string.view_as_list else R.string.view_as_grid),
                             tint = TextPrimary,
                         )
                     }
@@ -271,7 +279,7 @@ fun LibraryScreen(
                     }
                 }
                 collections.isEmpty() && filter != LibraryFilter.PLAYLISTS ->
-                    StatusMessage("Nada na biblioteca ainda.")
+                    StatusMessage(stringResource(R.string.library_empty))
                 gridMode -> LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 150.dp),
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
@@ -307,7 +315,7 @@ fun LibraryScreen(
         ) {
             Icon(Icons.Rounded.Shuffle, contentDescription = null)
             Spacer(Modifier.width(10.dp))
-            Text("Modo aleatório", style = MaterialTheme.typography.titleMedium, color = Ink)
+            Text(stringResource(R.string.library_shuffle_all), style = MaterialTheme.typography.titleMedium, color = Ink)
         }
     }
 }
@@ -322,8 +330,8 @@ private fun SortSelector(sort: LibrarySort, onSortChange: (LibrarySort) -> Unit)
                 .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(sort.label, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-            Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Ordenar", tint = TextPrimary)
+            Text(stringResource(sort.label), style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+            Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = stringResource(R.string.sort_label), tint = TextPrimary)
         }
         DropdownMenu(
             expanded = open,
@@ -332,7 +340,7 @@ private fun SortSelector(sort: LibrarySort, onSortChange: (LibrarySort) -> Unit)
         ) {
             LibrarySort.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.label, color = if (option == sort) TapeAmber else TextPrimary) },
+                    text = { Text(stringResource(option.label), color = if (option == sort) TapeAmber else TextPrimary) },
                     onClick = {
                         open = false
                         onSortChange(option)
@@ -361,7 +369,7 @@ private fun NewPlaylistGridItem(onClick: () -> Unit) {
             Icon(Icons.Rounded.Add, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(40.dp))
         }
         Text(
-            "Nova playlist",
+            stringResource(R.string.new_playlist),
             style = MaterialTheme.typography.bodyLarge,
             color = TextPrimary,
             modifier = Modifier.padding(top = 8.dp),
@@ -387,7 +395,7 @@ private fun NewPlaylistListItem(onClick: () -> Unit) {
             Icon(Icons.Rounded.Add, contentDescription = null, tint = TextPrimary)
         }
         Text(
-            "Nova playlist",
+            stringResource(R.string.new_playlist),
             style = MaterialTheme.typography.bodyLarge,
             color = TextPrimary,
             modifier = Modifier.padding(start = 14.dp),
@@ -413,16 +421,16 @@ private fun CollectionMenuItems(
         action()
     }
     if (collection.songs.isNotEmpty()) {
-        MenuItem("Tocar", Icons.Rounded.PlayArrow, closing(onPlay))
-        MenuItem("Tocar em ordem aleatória", Icons.Rounded.Shuffle, closing(onShuffle))
-        MenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay, closing(onAddToQueue))
-        MenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd, closing(onSave))
+        MenuItem(stringResource(R.string.action_play), Icons.Rounded.PlayArrow, closing(onPlay))
+        MenuItem(stringResource(R.string.menu_play_shuffled), Icons.Rounded.Shuffle, closing(onShuffle))
+        MenuItem(stringResource(R.string.menu_add_to_queue), Icons.AutoMirrored.Rounded.PlaylistPlay, closing(onAddToQueue))
+        MenuItem(stringResource(R.string.menu_save_to_playlist), Icons.AutoMirrored.Rounded.PlaylistAdd, closing(onSave))
     }
     if (collection.userPlaylistId != null) {
-        MenuItem("Editar playlist", Icons.Rounded.Edit, closing(onEdit))
-        MenuItem("Renomear", Icons.Rounded.DriveFileRenameOutline, closing(onRename))
-        MenuItem("Excluir playlist", Icons.Rounded.Delete, closing(onDelete))
+        MenuItem(stringResource(R.string.menu_edit_playlist), Icons.Rounded.Edit, closing(onEdit))
+        MenuItem(stringResource(R.string.action_rename), Icons.Rounded.DriveFileRenameOutline, closing(onRename))
+        MenuItem(stringResource(R.string.menu_delete_playlist), Icons.Rounded.Delete, closing(onDelete))
     } else if (collection.songs.isEmpty()) {
-        MenuItem("Abrir", Icons.AutoMirrored.Rounded.QueueMusic, closing(onEdit))
+        MenuItem(stringResource(R.string.action_open), Icons.AutoMirrored.Rounded.QueueMusic, closing(onEdit))
     }
 }

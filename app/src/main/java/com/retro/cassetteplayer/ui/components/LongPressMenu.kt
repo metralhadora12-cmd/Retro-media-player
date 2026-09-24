@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.IntSize
 import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 /**
  * Clickable container whose long press opens [menu] right under the finger.
@@ -65,7 +67,7 @@ fun LongPressMenuBox(
                         open = true
                     }
                 },
-                onLongClickLabel = if (menu != null) "Opções" else null,
+                onLongClickLabel = if (menu != null) stringResource(R.string.action_options) else null,
             )
     ) {
         content()

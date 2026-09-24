@@ -22,10 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 
 data class BottomDestination(
     val route: String,
-    val label: String,
+    @StringRes val labelRes: Int,
     val icon: ImageVector,
     val selectedIcon: ImageVector = icon,
 )
@@ -49,6 +51,7 @@ fun RetroBottomBar(
         destinations.forEach { destination ->
             val selected = destination.route == currentRoute
             val tint = if (selected) TextPrimary else TextSecondary
+            val label = stringResource(destination.labelRes)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -59,11 +62,11 @@ fun RetroBottomBar(
             ) {
                 Icon(
                     if (selected) destination.selectedIcon else destination.icon,
-                    contentDescription = destination.label,
+                    contentDescription = label,
                     tint = tint,
                 )
                 Spacer(Modifier.height(4.dp))
-                Text(destination.label, style = MaterialTheme.typography.labelSmall, color = tint)
+                Text(label, style = MaterialTheme.typography.labelSmall, color = tint)
             }
         }
     }

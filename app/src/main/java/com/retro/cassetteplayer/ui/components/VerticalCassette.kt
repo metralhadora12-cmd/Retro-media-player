@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import com.retro.cassetteplayer.ui.theme.LabelCream
 import com.retro.cassetteplayer.ui.theme.TapeBrown
 import com.retro.cassetteplayer.ui.theme.TapeOrange
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
 
 /** Width / height of the upright cassette. */
 const val VERTICAL_CASSETTE_ASPECT = 0.6f
@@ -94,14 +96,16 @@ fun VerticalCassette(
 ) {
     val angles = rememberReelAngles(isPlaying, progress)
     val textMeasurer = rememberTextMeasurer()
+    val defaultTitle = stringResource(R.string.cassette_default_title)
+    val defaultSubtitle = stringResource(R.string.cassette_default_subtitle)
     Canvas(modifier) {
         drawCassette(
             area = Rect(Offset.Zero, size),
             topAngle = angles.top,
             bottomAngle = angles.bottom,
             progress = progress.coerceIn(0f, 1f),
-            title = title,
-            subtitle = subtitle,
+            title = title.ifBlank { defaultTitle },
+            subtitle = subtitle.ifBlank { defaultSubtitle },
             textMeasurer = textMeasurer,
         )
     }
@@ -141,7 +145,7 @@ private fun DrawScope.drawCassette(
     // Title printed sideways on the cream part, artist sideways on the band
     drawSidewaysText(
         textMeasurer = textMeasurer,
-        text = title.ifBlank { "MIX TAPE" }.uppercase(),
+        text = title.uppercase(),
         center = Offset(x(0.1f), y(0.5f)),
         maxLength = h * 0.86f,
         fontSize = (w * 0.1f).toSp(),
@@ -151,7 +155,7 @@ private fun DrawScope.drawCassette(
     )
     drawSidewaysText(
         textMeasurer = textMeasurer,
-        text = subtitle.ifBlank { "PLAYLIST" }.uppercase(),
+        text = subtitle.uppercase(),
         center = Offset(band.center.x + w * 0.005f, y(0.5f)),
         maxLength = h * 0.7f,
         fontSize = (w * 0.055f).toSp(),

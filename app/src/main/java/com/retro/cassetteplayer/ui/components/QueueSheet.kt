@@ -35,9 +35,13 @@ import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeAmber
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.res.stringResource
+import com.retro.cassetteplayer.R
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.ExperimentalComposeUiApi
 
 /** "A seguir": the play queue in playback order, like YouTube Music's Up Next tab. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun QueueSheet(
     playback: PlaybackState,
@@ -52,16 +56,15 @@ fun QueueSheet(
     ) {
         Column(Modifier.navigationBarsPadding()) {
             Text(
-                text = "A seguir",
+                text = stringResource(R.string.queue_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = TextPrimary,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
             Text(
-                text = when (val count = playback.queue.size - 1) {
-                    in Int.MIN_VALUE..0 -> "Nenhuma faixa depois desta"
-                    1 -> "1 faixa na fila"
-                    else -> "$count faixas na fila"
+                text = (playback.queue.size - 1).let { count ->
+                    if (count <= 0) stringResource(R.string.queue_nothing_after)
+                    else pluralStringResource(R.plurals.queue_count, count, count)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary,
@@ -70,7 +73,7 @@ fun QueueSheet(
             HorizontalDivider(color = Color.White.copy(alpha = 0.08f), modifier = Modifier.padding(top = 8.dp))
 
             if (playback.queue.isEmpty()) {
-                StatusMessage("A fila está vazia.")
+                StatusMessage(stringResource(R.string.queue_empty))
             } else {
                 LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
                     itemsIndexed(playback.queue, key = { _, item -> item.index }) { position, item ->
@@ -108,7 +111,7 @@ private fun QueueRow(
                 .padding(horizontal = 14.dp)
         ) {
             Text(
-                item.title.ifBlank { "—" },
+                titleLabel(item.title),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Normal,
                 color = if (isCurrent) TapeAmber else TextPrimary,
@@ -116,7 +119,7 @@ private fun QueueRow(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                if (isCurrent) "Tocando agora • ${item.artist}" else item.artist,
+                if (isCurrent) stringResource(R.string.queue_now_playing, artistLabel(item.artist)) else artistLabel(item.artist),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary,
                 maxLines = 1,
@@ -125,7 +128,7 @@ private fun QueueRow(
         }
         if (!isCurrent) {
             IconButton(onClick = onRemove) {
-                Icon(Icons.Rounded.Close, contentDescription = "Remover da fila", tint = TextSecondary)
+                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.queue_remove), tint = TextSecondary)
             }
         }
     }
