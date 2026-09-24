@@ -14,10 +14,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -164,93 +171,118 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
         navController.navigate(Routes.collection(collection.id))
     }
 
-    Scaffold(
-        containerColor = Ink,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        bottomBar = {
-            AnimatedVisibility(
-                visible = currentRoute != Routes.PLAYER,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut(),
-            ) {
-                Column {
-                    if (playback.hasMedia) {
-                        MiniPlayer(
-                            state = playback,
-                            onOpen = openPlayer,
-                            onTogglePlay = viewModel::togglePlayPause,
-                            onNext = viewModel::skipNext,
-                        )
-                    }
-                    RetroBottomBar(
-                        destinations = Routes.bottomDestinations,
-                        currentRoute = currentRoute,
-                        onSelect = openTab,
+    // The bars sit under the NavHost: tab screens keep a fixed bottom gap for them, while
+    // the full-screen player is drawn on top. Nothing resizes while the player slides in/out.
+    val density = LocalDensity.current
+    var barsHeight by remember { mutableStateOf(0.dp) }
+    val tabContent: @Composable (@Composable () -> Unit) -> Unit = { content ->
+        Box(Modifier.padding(bottom = barsHeight)) { content() }
+    }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(Ink)
+    ) {
+        AnimatedVisibility(
+            visible = currentRoute != Routes.PLAYER,
+            enter = slideInVertically(tween(PLAYER_ANIM_MS)) { it },
+            exit = slideOutVertically(tween(PLAYER_ANIM_MS)) { it },
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) {
+            Column(Modifier.onSizeChanged { barsHeight = with(density) { it.height.toDp() } }) {
+                if (playback.hasMedia) {
+                    MiniPlayer(
+                        state = playback,
+                        onOpen = openPlayer,
+                        onTogglePlay = viewModel::togglePlayPause,
+                        onNext = viewModel::skipNext,
                     )
                 }
+                RetroBottomBar(
+                    destinations = Routes.bottomDestinations,
+                    currentRoute = currentRoute,
+                    onSelect = openTab,
+                )
             }
-        },
-    ) { innerPadding ->
+        }
+
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.fillMaxSize(),
+            enterTransition = { fadeIn(tween(TAB_FADE_MS)) },
+            exitTransition = {
+                // Keep the screen fully visible underneath while the player slides over it.
+                if (targetState.destination.route == Routes.PLAYER) fadeOut(snap(PLAYER_ANIM_MS))
+                else fadeOut(tween(TAB_FADE_MS))
+            },
+            popEnterTransition = {
+                if (initialState.destination.route == Routes.PLAYER) fadeIn(snap())
+                else fadeIn(tween(TAB_FADE_MS))
+            },
+            popExitTransition = { fadeOut(tween(TAB_FADE_MS)) },
         ) {
             composable(Routes.HOME) {
-                HomeScreen(
-                    songs = songs,
-                    albums = library.albums,
-                    playlists = library.playlists,
-                    playback = playback,
-                    isLoading = isLoading,
-                    hasPermission = hasPermission,
-                    onRequestPermission = { permissionLauncher.launch(requestedPermissions) },
-                    onOpenSettings = {
-                        context.startActivity(
-                            Intent(
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                Uri.fromParts("package", context.packageName, null),
+                tabContent {
+                    HomeScreen(
+                        songs = songs,
+                        albums = library.albums,
+                        playlists = library.playlists,
+                        playback = playback,
+                        isLoading = isLoading,
+                        hasPermission = hasPermission,
+                        onRequestPermission = { permissionLauncher.launch(requestedPermissions) },
+                        onOpenSettings = {
+                            context.startActivity(
+                                Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.fromParts("package", context.packageName, null),
+                                )
                             )
-                        )
-                    },
-                    onReload = viewModel::loadSongs,
-                    onOpenSearch = { openTab(Routes.SEARCH) },
-                    onOpenLibrary = { openTab(Routes.LIBRARY) },
-                    onOpenCollection = openCollection,
-                    onPlayAll = viewModel::playAll,
-                    onSongClick = viewModel::play,
-                    onPlayNext = viewModel::playNext,
-                    onAddToQueue = viewModel::addToQueue,
-                    onAddToPlaylist = saveSong,
-                )
+                        },
+                        onReload = viewModel::loadSongs,
+                        onOpenSearch = { openTab(Routes.SEARCH) },
+                        onOpenLibrary = { openTab(Routes.LIBRARY) },
+                        onOpenCollection = openCollection,
+                        onPlayAll = viewModel::playAll,
+                        onSongClick = viewModel::play,
+                        onPlayNext = viewModel::playNext,
+                        onAddToQueue = viewModel::addToQueue,
+                        onAddToPlaylist = saveSong,
+                    )
+                }
             }
             composable(Routes.SEARCH) {
-                SearchScreen(
-                    query = query,
-                    onQueryChange = viewModel::onQueryChange,
-                    results = searchResults,
-                    playback = playback,
-                    onSongClick = { song -> viewModel.play(searchResults, song) },
-                    onPlayNext = viewModel::playNext,
-                    onAddToQueue = viewModel::addToQueue,
-                    onAddToPlaylist = saveSong,
-                )
+                tabContent {
+                    SearchScreen(
+                        query = query,
+                        onQueryChange = viewModel::onQueryChange,
+                        results = searchResults,
+                        playback = playback,
+                        onSongClick = { song -> viewModel.play(searchResults, song) },
+                        onPlayNext = viewModel::playNext,
+                        onAddToQueue = viewModel::addToQueue,
+                        onAddToPlaylist = saveSong,
+                    )
+                }
             }
             composable(Routes.LIBRARY) {
-                LibraryScreen(
-                    songs = songs,
-                    library = library,
-                    playback = playback,
-                    onOpenSearch = { openTab(Routes.SEARCH) },
-                    onOpenCollection = openCollection,
-                    onShufflePlay = viewModel::shufflePlay,
-                    onSongClick = viewModel::play,
-                    onPlayNext = viewModel::playNext,
-                    onAddToQueue = viewModel::addToQueue,
-                    onAddToPlaylist = saveSong,
-                    onCreatePlaylist = { creatingPlaylist = true },
-                )
+                tabContent {
+                    LibraryScreen(
+                        songs = songs,
+                        library = library,
+                        playback = playback,
+                        onOpenSearch = { openTab(Routes.SEARCH) },
+                        onOpenCollection = openCollection,
+                        onShufflePlay = viewModel::shufflePlay,
+                        onSongClick = viewModel::play,
+                        onPlayNext = viewModel::playNext,
+                        onAddToQueue = viewModel::addToQueue,
+                        onAddToPlaylist = saveSong,
+                        onCreatePlaylist = { creatingPlaylist = true },
+                    )
+                }
             }
             composable(
                 route = Routes.COLLECTION,
@@ -260,28 +292,30 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                 }),
             ) { entry ->
                 val id = entry.arguments?.getString(Routes.COLLECTION_ARG).orEmpty()
-                CollectionScreen(
-                    collection = library.find(id),
-                    playback = playback,
-                    onBack = { navController.popBackStack() },
-                    onPlayAll = viewModel::playAll,
-                    onShufflePlay = viewModel::shufflePlay,
-                    onSongClick = viewModel::play,
-                    onPlayNext = viewModel::playNext,
-                    onAddToQueue = viewModel::addToQueue,
-                    onAddToPlaylist = saveSong,
-                    onSaveAll = saveToPlaylist,
-                    onRenamePlaylist = viewModel::renamePlaylist,
-                    onDeletePlaylist = viewModel::deletePlaylist,
-                    onRemoveFromPlaylist = viewModel::removeFromPlaylist,
-                    onReorderPlaylist = viewModel::reorderPlaylist,
-                )
+                tabContent {
+                    CollectionScreen(
+                        collection = library.find(id),
+                        playback = playback,
+                        onBack = { navController.popBackStack() },
+                        onPlayAll = viewModel::playAll,
+                        onShufflePlay = viewModel::shufflePlay,
+                        onSongClick = viewModel::play,
+                        onPlayNext = viewModel::playNext,
+                        onAddToQueue = viewModel::addToQueue,
+                        onAddToPlaylist = saveSong,
+                        onSaveAll = saveToPlaylist,
+                        onRenamePlaylist = viewModel::renamePlaylist,
+                        onDeletePlaylist = viewModel::deletePlaylist,
+                        onRemoveFromPlaylist = viewModel::removeFromPlaylist,
+                        onReorderPlaylist = viewModel::reorderPlaylist,
+                    )
+                }
             }
             composable(
                 route = Routes.PLAYER,
-                enterTransition = { slideInVertically { it } },
-                exitTransition = { slideOutVertically { it } },
-                popExitTransition = { slideOutVertically { it } },
+                enterTransition = { slideInVertically(tween(PLAYER_ANIM_MS)) { it } },
+                exitTransition = { slideOutVertically(tween(PLAYER_ANIM_MS)) { it } },
+                popExitTransition = { slideOutVertically(tween(PLAYER_ANIM_MS)) { it } },
             ) {
                 PlayerScreen(
                     playback = playback,
@@ -299,5 +333,15 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                 )
             }
         }
+
+        SnackbarHost(
+            snackbarHostState,
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = barsHeight),
+        )
     }
 }
+
+private const val PLAYER_ANIM_MS = 350
+private const val TAB_FADE_MS = 200
