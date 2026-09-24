@@ -100,10 +100,12 @@ shot 01_home; dump 01_home; crashed home
 
 # --- HQ badges before anything is played (FLAC x2 + ALAC in .m4a) ---
 tap_text "Library"; sleep 3
+# the chip row scrolls sideways: bring "Songs" into view
+adb shell input swipe $((W*9/10)) $((H*17/100)) $((W/10)) $((H*17/100)) 400; sleep 1
 tap_text "Songs"; sleep 4
 shot 01b_songs; dump 01b_songs
 echo "HQ badges before playing (expected 3): $(grep -o 'High quality (lossless)' "$OUT/01b_songs.xml" | wc -l)" | tee "$OUT/hq_count.txt"
-tap_text "Songs"; sleep 2
+tap_text "Clear filter"; sleep 2
 
 # --- Settings ---
 tap_text "Library"; sleep 3
