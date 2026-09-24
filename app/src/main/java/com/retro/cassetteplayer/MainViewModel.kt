@@ -28,6 +28,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import android.net.Uri
+import com.retro.cassetteplayer.data.Backup
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -190,6 +194,66 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /** Shows feedback coming from other screens (e.g. the tag editor). */
     fun showMessage(message: UiMessage) {
         _messages.tryEmit(message)
+    }
+
+    // --- Backup -----------------------------------------------------------------
+
+    /** Writes playlists and favourites as JSON to a file picked by the user. */
+    fun exportBackup(uri: Uri) {
+        viewModelScope.launch {
+            val json = Backup.export(_songs.value, playlistRepository.playlists.value, favoritesRepository.favorites.value)
+            val ok = withContext(Dispatchers.IO) {
+                runCatching {
+                    getApplication<Application>().contentResolver.openOutputStream(uri, "wt")?.use {
+                        it.write(json.toByteArray())
+                    } != null
+                }.getOrDefault(false)
+            }
+            _messages.tryEmit(UiMessage.Text(if (ok) R.string.msg_backup_exported else R.string.msg_backup_failed))
+        }
+    }
+
+    /** Restores a backup, merging with what's already there. */
+    fun importBackup(uri: Uri) {
+        viewModelScope.launch {
+            val text = withContext(Dispatchers.IO) {
+                runCatching {
+                    getApplication<Application>().contentResolver.openInputStream(uri)?.use {
+                        it.readBytes().decodeToString()
+                    }
+                }.getOrNull()
+            }
+            val contents = text?.let(Backup::parse)
+            if (contents == null) {
+                _messages.tryEmit(UiMessage.Text(R.string.msg_backup_invalid))
+                return@launch
+            }
+            val matcher = Backup.Matcher(_songs.value)
+            var missing = 0
+            fun resolve(refs: List<Backup.SongRef>): List<Long> = refs.mapNotNull { ref ->
+                matcher.find(ref)?.id.also { if (it == null) missing++ }
+            }
+
+            favoritesRepository.addAll(resolve(contents.favorites))
+            contents.playlists.forEach { (name, refs) ->
+                val ids = resolve(refs)
+                val existing = playlistRepository.playlists.value.firstOrNull { it.name.equals(name, ignoreCase = true) }
+                if (existing != null) playlistRepository.addSongs(existing.id, ids)
+                else playlistRepository.create(name, ids)
+            }
+            _messages.tryEmit(
+                if (missing == 0) {
+                    UiMessage.Text(R.string.msg_backup_imported, contents.playlists.size, contents.favorites.size)
+                } else {
+                    UiMessage.Text(
+                        R.string.msg_backup_imported_missing,
+                        contents.playlists.size,
+                        contents.favorites.size,
+                        missing,
+                    )
+                }
+            )
+        }
     }
 
     // --- Favourites -----------------------------------------------------------------

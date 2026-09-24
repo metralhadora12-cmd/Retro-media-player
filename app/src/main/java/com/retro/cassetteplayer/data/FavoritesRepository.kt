@@ -23,6 +23,17 @@ class FavoritesRepository(context: Context) {
         return nowFavorite
     }
 
+    /** Adds songs that aren't favourites yet (keeps the current order first). */
+    fun addAll(songIds: List<Long>): Int {
+        val current = _favorites.value
+        val new = songIds.distinct().filterNot { it in current }
+        if (new.isEmpty()) return 0
+        val updated = current + new
+        _favorites.value = updated
+        prefs.edit().putString(KEY_IDS, JSONArray(updated).toString()).apply()
+        return new.size
+    }
+
     fun remove(songId: Long) {
         if (songId in _favorites.value) toggle(songId)
     }

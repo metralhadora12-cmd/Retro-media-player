@@ -418,6 +418,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onOpenEqualizer = { navController.navigate(Routes.EQUALIZER) },
                             onOpenChangelog = { navController.navigate(Routes.CHANGELOG) },
                             onReloadLibrary = viewModel::loadSongs,
+                            onExportBackup = viewModel::exportBackup,
+                            onImportBackup = viewModel::importBackup,
                         )
                     }
                 }

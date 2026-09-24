@@ -135,6 +135,16 @@
     <string name="msg_tags_saved">Tags saved to the file</string>
     <string name="msg_tags_failed">Couldn\'t write tags to this file</string>
     <string name="msg_cover_failed">Couldn\'t download the cover</string>
+    <string name="settings_section_backup">Backup</string>
+    <string name="settings_backup_export">Export playlists and favorites</string>
+    <string name="settings_backup_export_summary">Saves a .json file wherever you choose</string>
+    <string name="settings_backup_import">Restore backup</string>
+    <string name="settings_backup_import_summary">Merges with your current playlists and favorites</string>
+    <string name="msg_backup_exported">Backup exported</string>
+    <string name="msg_backup_failed">Couldn\'t save the backup</string>
+    <string name="msg_backup_invalid">Invalid backup file</string>
+    <string name="msg_backup_imported">Backup restored: %1$d playlists, %2$d favorites</string>
+    <string name="msg_backup_imported_missing">Backup restored: %1$d playlists, %2$d favorites (%3$d songs not found)</string>
     <string name="msg_language_changed">Language changed</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_audio">Audio</string>
@@ -184,6 +194,9 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_2_1">
+        <item>Playlists and favorites backup: export to a file and restore later, even on another device</item>
+    </string-array>
     <string-array name="changelog_2_0">
         <item>Tag editing: title, artist, album, year, track and genre written straight into the file</item>
         <item>Change the cover from your gallery or search covers online (iTunes and Deezer)</item>

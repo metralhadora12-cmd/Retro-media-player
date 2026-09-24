@@ -137,6 +137,16 @@
     <string name="msg_tags_saved">Tags salvas no arquivo</string>
     <string name="msg_tags_failed">Não foi possível gravar as tags neste arquivo</string>
     <string name="msg_cover_failed">Não foi possível baixar a capa</string>
+    <string name="settings_section_backup">Backup</string>
+    <string name="settings_backup_export">Exportar playlists e favoritas</string>
+    <string name="settings_backup_export_summary">Salva um arquivo .json onde você escolher</string>
+    <string name="settings_backup_import">Restaurar backup</string>
+    <string name="settings_backup_import_summary">Junta com as playlists e favoritas atuais</string>
+    <string name="msg_backup_exported">Backup exportado</string>
+    <string name="msg_backup_failed">Não foi possível salvar o backup</string>
+    <string name="msg_backup_invalid">Arquivo de backup inválido</string>
+    <string name="msg_backup_imported">Backup restaurado: %1$d playlists, %2$d favoritas</string>
+    <string name="msg_backup_imported_missing">Backup restaurado: %1$d playlists, %2$d favoritas (%3$d músicas não encontradas)</string>
     <string name="msg_language_changed">Idioma alterado</string>
     <string name="settings_title">Configurações</string>
     <string name="settings_section_audio">Áudio</string>
@@ -189,6 +199,9 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_2_1">
+        <item>Backup de playlists e favoritas: exporte para um arquivo e restaure depois, até em outro aparelho</item>
+    </string-array>
     <string-array name="changelog_2_0">
         <item>Edição de tags: título, artista, álbum, ano, faixa e gênero gravados direto no arquivo</item>
         <item>Troque a capa pela galeria ou busque capas online (iTunes e Deezer)</item>

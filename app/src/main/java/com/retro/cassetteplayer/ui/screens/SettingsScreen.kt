@@ -3,6 +3,12 @@ package com.retro.cassetteplayer.ui.screens
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Upload
+import java.time.LocalDate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -60,7 +66,15 @@ fun SettingsScreen(
     onOpenEqualizer: () -> Unit,
     onOpenChangelog: () -> Unit,
     onReloadLibrary: () -> Unit,
+    onExportBackup: (Uri) -> Unit,
+    onImportBackup: (Uri) -> Unit,
 ) {
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri -> uri?.let(onExportBackup) }
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> uri?.let(onImportBackup) }
     val context = LocalContext.current
     val currentLanguage = remember { AppLanguage.current(context) }
     var choosingLanguage by remember { mutableStateOf(false) }
@@ -139,6 +153,24 @@ fun SettingsScreen(
                     title = stringResource(R.string.action_reload_library),
                     summary = stringResource(R.string.settings_reload_summary),
                     onClick = onReloadLibrary,
+                )
+            }
+            item { SectionTitle(stringResource(R.string.settings_section_backup)) }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.Upload,
+                    title = stringResource(R.string.settings_backup_export),
+                    summary = stringResource(R.string.settings_backup_export_summary),
+                    onClick = { exportLauncher.launch("retro-cassette-backup-${LocalDate.now()}.json") },
+                )
+            }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.Download,
+                    title = stringResource(R.string.settings_backup_import),
+                    summary = stringResource(R.string.settings_backup_import_summary),
+                    // Some file managers don't tag .json files, so accept any file and validate it
+                    onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream", "*/*")) },
                 )
             }
             item { SectionTitle(stringResource(R.string.settings_section_about)) }

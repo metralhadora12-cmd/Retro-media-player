@@ -135,6 +135,16 @@
     <string name="msg_tags_saved">Etiquetas guardadas en el archivo</string>
     <string name="msg_tags_failed">No se pudieron guardar las etiquetas en este archivo</string>
     <string name="msg_cover_failed">No se pudo descargar la portada</string>
+    <string name="settings_section_backup">Copia de seguridad</string>
+    <string name="settings_backup_export">Exportar playlists y favoritas</string>
+    <string name="settings_backup_export_summary">Guarda un archivo .json donde elijas</string>
+    <string name="settings_backup_import">Restaurar copia</string>
+    <string name="settings_backup_import_summary">Se combina con tus playlists y favoritas actuales</string>
+    <string name="msg_backup_exported">Copia exportada</string>
+    <string name="msg_backup_failed">No se pudo guardar la copia</string>
+    <string name="msg_backup_invalid">Archivo de copia no válido</string>
+    <string name="msg_backup_imported">Copia restaurada: %1$d playlists, %2$d favoritas</string>
+    <string name="msg_backup_imported_missing">Copia restaurada: %1$d playlists, %2$d favoritas (%3$d canciones no encontradas)</string>
     <string name="msg_language_changed">Idioma cambiado</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_audio">Audio</string>
@@ -187,6 +197,9 @@
         <item quantity="many">%d pistas añadidas a la cola</item>
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
+    <string-array name="changelog_2_1">
+        <item>Copia de playlists y favoritas: exporta a un archivo y restáurala después, incluso en otro dispositivo</item>
+    </string-array>
     <string-array name="changelog_2_0">
         <item>Edición de etiquetas: título, artista, álbum, año, pista y género guardados en el archivo</item>
         <item>Cambia la portada desde la galería o busca portadas en línea (iTunes y Deezer)</item>
