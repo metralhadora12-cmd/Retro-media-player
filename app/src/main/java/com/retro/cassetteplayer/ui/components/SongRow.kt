@@ -58,6 +58,7 @@ import com.retro.cassetteplayer.ui.theme.TapeOrange
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.DriveFileRenameOutline
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -77,6 +78,7 @@ fun SongRow(
     val favorites = LocalFavorites.current
     val deleteSong = LocalDeleteSong.current
     val editSong = LocalEditSong.current
+    val renameSong = LocalRenameSong.current
     val isFavorite = favorites.isFavorite(song)
 
     // Where the finger went down (row coordinates) and the row size, used to open the
@@ -169,6 +171,10 @@ fun SongRow(
                     menuOpen = false
                     onRemoveFromPlaylist()
                 }
+            }
+            SongMenuItem(stringResource(R.string.menu_rename_song), Icons.Rounded.DriveFileRenameOutline) {
+                menuOpen = false
+                renameSong(song)
             }
             SongMenuItem(stringResource(R.string.menu_edit_tags), Icons.Rounded.Edit) {
                 menuOpen = false

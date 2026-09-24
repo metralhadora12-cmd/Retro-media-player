@@ -1,6 +1,7 @@
 package com.retro.cassetteplayer.data
 
 import android.app.RecoverableSecurityException
+import android.content.ContentValues
 import android.content.Context
 import android.content.IntentSender
 import android.graphics.BitmapFactory
@@ -124,6 +125,55 @@ class TagEditor(private val context: Context) {
 
     private class PermissionNeeded(val intentSender: IntentSender) : Exception()
 
+    /**
+     * Renames a song: sets the title tag to [newName] and, when [renameFile] is true,
+     * also renames the file itself (keeping its extension). Saved if at least one of the
+     * two succeeded (some formats can't hold tags but can still be renamed).
+     */
+    suspend fun rename(song: Song, newName: String, renameFile: Boolean): WriteResult = withContext(Dispatchers.IO) {
+        try {
+            val titleOk = editFile(song) { tag -> tag.put(FieldKey.TITLE, newName) }
+            val fileOk = renameFile && renameFileTo(song, sanitizeFileName(newName))
+            if (titleOk || fileOk) WriteResult.Saved else WriteResult.Failed
+        } catch (e: PermissionNeeded) {
+            WriteResult.NeedsPermission(e.intentSender)
+        }
+    }
+
+    private fun renameFileTo(song: Song, baseName: String): Boolean {
+        if (baseName.isBlank()) return false
+        val newName = "$baseName.${extensionOf(song)}"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // MediaStore renames the file and keeps the same id (playlists stay intact)
+            return try {
+                val values = ContentValues().apply { put(MediaStore.Audio.Media.DISPLAY_NAME, newName) }
+                context.contentResolver.update(song.uri, values, null, null) > 0
+            } catch (e: SecurityException) {
+                if (e is RecoverableSecurityException) throw PermissionNeeded(e.userAction.actionIntent.intentSender)
+                false
+            } catch (e: Exception) {
+                false
+            }
+        }
+        @Suppress("DEPRECATION")
+        val path = context.contentResolver.query(
+            song.uri, arrayOf(MediaStore.Audio.Media.DATA), null, null, null,
+        )?.use { if (it.moveToFirst()) it.getString(0) else null } ?: return false
+        val source = File(path)
+        val target = File(source.parentFile, newName)
+        if (target.exists() || !source.renameTo(target)) return false
+        MediaScannerConnection.scanFile(context, arrayOf(source.path, target.path), null, null)
+        return true
+    }
+
+    /** Characters not allowed in file names are replaced; length is capped. */
+    private fun sanitizeFileName(name: String): String =
+        name.trim()
+            .map { c -> if (c in INVALID_FILE_CHARS || c.code < 32) '_' else c }
+            .joinToString("")
+            .take(120)
+            .trim('.', ' ')
+
     private suspend fun writeAll(
         song: Song,
         tags: SongTags,
@@ -242,5 +292,6 @@ class TagEditor(private val context: Context) {
     private companion object {
         /** ID3 / FLAC picture type "Cover (front)". */
         const val FRONT_COVER = 3
+        const val INVALID_FILE_CHARS = "\\/:*?\"<>|"
     }
 }

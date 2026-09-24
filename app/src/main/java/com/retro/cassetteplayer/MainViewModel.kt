@@ -1,6 +1,8 @@
 package com.retro.cassetteplayer
 
 import android.app.Application
+import com.retro.cassetteplayer.data.WriteResult
+import com.retro.cassetteplayer.data.TagEditor
 import kotlinx.coroutines.Job
 import com.retro.cassetteplayer.data.LyricsResult
 import com.retro.cassetteplayer.data.LyricsRepository
@@ -56,6 +58,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val playlistRepository = PlaylistRepository(application)
     private val favoritesRepository = FavoritesRepository(application)
     private val lyricsRepository = LyricsRepository(application)
+    private val tagEditor = TagEditor(application)
+
+    /** System confirmations (write access) the UI has to launch; answer with [onWritePermissionResult]. */
+    private val _writePermissionRequests = MutableSharedFlow<IntentSender>(extraBufferCapacity = 1)
+    val writePermissionRequests: SharedFlow<IntentSender> = _writePermissionRequests.asSharedFlow()
+    private var pendingRename: PendingRename? = null
+
+    private class PendingRename(val song: Song, val name: String, val renameFile: Boolean, var granted: Boolean = false)
 
     /** Lyrics of the song they were requested for; Loading while looking them up. */
     private val _lyrics = MutableStateFlow<LyricsState>(LyricsState.Idle)
@@ -216,6 +226,55 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /** Shows feedback coming from other screens (e.g. the tag editor). */
     fun showMessage(message: UiMessage) {
         _messages.tryEmit(message)
+    }
+
+    // --- Renaming songs --------------------------------------------------------------
+
+    /** Renames the title tag (and optionally the file); asks for write access first when needed. */
+    fun renameSong(song: Song, newName: String, renameFile: Boolean) {
+        val name = newName.trim()
+        if (name.isEmpty()) return
+        val pending = PendingRename(song, name, renameFile)
+        pendingRename = pending
+        val request = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            runCatching { tagEditor.writeRequest(listOf(song)) }.getOrNull()
+        } else {
+            null
+        }
+        if (request != null) _writePermissionRequests.tryEmit(request) else performRename(pending)
+    }
+
+    fun onWritePermissionResult(granted: Boolean) {
+        val pending = pendingRename ?: return
+        if (!granted) {
+            pendingRename = null
+            return
+        }
+        pending.granted = true
+        performRename(pending)
+    }
+
+    private fun performRename(pending: PendingRename) {
+        viewModelScope.launch {
+            when (val result = tagEditor.rename(pending.song, pending.name, pending.renameFile)) {
+                WriteResult.Saved -> {
+                    pendingRename = null
+                    _messages.tryEmit(UiMessage.Text(R.string.msg_song_renamed))
+                    loadSongs()
+                }
+                WriteResult.Failed -> {
+                    pendingRename = null
+                    _messages.tryEmit(UiMessage.Text(R.string.msg_rename_failed))
+                }
+                // Android 10 asks while writing; retry once after the user allows it
+                is WriteResult.NeedsPermission ->
+                    if (!pending.granted) _writePermissionRequests.tryEmit(result.intentSender)
+                    else {
+                        pendingRename = null
+                        _messages.tryEmit(UiMessage.Text(R.string.msg_rename_failed))
+                    }
+            }
+        }
     }
 
     // --- Lyrics -----------------------------------------------------------------

@@ -89,6 +89,8 @@ import com.retro.cassetteplayer.ui.screens.EditTagsScreen
 import com.retro.cassetteplayer.ui.screens.StatusMessage
 import com.retro.cassetteplayer.LyricsState
 import com.retro.cassetteplayer.ui.components.LyricsSheet
+import com.retro.cassetteplayer.ui.components.LocalRenameSong
+import com.retro.cassetteplayer.ui.components.RenameSongDialog
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -273,10 +275,32 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
 
     val editSong: (Song) -> Unit = { song -> navController.navigate(Routes.editTags(song.id)) }
 
+    // --- Renaming songs (title tag + file name, with the system write confirmation) ----
+    var songToRename by remember { mutableStateOf<Song?>(null) }
+    val writePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result -> viewModel.onWritePermissionResult(result.resultCode == Activity.RESULT_OK) }
+    LaunchedEffect(Unit) {
+        viewModel.writePermissionRequests.collect { sender ->
+            writePermissionLauncher.launch(IntentSenderRequest.Builder(sender).build())
+        }
+    }
+    songToRename?.let { song ->
+        RenameSongDialog(
+            initialName = song.title,
+            onConfirm = { name, renameFile ->
+                songToRename = null
+                viewModel.renameSong(song, name, renameFile)
+            },
+            onDismiss = { songToRename = null },
+        )
+    }
+
     CompositionLocalProvider(
         LocalFavorites provides favoritesState,
         LocalDeleteSong provides deleteSong,
         LocalEditSong provides editSong,
+        LocalRenameSong provides { song -> songToRename = song },
     ) {
         Box(
             Modifier

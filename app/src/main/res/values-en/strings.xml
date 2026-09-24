@@ -154,6 +154,12 @@
     <string name="lyrics_source_file">Lyrics embedded in the file</string>
     <string name="lyrics_source_lrc">Lyrics from the .lrc file</string>
     <string name="lyrics_source_online">Lyrics: LRCLIB (lrclib.net)</string>
+    <string name="menu_rename_song">Rename</string>
+    <string name="rename_song_title">Rename song</string>
+    <string name="rename_song_hint">Song name</string>
+    <string name="rename_song_file">Also rename the file</string>
+    <string name="msg_song_renamed">Song renamed</string>
+    <string name="msg_rename_failed">Couldn\'t rename the song</string>
     <string name="msg_language_changed">Language changed</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_audio">Audio</string>
@@ -203,6 +209,9 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_2_3">
+        <item>Rename songs from the long-press menu: changes the title tag and, optionally, the file name</item>
+    </string-array>
     <string-array name="changelog_2_2">
         <item>Lyrics in the player (LYRICS tab): from the track itself, an .lrc file or online via LRCLIB</item>
         <item>Synced lyrics follow the song; tap a line to jump to it</item>

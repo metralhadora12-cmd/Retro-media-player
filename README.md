@@ -47,6 +47,7 @@ app/src/main/java/com/retro/cassetteplayer/
 - **Menu por toque longo**: nas músicas e nos itens da Biblioteca (tocar, aleatório, fila, salvar; nas suas playlists também editar, renomear e excluir). Nas músicas há também "Excluir do aparelho", com confirmação do sistema no Android 10+.
 - **Configurações** (engrenagem na Início e na Biblioteca): equalizador, idioma, recarregar biblioteca, novidades e versão.
 - **Edição de tags**: título, artista, álbum, artista do álbum, ano, faixa e gênero gravados no próprio arquivo (JAudioTagger); capa da galeria ou buscada online (iTunes e Deezer), com opção de aplicar ao álbum inteiro.
+- **Renomear músicas**: toque longo → Renomear; altera o título nas tags e, opcionalmente, o nome do arquivo (o id no MediaStore é mantido, então playlists e favoritas continuam valendo).
 - **Letras**: aba LETRA no player; letra da própria faixa, de um arquivo .lrc ou online pelo LRCLIB (grátis, sem chave). Letras sincronizadas destacam a linha atual e permitem pular tocando nela; ficam guardadas no aparelho.
 - **Backup**: exporta playlists e favoritas para um arquivo .json e restaura (mesclando), inclusive em outro aparelho — as músicas são reencontradas por título/artista/álbum.
 - **Tema**: escuro (padrão), claro ou seguindo o sistema.

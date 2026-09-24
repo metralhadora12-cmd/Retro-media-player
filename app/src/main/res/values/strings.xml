@@ -156,6 +156,12 @@
     <string name="lyrics_source_file">Letra gravada no arquivo</string>
     <string name="lyrics_source_lrc">Letra do arquivo .lrc</string>
     <string name="lyrics_source_online">Letra: LRCLIB (lrclib.net)</string>
+    <string name="menu_rename_song">Renomear</string>
+    <string name="rename_song_title">Renomear música</string>
+    <string name="rename_song_hint">Nome da música</string>
+    <string name="rename_song_file">Renomear também o arquivo</string>
+    <string name="msg_song_renamed">Música renomeada</string>
+    <string name="msg_rename_failed">Não foi possível renomear a música</string>
     <string name="msg_language_changed">Idioma alterado</string>
     <string name="settings_title">Configurações</string>
     <string name="settings_section_audio">Áudio</string>
@@ -208,6 +214,9 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_2_3">
+        <item>Renomear músicas pelo toque longo: muda o título nas tags e, se quiser, o nome do arquivo</item>
+    </string-array>
     <string-array name="changelog_2_2">
         <item>Letras no player (aba LETRA): da própria faixa, de um arquivo .lrc ou online pelo LRCLIB</item>
         <item>Letras sincronizadas acompanham a música; toque numa linha para pular até ela</item>

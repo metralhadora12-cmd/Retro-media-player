@@ -154,6 +154,12 @@
     <string name="lyrics_source_file">Letra guardada en el archivo</string>
     <string name="lyrics_source_lrc">Letra del archivo .lrc</string>
     <string name="lyrics_source_online">Letra: LRCLIB (lrclib.net)</string>
+    <string name="menu_rename_song">Renombrar</string>
+    <string name="rename_song_title">Renombrar canción</string>
+    <string name="rename_song_hint">Nombre de la canción</string>
+    <string name="rename_song_file">Renombrar también el archivo</string>
+    <string name="msg_song_renamed">Canción renombrada</string>
+    <string name="msg_rename_failed">No se pudo renombrar la canción</string>
     <string name="msg_language_changed">Idioma cambiado</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_audio">Audio</string>
@@ -206,6 +212,9 @@
         <item quantity="many">%d pistas añadidas a la cola</item>
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
+    <string-array name="changelog_2_3">
+        <item>Renombrar canciones desde la pulsación larga: cambia el título en las etiquetas y, si quieres, el nombre del archivo</item>
+    </string-array>
     <string-array name="changelog_2_2">
         <item>Letras en el reproductor (pestaña LETRA): de la propia pista, de un archivo .lrc o en línea con LRCLIB</item>
         <item>Las letras sincronizadas siguen la canción; toca una línea para saltar a ella</item>

@@ -49,6 +49,8 @@ import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 
 /** Dialog asking for a playlist name; used to create and to rename. */
 @Composable
@@ -173,6 +175,75 @@ fun DeletePlaylistDialog(name: String, onConfirm: () -> Unit, onDismiss: () -> U
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = TextPrimary) }
         },
     )
+}
+
+/** Rename a song: new title (written to the tags) and, optionally, the file name. */
+@Composable
+fun RenameSongDialog(
+    initialName: String,
+    onConfirm: (name: String, renameFile: Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by rememberSaveable { mutableStateOf(initialName) }
+    var renameFile by rememberSaveable { mutableStateOf(true) }
+    val focusRequester = remember { FocusRequester() }
+    val canConfirm = name.isNotBlank()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = InkSurface,
+        title = { Text(stringResource(R.string.rename_song_title), color = TextPrimary) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it.take(120) },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.rename_song_hint), color = TextSecondary) },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { if (canConfirm) onConfirm(name, renameFile) }),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = InkRaised,
+                        unfocusedContainerColor = InkRaised,
+                        focusedBorderColor = TapeOrange,
+                        unfocusedBorderColor = InkRaised,
+                        cursorColor = TapeOrange,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                )
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .clickable { renameFile = !renameFile },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = renameFile,
+                        onCheckedChange = { renameFile = it },
+                        colors = CheckboxDefaults.colors(checkedColor = TapeOrange),
+                    )
+                    Text(stringResource(R.string.rename_song_file), color = TextPrimary)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(name, renameFile) }, enabled = canConfirm) {
+                Text(stringResource(R.string.action_rename), color = if (canConfirm) TapeOrange else TextSecondary)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = TextPrimary) }
+        },
+    )
+    LaunchedEffect(Unit) { runCatching { focusRequester.requestFocus() } }
 }
 
 private const val MAX_NAME_LENGTH = 60
