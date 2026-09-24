@@ -46,7 +46,13 @@ adb shell mkdir -p /sdcard/Music/E2E
 for f in e2e-media/*; do adb push "$f" /sdcard/Music/E2E/; done
 adb shell pm grant $APP android.permission.READ_MEDIA_AUDIO || true
 adb shell pm grant $APP android.permission.POST_NOTIFICATIONS || true
-sleep 8
+# Wait until MediaStore has scanned the test files (is_music set)
+for i in $(seq 1 40); do
+  n=$(adb shell content query --uri content://media/external/audio/media --projection is_music 2>/dev/null | grep -c "is_music=1")
+  echo "scanned: $n"
+  [ "$n" -ge 3 ] && break
+  sleep 3
+done
 adb shell content query --uri content://media/external/audio/media \
   --projection _id:_display_name:mime_type:title:is_music > "$OUT/mediastore_before.txt" 2>&1
 
@@ -57,8 +63,10 @@ shot 01_home; dump 01_home
 
 tap_text "Library"; sleep 4
 shot 02_library; dump 02_library
+shot 02b_library_grid
 tap_text "Songs"; sleep 3
 shot 03_songs; dump 03_songs
+echo "HQ badges on songs screen: $(grep -o 'High quality (lossless)' "$OUT/03_songs.xml" | wc -l)" | tee "$OUT/hq_count.txt"
 
 # --- rename ---
 longpress_text "Lossless Test One"; sleep 2

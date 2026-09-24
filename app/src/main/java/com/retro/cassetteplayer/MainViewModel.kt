@@ -1,6 +1,10 @@
 package com.retro.cassetteplayer
 
 import android.app.Application
+import android.provider.MediaStore
+import android.os.Looper
+import android.os.Handler
+import android.database.ContentObserver
 import com.retro.cassetteplayer.playback.SessionStore
 import com.retro.cassetteplayer.data.LosslessProbe
 import com.retro.cassetteplayer.data.WriteResult
@@ -118,8 +122,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryCollections())
 
+    private var reloadJob: Job? = null
+    private var observerReload: Job? = null
+
+    private val mediaObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
+        override fun onChange(selfChange: Boolean) {
+            if (_hasPermission.value != true) return
+            // Debounce bursts of changes (a scan touches many rows)
+            observerReload?.cancel()
+            observerReload = viewModelScope.launch {
+                delay(1_500)
+                loadSongs(quiet = true)
+            }
+        }
+    }
+
     init {
         connection.connect()
+        // Keep the library in sync with MediaStore (new files, renames, deletions, tag edits).
+        application.contentResolver.registerContentObserver(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaObserver,
+        )
         // The player decoded the current track as lossless: remember it for the library badge.
         viewModelScope.launch {
             playback.map { it.mediaId to (it.audioFormat?.lossless == true) }
@@ -153,9 +176,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (granted && _songs.value.isEmpty()) loadSongs()
     }
 
-    fun loadSongs() {
-        viewModelScope.launch {
-            _isLoading.value = true
+    fun loadSongs() = loadSongs(quiet = false)
+
+    /** [quiet]: refresh in the background without the loading state (library changes). */
+    private fun loadSongs(quiet: Boolean) {
+        reloadJob?.cancel()
+        reloadJob = viewModelScope.launch {
+            if (!quiet || _songs.value.isEmpty()) _isLoading.value = true
             val loaded = runCatching { repository.loadSongs() }.getOrDefault(emptyList())
             // Songs already known to be lossless (probed before or decoded as lossless)
             val known = losslessProbe.cachedLosslessIds(loaded)
@@ -441,6 +468,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun removeFromPlaylist(playlistId: String, song: Song) = playlistRepository.removeSong(playlistId, song.id)
 
     override fun onCleared() {
+        getApplication<Application>().contentResolver.unregisterContentObserver(mediaObserver)
         connection.release()
         super.onCleared()
     }
