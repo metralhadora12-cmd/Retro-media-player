@@ -47,6 +47,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
@@ -128,6 +129,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    val currentTab = remember(backStackEntry) { navController.currentTabRoute() }
     // --- Playlists: "Salvar na playlist" sheet and the name dialog ---------------------
     var songsToSave by remember { mutableStateOf<List<Song>?>(null) }
     var creatingPlaylist by rememberSaveable { mutableStateOf(false) }
@@ -177,10 +179,16 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
 
     val openPlayer = { navController.navigate(Routes.PLAYER) { launchSingleTop = true } }
     val openTab: (String) -> Unit = { route ->
-        navController.navigate(route) {
-            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-            launchSingleTop = true
-            restoreState = true
+        when {
+            // Início always goes back to the home screen itself (never to a saved album page).
+            route == Routes.HOME -> navController.popBackStack(Routes.HOME, inclusive = false)
+            // Reselecting the tab you're in returns to its root (e.g. album -> Biblioteca).
+            route == navController.currentTabRoute() -> navController.popBackStack(route, inclusive = false)
+            else -> navController.navigate(route) {
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
         }
     }
     val openCollection: (SongCollection) -> Unit = { collection ->
@@ -258,7 +266,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     }
                     RetroBottomBar(
                         destinations = Routes.bottomDestinations,
-                        currentRoute = currentRoute,
+                        // Album/playlist pages keep their tab highlighted
+                        currentRoute = currentTab,
                         onSelect = openTab,
                     )
                 }
@@ -409,6 +418,12 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
         }
     }
 }
+
+private val tabRoutes = Routes.bottomDestinations.map { it.route }.toSet()
+
+/** The bottom-bar tab that owns the current screen (the last tab root in the back stack). */
+private fun NavHostController.currentTabRoute(): String? =
+    currentBackStack.value.lastOrNull { it.destination.route in tabRoutes }?.destination?.route
 
 private const val PLAYER_ANIM_MS = 350
 private const val TAB_FADE_MS = 200
