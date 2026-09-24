@@ -12,3 +12,6 @@ class FavoritesState(
 }
 
 val LocalFavorites = compositionLocalOf { FavoritesState(emptySet()) {} }
+
+/** Asks to delete a song from the device (confirmation handled by the app shell). */
+val LocalDeleteSong = compositionLocalOf<(Song) -> Unit> { {} }

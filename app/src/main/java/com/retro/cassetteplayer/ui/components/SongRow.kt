@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
+import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -71,6 +72,7 @@ fun SongRow(
     var menuOpen by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
     val favorites = LocalFavorites.current
+    val deleteSong = LocalDeleteSong.current
     val isFavorite = favorites.isFavorite(song)
 
     // Where the finger went down (row coordinates) and the row size, used to open the
@@ -160,6 +162,10 @@ fun SongRow(
                     menuOpen = false
                     onRemoveFromPlaylist()
                 }
+            }
+            SongMenuItem("Excluir do aparelho", Icons.Rounded.DeleteOutline) {
+                menuOpen = false
+                deleteSong(song)
             }
         }
     }

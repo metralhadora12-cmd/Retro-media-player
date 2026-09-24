@@ -1,6 +1,7 @@
 package com.retro.cassetteplayer.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -25,7 +27,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -53,6 +58,7 @@ import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.ui.components.AddToPlaylistSheet
 import com.retro.cassetteplayer.ui.components.FavoritesState
+import com.retro.cassetteplayer.ui.components.LocalDeleteSong
 import com.retro.cassetteplayer.ui.components.LocalFavorites
 import com.retro.cassetteplayer.ui.components.MiniPlayer
 import com.retro.cassetteplayer.ui.components.PlaylistNameDialog
@@ -65,17 +71,23 @@ import com.retro.cassetteplayer.ui.screens.HomeScreen
 import com.retro.cassetteplayer.ui.screens.PlayerScreen
 import com.retro.cassetteplayer.ui.screens.SearchScreen
 import com.retro.cassetteplayer.ui.theme.Ink
+import com.retro.cassetteplayer.ui.theme.InkSurface
+import com.retro.cassetteplayer.ui.theme.TapeOrange
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
     else Manifest.permission.READ_EXTERNAL_STORAGE
 
-private val requestedPermissions: Array<String> =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+private val requestedPermissions: Array<String> = when {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
         arrayOf(Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.POST_NOTIFICATIONS)
-    } else {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-    }
+    // Android 8-9 also need write access to delete songs
+    else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+}
 
 private fun Context.hasAudioPermission(): Boolean =
     ContextCompat.checkSelfPermission(this, audioPermission) == PackageManager.PERMISSION_GRANTED
@@ -183,11 +195,47 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
         Box(Modifier.padding(bottom = barsHeight)) { content() }
     }
 
+    // --- Deleting songs: system confirmation (Android 10+) or our own dialog (8-9) -------
+    val deleteLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        viewModel.onDeleteConfirmation(result.resultCode == Activity.RESULT_OK)
+    }
+    var songToConfirmDelete by remember { mutableStateOf<Song?>(null) }
+    val startDelete: (Song) -> Unit = { song ->
+        viewModel.requestDelete(song)?.let { sender ->
+            deleteLauncher.launch(IntentSenderRequest.Builder(sender).build())
+        }
+    }
+    val deleteSong: (Song) -> Unit = { song ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) startDelete(song) else songToConfirmDelete = song
+    }
+    songToConfirmDelete?.let { song ->
+        AlertDialog(
+            onDismissRequest = { songToConfirmDelete = null },
+            containerColor = InkSurface,
+            title = { Text("Excluir música?", color = TextPrimary) },
+            text = { Text("\"${song.title}\" será apagada do aparelho.", color = TextSecondary) },
+            confirmButton = {
+                TextButton(onClick = {
+                    songToConfirmDelete = null
+                    startDelete(song)
+                }) { Text("Excluir", color = TapeOrange) }
+            },
+            dismissButton = {
+                TextButton(onClick = { songToConfirmDelete = null }) { Text("Cancelar", color = TextPrimary) }
+            },
+        )
+    }
+
     val favoritesState = remember(favorites) {
         FavoritesState(favorites.toSet()) { song -> viewModel.toggleFavorite(song.id) }
     }
 
-    CompositionLocalProvider(LocalFavorites provides favoritesState) {
+    CompositionLocalProvider(
+        LocalFavorites provides favoritesState,
+        LocalDeleteSong provides deleteSong,
+    ) {
         Box(
             Modifier
                 .fillMaxSize()

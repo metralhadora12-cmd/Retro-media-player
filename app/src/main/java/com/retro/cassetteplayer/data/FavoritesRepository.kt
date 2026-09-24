@@ -23,6 +23,10 @@ class FavoritesRepository(context: Context) {
         return nowFavorite
     }
 
+    fun remove(songId: Long) {
+        if (songId in _favorites.value) toggle(songId)
+    }
+
     private fun load(): List<Long> {
         val raw = prefs.getString(KEY_IDS, null) ?: return emptyList()
         return runCatching {

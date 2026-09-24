@@ -122,6 +122,13 @@ class PlaybackConnection(context: Context) {
         }
     }
 
+    /** Removes every queue entry of a song (used after the file is deleted). */
+    fun removeFromQueue(mediaId: String) = withController { player ->
+        for (i in player.mediaItemCount - 1 downTo 0) {
+            if (player.getMediaItemAt(i).mediaId == mediaId) player.removeMediaItem(i)
+        }
+    }
+
     fun togglePlayPause() = withController { player ->
         when {
             player.isPlaying -> player.pause()

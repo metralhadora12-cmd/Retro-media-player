@@ -7,6 +7,10 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <!-- Deleting songs on Android 8-9 (newer versions ask the user through MediaStore) -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <!-- Background playback -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

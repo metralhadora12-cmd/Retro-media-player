@@ -1,12 +1,22 @@
 package com.retro.cassetteplayer.data
 
+import android.app.RecoverableSecurityException
 import android.content.ContentUris
 import android.content.Context
+import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+/** Result of trying to delete a song file. */
+sealed interface DeleteOutcome {
+    data object Deleted : DeleteOutcome
+    /** The system must confirm first; launch this and call again / finish on RESULT_OK. */
+    class NeedsConfirmation(val intentSender: IntentSender) : DeleteOutcome
+    data object Failed : DeleteOutcome
+}
 
 /** Reads local audio files through the MediaStore API. */
 class MusicRepository(private val context: Context) {
@@ -67,6 +77,28 @@ class MusicRepository(private val context: Context) {
                 }
             }
         songs
+    }
+
+    /**
+     * Deletes the song's file. Android 11+ always goes through the system confirmation
+     * (createDeleteRequest); on Android 10 a RecoverableSecurityException carries the
+     * confirmation for files the app doesn't own; older versions delete directly.
+     */
+    fun requestDelete(song: Song): DeleteOutcome {
+        val resolver = context.contentResolver
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val request = MediaStore.createDeleteRequest(resolver, listOf(song.uri))
+            return DeleteOutcome.NeedsConfirmation(request.intentSender)
+        }
+        return try {
+            if (resolver.delete(song.uri, null, null) > 0) DeleteOutcome.Deleted else DeleteOutcome.Failed
+        } catch (e: SecurityException) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && e is RecoverableSecurityException) {
+                DeleteOutcome.NeedsConfirmation(e.userAction.actionIntent.intentSender)
+            } else {
+                DeleteOutcome.Failed
+            }
+        }
     }
 
     private fun String?.orUnknown(fallback: String): String =

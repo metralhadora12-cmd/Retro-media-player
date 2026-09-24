@@ -1,8 +1,11 @@
 package com.retro.cassetteplayer
 
 import android.app.Application
+import android.content.IntentSender
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.retro.cassetteplayer.data.DeleteOutcome
 import com.retro.cassetteplayer.data.FavoritesRepository
 import com.retro.cassetteplayer.data.LibraryCollections
 import com.retro.cassetteplayer.data.MusicRepository
@@ -132,6 +135,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun cycleRepeat() = connection.cycleRepeat()
     fun playQueueItem(index: Int) = connection.playQueueItem(index)
     fun removeQueueItem(index: Int) = connection.removeQueueItem(index)
+
+    // --- Deleting songs --------------------------------------------------------------
+
+    private var pendingDelete: Song? = null
+
+    /**
+     * Starts deleting [song]. Returns an IntentSender when the system has to confirm;
+     * the UI launches it and reports back through [onDeleteConfirmation].
+     */
+    fun requestDelete(song: Song): IntentSender? =
+        when (val outcome = repository.requestDelete(song)) {
+            DeleteOutcome.Deleted -> {
+                onSongDeleted(song)
+                null
+            }
+            is DeleteOutcome.NeedsConfirmation -> {
+                pendingDelete = song
+                outcome.intentSender
+            }
+            DeleteOutcome.Failed -> {
+                _messages.tryEmit("Não foi possível excluir a música")
+                null
+            }
+        }
+
+    fun onDeleteConfirmation(confirmed: Boolean) {
+        val song = pendingDelete ?: return
+        pendingDelete = null
+        if (!confirmed) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // createDeleteRequest already removed the file once the user confirmed
+            onSongDeleted(song)
+        } else if (repository.requestDelete(song) == DeleteOutcome.Deleted) {
+            onSongDeleted(song)
+        } else {
+            _messages.tryEmit("Não foi possível excluir a música")
+        }
+    }
+
+    private fun onSongDeleted(song: Song) {
+        _songs.value = _songs.value.filterNot { it.id == song.id }
+        connection.removeFromQueue(song.id.toString())
+        favoritesRepository.remove(song.id)
+        playlistRepository.removeSongEverywhere(song.id)
+        _messages.tryEmit("\"${song.title}\" excluída")
+    }
 
     // --- Favourites -----------------------------------------------------------------
 

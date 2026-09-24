@@ -60,6 +60,11 @@ class PlaylistRepository(context: Context) {
         playlist.copy(songIds = ordered + playlist.songIds.filterNot { it in ordered })
     }
 
+    /** Drops a song (e.g. deleted from the device) from every playlist that has it. */
+    fun removeSongEverywhere(songId: Long) = update { list ->
+        list.map { if (songId in it.songIds) it.copy(songIds = it.songIds - songId) else it }
+    }
+
     private fun edit(id: String, transform: (UserPlaylist) -> UserPlaylist) = update { list ->
         list.map { if (it.id == id) transform(it).copy(updatedAt = System.currentTimeMillis()) else it }
     }
