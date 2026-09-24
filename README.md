@@ -42,7 +42,7 @@ app/src/main/java/com/retro/cassetteplayer/
 - **Player**: mesmo fundo escuro do app com um brilho laranja sutil; fita em pé com sombra suave, teclas de piano grafite; carretéis em 3D (rolo de fita com volume, cubo convexo com miolo rebaixado, luz fixa); a fita passa do carretel de cima para o de baixo conforme a minutagem, e o carretel mais vazio gira mais rápido (velocidade de fita constante).
 - **Controles**: três teclas de piano (anterior, play/pause travando, próxima), aleatório e repetir (desligado / todas / uma).
 - **Favoritas**: coração no player (fica laranja) ou "Adicionar às favoritas" no menu de qualquer música; playlist automática "Favoritas" no topo da Biblioteca.
-- **Playlists**: crie pelo "+" da Biblioteca ou por "Salvar na playlist" (menu ⋮ das músicas, botão no player, botão "Salvar" em álbuns/artistas); renomeie, exclua, remova faixas e arraste pela alça ⠿ para reordenar na página da playlist.
+- **Playlists**: crie pelo "+" da Biblioteca ou por "Salvar na playlist" (toque longo nas músicas, botão no player, botão "Salvar" em álbuns/artistas); renomeie, exclua, remova faixas e arraste pela alça ⠿ para reordenar na página da playlist.
 - **A seguir**: fila de reprodução na ordem real (respeita o aleatório), tocar qualquer item ou remover da fila.
 - **Seek**: toque ou arraste na régua; o contador mostra o tempo de destino enquanto você arrasta.
 - **Lista**: título, artista e álbum, com menu de três pontos (Tocar, Tocar a seguir, Adicionar à fila).

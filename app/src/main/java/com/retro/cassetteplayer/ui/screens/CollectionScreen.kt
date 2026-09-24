@@ -233,8 +233,8 @@ fun CollectionScreen(
             if (collection.songs.isEmpty()) {
                 item {
                     StatusMessage(
-                        if (isFavorites) "Nenhuma favorita ainda. Toque no coração no player ou use \"Adicionar às favoritas\" no menu ⋮ de uma música."
-                        else "Playlist vazia. Use \"Salvar na playlist\" no menu ⋮ de uma música para adicioná-la aqui."
+                        if (isFavorites) "Nenhuma favorita ainda. Toque no coração no player ou segure uma música e escolha \"Adicionar às favoritas\"."
+                        else "Playlist vazia. Segure uma música e escolha \"Salvar na playlist\" para adicioná-la aqui."
                     )
                 }
             }

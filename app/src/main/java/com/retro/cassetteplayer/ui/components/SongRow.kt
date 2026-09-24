@@ -26,14 +26,12 @@ import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -76,7 +74,7 @@ fun SongRow(
     val isFavorite = favorites.isFavorite(song)
 
     // Where the finger went down (row coordinates) and the row size, used to open the
-    // menu right under the finger. The ⋮ button places it at the row's right edge instead.
+    // menu right under the finger.
     var pressOffset by remember { mutableStateOf(Offset.Zero) }
     var rowSize by remember { mutableStateOf(IntSize.Zero) }
     val density = LocalDensity.current
@@ -95,7 +93,7 @@ fun SongRow(
                         pressOffset = awaitFirstDown(requireUnconsumed = false).position
                     }
                 }
-                // Tap plays; press and hold opens the same options as the ⋮ button.
+                // Tap plays; press and hold opens the options menu.
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = {
@@ -104,7 +102,7 @@ fun SongRow(
                     },
                     onLongClickLabel = "Opções",
                 )
-                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AlbumArt(song.artworkUri, Modifier.size(48.dp), RoundedCornerShape(4.dp))
@@ -127,14 +125,6 @@ fun SongRow(
             }
             if (isCurrent) {
                 PlaybackLed(lit = isPlaying, modifier = Modifier.padding(start = 8.dp))
-            }
-            IconButton(
-                onClick = {
-                    pressOffset = Offset(rowSize.width.toFloat(), rowSize.height.toFloat())
-                    menuOpen = true
-                },
-            ) {
-                Icon(Icons.Rounded.MoreVert, contentDescription = "Opções", tint = TextSecondary)
             }
         }
 
