@@ -32,12 +32,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.retro.cassetteplayer.ui.theme.Cream
+import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.LcdBackground
 import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.RetroAmber
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.HotlineAmber
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
 private const val TICKS = 60
 
@@ -104,7 +104,7 @@ fun RetroSeekBar(
             )
             // Played portion
             drawRoundRect(
-                brush = Brush.horizontalGradient(listOf(RetroOrange, RetroAmber)),
+                brush = Brush.horizontalGradient(listOf(HotlineOrange, HotlineAmber)),
                 topLeft = Offset(inset, grooveTop),
                 size = Size(trackWidth * fraction, grooveHeight),
                 cornerRadius = CornerRadius(grooveHeight / 2),
@@ -120,7 +120,7 @@ fun RetroSeekBar(
                 }
                 val passed = x <= needleX
                 drawLine(
-                    color = if (passed) RetroAmber else Cream.copy(alpha = 0.55f),
+                    color = if (passed) HotlineAmber else TextPrimary.copy(alpha = 0.55f),
                     start = Offset(x, grooveTop - 3.dp.toPx()),
                     end = Offset(x, grooveTop - 3.dp.toPx() - tickHeight),
                     strokeWidth = if (i % 10 == 0) 2.dp.toPx() else 1.dp.toPx(),
@@ -129,13 +129,13 @@ fun RetroSeekBar(
 
             // Needle with glow and a pointer on top
             drawLine(
-                color = RetroOrange.copy(alpha = 0.3f),
+                color = HotlineOrange.copy(alpha = 0.3f),
                 start = Offset(needleX, 0f),
                 end = Offset(needleX, size.height),
                 strokeWidth = 8.dp.toPx(),
             )
             drawLine(
-                color = RetroOrange,
+                color = HotlineOrange,
                 start = Offset(needleX, 4.dp.toPx()),
                 end = Offset(needleX, size.height),
                 strokeWidth = 2.5.dp.toPx(),
@@ -147,7 +147,7 @@ fun RetroSeekBar(
                 lineTo(needleX, 9.dp.toPx())
                 close()
             }
-            drawPath(pointer, RetroOrange)
+            drawPath(pointer, HotlineOrange)
         }
 
         Row(
@@ -178,7 +178,7 @@ fun LcdCounter(text: String, modifier: Modifier = Modifier) {
             fontSize = 15.sp,
             letterSpacing = 2.sp,
         ),
-        color = RetroAmber,
+        color = HotlineAmber,
     )
 }
 

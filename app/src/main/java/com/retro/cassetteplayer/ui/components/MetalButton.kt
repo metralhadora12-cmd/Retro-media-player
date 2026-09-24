@@ -37,7 +37,7 @@ import com.retro.cassetteplayer.ui.theme.MetalHighlight
 import com.retro.cassetteplayer.ui.theme.MetalLight
 import com.retro.cassetteplayer.ui.theme.MetalMid
 import com.retro.cassetteplayer.ui.theme.MetalShadow
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
 /**
  * A skeuomorphic, brushed-aluminium key. It sinks when pressed and can stay latched
@@ -102,7 +102,7 @@ fun MetalButton(
         contentAlignment = Alignment.Center,
     ) {
         CompositionLocalProvider(
-            LocalContentColor provides if (enabled) Color(0xFF262626) else MetalDark,
+            LocalContentColor provides if (enabled) Color(0xFF17223A) else MetalDark,
         ) {
             content()
         }
@@ -131,7 +131,7 @@ fun MetalIconButton(
             imageVector = icon,
             contentDescription = contentDescription,
             modifier = Modifier.size(iconSize),
-            tint = if (accent) RetroOrange else LocalContentColor.current,
+            tint = if (accent) HotlineOrange else LocalContentColor.current,
         )
     }
 }

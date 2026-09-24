@@ -5,11 +5,15 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.retro.cassetteplayer.ui.theme.Charcoal
-import com.retro.cassetteplayer.ui.theme.Graphite
-import com.retro.cassetteplayer.ui.theme.SteelDark
-import com.retro.cassetteplayer.ui.theme.SteelLight
-import com.retro.cassetteplayer.ui.theme.SteelMid
+import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.NavyRaised
+import com.retro.cassetteplayer.ui.theme.NavySurface
+import com.retro.cassetteplayer.ui.theme.Silver
+import com.retro.cassetteplayer.ui.theme.SilverDark
+import com.retro.cassetteplayer.ui.theme.SilverLight
+import com.retro.cassetteplayer.ui.theme.WalkmanBlue
+import com.retro.cassetteplayer.ui.theme.WalkmanBlueDark
+import com.retro.cassetteplayer.ui.theme.WalkmanBlueLight
 import kotlin.random.Random
 
 private class Grain(
@@ -67,10 +71,14 @@ fun Modifier.brushedMetal(
     }
 }
 
-/** Dark matte body (#1E1E1E / #2B2B2B) used for lists and bars. */
-fun Modifier.darkBrushedMetal(): Modifier =
-    brushedMetal(highlight = Graphite, base = Color(0xFF242424), shadow = Charcoal, seed = 11)
+/** Deep blue brushed finish used for bars and lists. */
+fun Modifier.navyBrushedMetal(): Modifier =
+    brushedMetal(highlight = NavyRaised, base = NavySurface, shadow = Navy, seed = 11)
 
-/** Brushed aluminium / steel backdrop used by the player view and the header card. */
-fun Modifier.steelBrushedMetal(): Modifier =
-    brushedMetal(highlight = SteelLight, base = SteelMid, shadow = SteelDark, grainCount = 420, seed = 3)
+/** Metallic blue body of the player, with a denser brushed grain. */
+fun Modifier.blueBrushedMetal(): Modifier =
+    brushedMetal(highlight = WalkmanBlueLight, base = WalkmanBlue, shadow = WalkmanBlueDark, grainCount = 520, seed = 3)
+
+/** Silver trim band (top edge of the device). */
+fun Modifier.silverBrushedMetal(): Modifier =
+    brushedMetal(highlight = SilverLight, base = Silver, shadow = SilverDark, grainCount = 180, seed = 5)

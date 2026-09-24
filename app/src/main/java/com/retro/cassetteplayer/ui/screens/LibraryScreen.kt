@@ -57,10 +57,10 @@ import com.retro.cassetteplayer.ui.components.MetalButton
 import com.retro.cassetteplayer.ui.components.RetroChip
 import com.retro.cassetteplayer.ui.components.RetroIconChip
 import com.retro.cassetteplayer.ui.components.SongRow
-import com.retro.cassetteplayer.ui.theme.Charcoal
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.Graphite
-import com.retro.cassetteplayer.ui.theme.RetroAmber
+import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.NavySurface
+import com.retro.cassetteplayer.ui.theme.HotlineAmber
 
 enum class LibraryFilter(val label: String) {
     PLAYLISTS("Playlists"),
@@ -118,7 +118,7 @@ fun LibraryScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Charcoal)
+            .background(Navy)
     ) {
         Column(Modifier.statusBarsPadding()) {
             Row(
@@ -130,11 +130,11 @@ fun LibraryScreen(
                 Text(
                     text = "Biblioteca",
                     style = MaterialTheme.typography.headlineSmall.copy(fontSize = 28.sp, letterSpacing = 0.sp),
-                    color = Cream,
+                    color = TextPrimary,
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(onClick = onOpenSearch) {
-                    Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = Cream)
+                    Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = TextPrimary)
                 }
             }
 
@@ -171,7 +171,7 @@ fun LibraryScreen(
                         Icon(
                             if (gridMode) Icons.AutoMirrored.Rounded.ViewList else Icons.Rounded.GridView,
                             contentDescription = if (gridMode) "Ver em lista" else "Ver em grade",
-                            tint = Cream,
+                            tint = TextPrimary,
                         )
                     }
                 }
@@ -242,17 +242,17 @@ private fun SortSelector(sort: LibrarySort, onSortChange: (LibrarySort) -> Unit)
                 .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(sort.label, style = MaterialTheme.typography.titleMedium, color = Cream.copy(alpha = 0.85f))
-            Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Ordenar", tint = Cream)
+            Text(sort.label, style = MaterialTheme.typography.titleMedium, color = TextPrimary.copy(alpha = 0.85f))
+            Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Ordenar", tint = TextPrimary)
         }
         DropdownMenu(
             expanded = open,
             onDismissRequest = { open = false },
-            modifier = Modifier.background(Graphite),
+            modifier = Modifier.background(NavySurface),
         ) {
             LibrarySort.entries.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.label, color = if (option == sort) RetroAmber else Cream) },
+                    text = { Text(option.label, color = if (option == sort) HotlineAmber else TextPrimary) },
                     onClick = {
                         open = false
                         onSortChange(option)

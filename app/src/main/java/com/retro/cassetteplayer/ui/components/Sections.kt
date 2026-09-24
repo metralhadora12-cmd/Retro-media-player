@@ -41,17 +41,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.retro.cassetteplayer.data.CollectionKind
 import com.retro.cassetteplayer.data.SongCollection
-import com.retro.cassetteplayer.ui.theme.Charcoal
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
+import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.NavyRaised
+import com.retro.cassetteplayer.ui.theme.NavySurface
+import com.retro.cassetteplayer.ui.theme.Silver
+import com.retro.cassetteplayer.ui.theme.SilverLight
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.RetroAmber
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.HotlineAmber
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
-/** Gradient that tints the top of Home / Library, like YouTube Music's header glow. */
+/** Metallic blue glow that tints the top of Home and collection pages. */
 val TopGlow = Brush.verticalGradient(
-    listOf(Color(0xFF5C2408), Color(0xFF2C170C), Charcoal)
+    listOf(Color(0xFF2F5A97), Color(0xFF18305A), Navy)
 )
 
 /** Filter chip styled like a small metal selector; selected chips turn cream. */
@@ -67,7 +71,7 @@ fun RetroChip(
         modifier = modifier
             .clip(shape)
             .background(chipBrush(selected))
-            .border(1.dp, if (selected) RetroOrange else Color.White.copy(alpha = 0.1f), shape)
+            .border(1.dp, if (selected) HotlineOrange else Color.White.copy(alpha = 0.1f), shape)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 9.dp),
         contentAlignment = Alignment.Center,
@@ -75,7 +79,7 @@ fun RetroChip(
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 0.5.sp),
-            color = if (selected) Charcoal else Cream,
+            color = if (selected) Navy else TextPrimary,
             maxLines = 1,
         )
     }
@@ -97,13 +101,13 @@ fun RetroIconChip(
             .padding(horizontal = 10.dp, vertical = 7.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription, tint = Charcoal, modifier = Modifier.size(22.dp))
+        Icon(icon, contentDescription, tint = Navy, modifier = Modifier.size(22.dp))
     }
 }
 
 private fun chipBrush(selected: Boolean): Brush =
-    if (selected) Brush.verticalGradient(listOf(Cream, Color(0xFFE0CBA2)))
-    else Brush.verticalGradient(listOf(Color(0xFF3A3A3A), Color(0xFF2A2A2A)))
+    if (selected) Brush.verticalGradient(listOf(SilverLight, Silver))
+    else Brush.verticalGradient(listOf(NavyRaised, NavySurface))
 
 @Composable
 fun SectionHeader(
@@ -128,13 +132,13 @@ fun SectionHeader(
                 Text(
                     text = overline.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = CreamMuted,
+                    color = TextSecondary,
                 )
             }
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 22.sp),
-                color = Cream,
+                color = TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -191,7 +195,7 @@ fun CoverTile(
                 style = MaterialTheme.typography.bodyMedium,
                 fontFamily = DisplayFont,
                 fontWeight = FontWeight.Bold,
-                color = Cream,
+                color = TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
@@ -200,7 +204,7 @@ fun CoverTile(
                 Icon(
                     Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = Cream,
+                    tint = TextPrimary,
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -210,7 +214,7 @@ fun CoverTile(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .height(3.dp)
-                .background(Brush.horizontalGradient(listOf(RetroOrange, RetroAmber)))
+                .background(Brush.horizontalGradient(listOf(HotlineOrange, HotlineAmber)))
         )
     }
 }
@@ -223,7 +227,7 @@ fun PageDots(count: Int, current: Int, modifier: Modifier = Modifier) {
             Box(
                 Modifier
                     .size(8.dp)
-                    .background(if (i == current) RetroOrange else MetalDark, CircleShape)
+                    .background(if (i == current) HotlineOrange else MetalDark, CircleShape)
             )
         }
     }
@@ -262,7 +266,7 @@ fun CollectionGridItem(
             text = collection.title,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
-            color = Cream,
+            color = TextPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 8.dp),
@@ -271,7 +275,7 @@ fun CollectionGridItem(
             Icon(
                 collection.kindIcon(),
                 contentDescription = null,
-                tint = RetroAmber,
+                tint = HotlineAmber,
                 modifier = Modifier
                     .padding(top = 2.dp, end = 4.dp)
                     .size(14.dp),
@@ -279,7 +283,7 @@ fun CollectionGridItem(
             Text(
                 text = collection.subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = CreamMuted,
+                color = TextSecondary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -310,14 +314,14 @@ fun CollectionListItem(
                 collection.title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = Cream,
+                color = TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 collection.subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = CreamMuted,
+                color = TextSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

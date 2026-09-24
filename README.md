@@ -1,6 +1,6 @@
 # Retro Cassette Player
 
-Reprodutor de áudio Android nativo com estética de Walkman / tape deck metálico.
+Reprodutor de áudio Android nativo inspirado nos walkmans dos anos 80: corpo azul metálico escovado, faixa prateada, botão laranja "hotline" e janela fumê com os carretéis girando.
 
 ## Stack
 - **Kotlin** + **Jetpack Compose** (Material 3)
@@ -24,11 +24,11 @@ app/src/main/java/com/retro/cassetteplayer/
 └── ui/
     ├── RetroCassetteApp.kt      # Scaffold, permissões, NavHost, mini-player
     ├── navigation/Routes.kt
-    ├── theme/                   # Paleta (#1E1E1E, #2B2B2B, #D35400, #F5E6CA...), tipografia mono
+    ├── theme/                   # Paleta walkman (azul metálico, prata, laranja hotline), tipografia mono
     ├── components/
     │   ├── BrushedMetal.kt      # Textura de metal escovado
     │   ├── MetalButton.kt       # Teclas metálicas em relevo (afundam / travam)
-    │   ├── Cassette.kt          # Fita cassete em Canvas, carretéis girando, caixa de acrílico
+    │   ├── Walkman.kt           # Walkman em Canvas: faixa prata, janela fumê, carretéis girando
     │   ├── RetroSeekBar.kt      # Régua graduada com agulha laranja + contadores LCD
     │   ├── Sections.kt          # Chips, capas, cabeçalhos de seção
     │   ├── MiniPlayer.kt, RetroBottomBar.kt, SongRow.kt, AlbumArt.kt

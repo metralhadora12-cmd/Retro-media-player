@@ -36,15 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.playback.PlaybackState
-import com.retro.cassetteplayer.ui.components.AcrylicCase
-import com.retro.cassetteplayer.ui.components.CassetteTape
 import com.retro.cassetteplayer.ui.components.MetalButton
 import com.retro.cassetteplayer.ui.components.MetalIconButton
 import com.retro.cassetteplayer.ui.components.PlaybackLed
 import com.retro.cassetteplayer.ui.components.RetroSeekBar
-import com.retro.cassetteplayer.ui.components.steelBrushedMetal
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
+import com.retro.cassetteplayer.ui.components.WalkmanDeck
+import com.retro.cassetteplayer.ui.components.navyBrushedMetal
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 
 @Composable
 fun PlayerScreen(
@@ -61,7 +60,7 @@ fun PlayerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .steelBrushedMetal()
+            .navyBrushedMetal()
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 20.dp),
@@ -83,7 +82,7 @@ fun PlayerScreen(
             Text(
                 text = "NOW PLAYING",
                 style = MaterialTheme.typography.labelLarge,
-                color = Cream,
+                color = TextPrimary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
             )
@@ -98,21 +97,19 @@ fun PlayerScreen(
 
         Spacer(Modifier.weight(1f))
 
-        AcrylicCase(Modifier.fillMaxWidth()) {
-            CassetteTape(
-                isPlaying = playback.isPlaying,
-                progress = playback.progress,
-                label = playback.title,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+        WalkmanDeck(
+            isPlaying = playback.isPlaying,
+            progress = playback.progress,
+            label = playback.title,
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Spacer(Modifier.weight(1f))
 
         Text(
             text = playback.title.ifBlank { "Nenhuma fita inserida" },
             style = MaterialTheme.typography.titleLarge,
-            color = Cream,
+            color = TextPrimary,
             textAlign = TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
@@ -121,7 +118,7 @@ fun PlayerScreen(
         Text(
             text = playback.artist,
             style = MaterialTheme.typography.bodyLarge,
-            color = CreamMuted,
+            color = TextSecondary,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

@@ -26,14 +26,14 @@ import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.SongRow
-import com.retro.cassetteplayer.ui.theme.Charcoal
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
+import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.LcdBackground
 import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.RetroAmber
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.HotlineAmber
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
 @Composable
 fun SearchScreen(
@@ -48,36 +48,36 @@ fun SearchScreen(
     Column(
         Modifier
             .fillMaxSize()
-            .background(Charcoal)
+            .background(Navy)
             .statusBarsPadding()
     ) {
         Text(
             text = "SEARCH",
             style = MaterialTheme.typography.headlineSmall,
-            color = Cream,
+            color = TextPrimary,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
         )
         OutlinedTextField(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
-            placeholder = { Text("Título, artista ou álbum", color = CreamMuted) },
-            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = RetroAmber) },
+            placeholder = { Text("Título, artista ou álbum", color = TextSecondary) },
+            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = HotlineAmber) },
             trailingIcon = {
                 if (query.isNotEmpty()) {
                     IconButton(onClick = { onQueryChange("") }) {
-                        Icon(Icons.Rounded.Close, contentDescription = "Limpar", tint = CreamMuted)
+                        Icon(Icons.Rounded.Close, contentDescription = "Limpar", tint = TextSecondary)
                     }
                 }
             },
-            textStyle = MaterialTheme.typography.titleMedium.copy(fontFamily = DisplayFont, color = RetroAmber),
+            textStyle = MaterialTheme.typography.titleMedium.copy(fontFamily = DisplayFont, color = HotlineAmber),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = LcdBackground,
                 unfocusedContainerColor = LcdBackground,
-                focusedBorderColor = RetroOrange,
+                focusedBorderColor = HotlineOrange,
                 unfocusedBorderColor = MetalDark,
-                cursorColor = RetroOrange,
+                cursorColor = HotlineOrange,
             ),
             modifier = Modifier
                 .fillMaxWidth()

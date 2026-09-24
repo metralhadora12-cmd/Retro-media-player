@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="charcoal">#FF1E1E1E</color>
-    <color name="graphite">#FF2B2B2B</color>
-    <color name="retro_orange">#FFD35400</color>
-    <color name="cream">#FFF5E6CA</color>
+    <color name="navy">#FF0E1B30</color>
+    <color name="walkman_blue">#FF3A67A8</color>
+    <color name="hotline_orange">#FFF28A1E</color>
+    <color name="silver">#FFC9CDD3</color>
 </resources>

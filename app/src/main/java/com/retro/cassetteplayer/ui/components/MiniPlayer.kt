@@ -25,9 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.playback.PlaybackState
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
 /** Fixed mini-player shown above the bottom navigation bar. */
 @Composable
@@ -41,7 +41,7 @@ fun MiniPlayer(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .darkBrushedMetal()
+            .navyBrushedMetal()
             .clickable(onClick = onOpen),
     ) {
         Box(
@@ -54,7 +54,7 @@ fun MiniPlayer(
                 Modifier
                     .fillMaxWidth(state.progress)
                     .fillMaxHeight()
-                    .background(RetroOrange)
+                    .background(HotlineOrange)
             )
         }
         Row(
@@ -70,14 +70,14 @@ fun MiniPlayer(
                 Text(
                     text = state.title.ifBlank { "—" },
                     style = MaterialTheme.typography.titleMedium,
-                    color = Cream,
+                    color = TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = state.artist,
                     style = MaterialTheme.typography.bodySmall,
-                    color = CreamMuted,
+                    color = TextSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

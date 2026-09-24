@@ -42,9 +42,9 @@ import com.retro.cassetteplayer.ui.components.CollageArt
 import com.retro.cassetteplayer.ui.components.MetalButton
 import com.retro.cassetteplayer.ui.components.SongRow
 import com.retro.cassetteplayer.ui.components.TopGlow
-import com.retro.cassetteplayer.ui.theme.Charcoal
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
+import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 
 /** Album / artist / playlist page: big cover, play & shuffle keys and the track list. */
 @Composable
@@ -61,7 +61,7 @@ fun CollectionScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Charcoal)
+            .background(Navy)
     ) {
         Box(
             Modifier
@@ -73,7 +73,7 @@ fun CollectionScreen(
             item {
                 Row(Modifier.statusBarsPadding().padding(4.dp)) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar", tint = Cream)
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar", tint = TextPrimary)
                     }
                 }
             }
@@ -97,13 +97,13 @@ fun CollectionScreen(
                     Text(
                         collection.title,
                         style = MaterialTheme.typography.titleLarge,
-                        color = Cream,
+                        color = TextPrimary,
                         textAlign = TextAlign.Center,
                     )
                     Text(
                         collection.subtitle,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = CreamMuted,
+                        color = TextSecondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp),
                     )

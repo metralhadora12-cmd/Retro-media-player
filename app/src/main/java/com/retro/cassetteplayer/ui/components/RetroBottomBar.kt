@@ -26,10 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.retro.cassetteplayer.ui.theme.CreamMuted
-import com.retro.cassetteplayer.ui.theme.MetalDark
-import com.retro.cassetteplayer.ui.theme.RetroAmber
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.TextSecondary
+import com.retro.cassetteplayer.ui.theme.Silver
+import com.retro.cassetteplayer.ui.theme.HotlineAmber
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
 data class BottomDestination(
     val route: String,
@@ -48,9 +48,9 @@ fun RetroBottomBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .darkBrushedMetal()
+            .navyBrushedMetal()
             .drawBehind {
-                drawLine(MetalDark, Offset(0f, 0f), Offset(size.width, 0f), 1.dp.toPx())
+                drawLine(Silver.copy(alpha = 0.55f), Offset(0f, 0f), Offset(size.width, 0f), 1.5.dp.toPx())
             }
             .navigationBarsPadding()
             .height(68.dp),
@@ -59,7 +59,7 @@ fun RetroBottomBar(
     ) {
         destinations.forEach { destination ->
             val selected = destination.route == currentRoute
-            val tint = if (selected) RetroAmber else CreamMuted
+            val tint = if (selected) HotlineAmber else TextSecondary
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -72,8 +72,8 @@ fun RetroBottomBar(
                 Box(
                     Modifier
                         .size(width = 20.dp, height = 3.dp)
-                        .shadow(if (selected) 4.dp else 0.dp, ledShape, spotColor = RetroOrange)
-                        .background(if (selected) RetroOrange else Color.Black.copy(alpha = 0.5f), ledShape)
+                        .shadow(if (selected) 4.dp else 0.dp, ledShape, spotColor = HotlineOrange)
+                        .background(if (selected) HotlineOrange else Color.Black.copy(alpha = 0.5f), ledShape)
                 )
                 Spacer(Modifier.height(6.dp))
                 Icon(destination.icon, contentDescription = destination.label, tint = tint)

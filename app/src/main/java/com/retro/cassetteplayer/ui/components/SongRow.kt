@@ -35,11 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.data.Song
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
-import com.retro.cassetteplayer.ui.theme.Graphite
-import com.retro.cassetteplayer.ui.theme.RetroAmber
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
+import com.retro.cassetteplayer.ui.theme.NavySurface
+import com.retro.cassetteplayer.ui.theme.HotlineAmber
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 
 @Composable
 fun SongRow(
@@ -67,21 +67,21 @@ fun SongRow(
                 text = song.title,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = if (isCurrent) RetroAmber else Cream,
+                color = if (isCurrent) HotlineAmber else TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = song.artist,
                 style = MaterialTheme.typography.bodyMedium,
-                color = CreamMuted,
+                color = TextSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = song.album,
                 style = MaterialTheme.typography.labelSmall,
-                color = CreamMuted.copy(alpha = 0.7f),
+                color = TextSecondary.copy(alpha = 0.7f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -91,12 +91,12 @@ fun SongRow(
         }
         Box {
             IconButton(onClick = { menuOpen = true }) {
-                Icon(Icons.Rounded.MoreVert, contentDescription = "Opções", tint = CreamMuted)
+                Icon(Icons.Rounded.MoreVert, contentDescription = "Opções", tint = TextSecondary)
             }
             DropdownMenu(
                 expanded = menuOpen,
                 onDismissRequest = { menuOpen = false },
-                modifier = Modifier.background(Graphite),
+                modifier = Modifier.background(NavySurface),
             ) {
                 SongMenuItem("Tocar", Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
                 SongMenuItem("Tocar a seguir", Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
@@ -112,8 +112,8 @@ fun SongRow(
 @Composable
 private fun SongMenuItem(text: String, icon: ImageVector, onClick: () -> Unit) {
     DropdownMenuItem(
-        text = { Text(text, color = Cream) },
-        leadingIcon = { Icon(icon, contentDescription = null, tint = RetroAmber) },
+        text = { Text(text, color = TextPrimary) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = HotlineAmber) },
         onClick = onClick,
     )
 }
@@ -124,7 +124,7 @@ fun PlaybackLed(lit: Boolean, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(10.dp)
-            .shadow(if (lit) 6.dp else 0.dp, CircleShape, ambientColor = RetroOrange, spotColor = RetroOrange)
-            .background(if (lit) RetroOrange else RetroOrange.copy(alpha = 0.3f), CircleShape)
+            .shadow(if (lit) 6.dp else 0.dp, CircleShape, ambientColor = HotlineOrange, spotColor = HotlineOrange)
+            .background(if (lit) HotlineOrange else HotlineOrange.copy(alpha = 0.3f), CircleShape)
     )
 }

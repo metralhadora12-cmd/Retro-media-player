@@ -47,7 +47,7 @@ import com.retro.cassetteplayer.ui.screens.LibraryScreen
 import com.retro.cassetteplayer.ui.screens.HomeScreen
 import com.retro.cassetteplayer.ui.screens.PlayerScreen
 import com.retro.cassetteplayer.ui.screens.SearchScreen
-import com.retro.cassetteplayer.ui.theme.Charcoal
+import com.retro.cassetteplayer.ui.theme.Navy
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -111,7 +111,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     }
 
     Scaffold(
-        containerColor = Charcoal,
+        containerColor = Navy,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             AnimatedVisibility(

@@ -61,7 +61,6 @@ import com.retro.cassetteplayer.R
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.playback.PlaybackState
-import com.retro.cassetteplayer.ui.components.CassetteTape
 import com.retro.cassetteplayer.ui.components.CollageArt
 import com.retro.cassetteplayer.ui.components.CoverTile
 import com.retro.cassetteplayer.ui.components.MetalButton
@@ -71,13 +70,13 @@ import com.retro.cassetteplayer.ui.components.RetroChip
 import com.retro.cassetteplayer.ui.components.SectionHeader
 import com.retro.cassetteplayer.ui.components.SongRow
 import com.retro.cassetteplayer.ui.components.TopGlow
-import com.retro.cassetteplayer.ui.components.steelBrushedMetal
-import com.retro.cassetteplayer.ui.theme.Charcoal
-import com.retro.cassetteplayer.ui.theme.Cream
-import com.retro.cassetteplayer.ui.theme.CreamMuted
+import com.retro.cassetteplayer.ui.components.WalkmanDeck
+import com.retro.cassetteplayer.ui.theme.Navy
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.DisplayFont
-import com.retro.cassetteplayer.ui.theme.Gunmetal
-import com.retro.cassetteplayer.ui.theme.RetroOrange
+import com.retro.cassetteplayer.ui.theme.NavyRaised
+import com.retro.cassetteplayer.ui.theme.HotlineOrange
 import kotlin.random.Random
 
 private const val TILES_PER_PAGE = 9
@@ -131,7 +130,7 @@ fun HomeScreen(
     Box(
         Modifier
             .fillMaxSize()
-            .background(Charcoal)
+            .background(Navy)
     ) {
         Box(
             Modifier
@@ -185,7 +184,7 @@ fun HomeScreen(
                                             Icon(
                                                 Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                                                 contentDescription = "Abrir biblioteca",
-                                                tint = Cream,
+                                                tint = TextPrimary,
                                             )
                                         }
                                     },
@@ -267,19 +266,19 @@ private fun HomeTopBar(onReload: () -> Unit, onOpenSearch: () -> Unit) {
         Text(
             text = "Retro",
             style = MaterialTheme.typography.headlineSmall,
-            color = Cream,
+            color = TextPrimary,
         )
         Text(
             text = "Cassette",
             style = MaterialTheme.typography.headlineSmall,
-            color = RetroOrange,
+            color = HotlineOrange,
         )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = onReload) {
-            Icon(Icons.Rounded.Refresh, contentDescription = "Recarregar biblioteca", tint = Cream)
+            Icon(Icons.Rounded.Refresh, contentDescription = "Recarregar biblioteca", tint = TextPrimary)
         }
         IconButton(onClick = onOpenSearch) {
-            Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = Cream)
+            Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = TextPrimary)
         }
     }
 }
@@ -290,8 +289,8 @@ private fun CassetteAvatar() {
         modifier = Modifier
             .size(44.dp)
             .clip(CircleShape)
-            .background(Gunmetal)
-            .border(1.dp, RetroOrange, CircleShape),
+            .background(NavyRaised)
+            .border(1.dp, HotlineOrange, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Image(
@@ -388,7 +387,7 @@ private fun AlbumCard(album: SongCollection, onClick: () -> Unit) {
             album.title,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
-            color = Cream,
+            color = TextPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 6.dp),
@@ -396,7 +395,7 @@ private fun AlbumCard(album: SongCollection, onClick: () -> Unit) {
         Text(
             album.songs.first().artist,
             style = MaterialTheme.typography.bodySmall,
-            color = CreamMuted,
+            color = TextSecondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -409,19 +408,13 @@ private fun MixtapeCard(
     canShuffle: Boolean,
     onShufflePlay: () -> Unit,
 ) {
-    val cardShape = RoundedCornerShape(18.dp)
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-            .shadow(12.dp, cardShape)
-            .clip(cardShape)
-            .steelBrushedMetal()
-            .border(1.dp, Color.White.copy(alpha = 0.15f), cardShape)
-            .padding(16.dp),
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CassetteTape(
+        WalkmanDeck(
             isPlaying = playback.isPlaying,
             progress = playback.progress,
             label = playback.title.ifBlank { "MIX TAPE VOL.1" },
@@ -457,14 +450,14 @@ private fun PermissionCard(onRequestPermission: () -> Unit, onOpenSettings: () -
         Text(
             text = "Para tocar suas fitas, o app precisa de acesso aos arquivos de áudio do dispositivo.",
             style = MaterialTheme.typography.bodyLarge,
-            color = Cream,
+            color = TextPrimary,
             textAlign = TextAlign.Center,
         )
         MetalButton(onClick = onRequestPermission, modifier = Modifier.height(50.dp)) {
             Text("PERMITIR ACESSO", style = MaterialTheme.typography.labelLarge)
         }
         TextButton(onClick = onOpenSettings) {
-            Text("Abrir configurações do app", color = RetroOrange)
+            Text("Abrir configurações do app", color = HotlineOrange)
         }
     }
 }
@@ -479,14 +472,14 @@ fun StatusMessage(text: String, showProgress: Boolean = false) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (showProgress) {
-                CircularProgressIndicator(color = RetroOrange, modifier = Modifier.size(32.dp))
+                CircularProgressIndicator(color = HotlineOrange, modifier = Modifier.size(32.dp))
                 Spacer(Modifier.height(12.dp))
             }
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
                 fontFamily = DisplayFont,
-                color = CreamMuted,
+                color = TextSecondary,
                 textAlign = TextAlign.Center,
             )
         }
