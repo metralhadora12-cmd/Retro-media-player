@@ -112,6 +112,11 @@
     <string name="settings_equalizer">Equalizer</string>
     <string name="settings_on">On</string>
     <string name="settings_off">Off</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_system">System default</string>
+    <string name="settings_section_appearance">Appearance</string>
     <string name="settings_language">Language</string>
     <string name="settings_reload_summary">Scan the device for new music</string>
     <string name="settings_whats_new">What\'s new</string>
@@ -148,6 +153,9 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_1_8">
+        <item>Light, dark or system theme (Settings → Appearance)</item>
+    </string-array>
     <string-array name="changelog_1_7">
         <item>Settings screen (gear on Home and Library)</item>
         <item>Languages: Portuguese, English and Spanish</item>

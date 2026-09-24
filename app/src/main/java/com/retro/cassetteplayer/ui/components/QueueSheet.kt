@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.ExperimentalComposeUiApi
+import com.retro.cassetteplayer.ui.theme.Hairline
 
 /** "A seguir": the play queue in playback order, like YouTube Music's Up Next tab. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -70,7 +71,7 @@ fun QueueSheet(
                 color = TextSecondary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             )
-            HorizontalDivider(color = Color.White.copy(alpha = 0.08f), modifier = Modifier.padding(top = 8.dp))
+            HorizontalDivider(color = Hairline, modifier = Modifier.padding(top = 8.dp))
 
             if (playback.queue.isEmpty()) {
                 StatusMessage(stringResource(R.string.queue_empty))

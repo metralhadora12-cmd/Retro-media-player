@@ -55,6 +55,7 @@ import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import java.util.Locale
 import kotlin.math.roundToInt
+import com.retro.cassetteplayer.ui.theme.Hairline
 
 /** Built-in equalizer: on/off, presets, one retro fader per band and bass boost. */
 @Composable
@@ -239,10 +240,10 @@ private fun BandFader(
             // Scale ticks and the 0 dB line
             for (i in 0..8) {
                 val y = top + track * i / 8f
-                drawLine(Color.White.copy(alpha = 0.12f), Offset(cx - 12.dp.toPx(), y), Offset(cx - 6.dp.toPx(), y), 1.dp.toPx())
-                drawLine(Color.White.copy(alpha = 0.12f), Offset(cx + 6.dp.toPx(), y), Offset(cx + 12.dp.toPx(), y), 1.dp.toPx())
+                drawLine(Hairline, Offset(cx - 12.dp.toPx(), y), Offset(cx - 6.dp.toPx(), y), 1.dp.toPx())
+                drawLine(Hairline, Offset(cx + 6.dp.toPx(), y), Offset(cx + 12.dp.toPx(), y), 1.dp.toPx())
             }
-            drawLine(Color.White.copy(alpha = 0.35f), Offset(cx - 14.dp.toPx(), zeroY), Offset(cx + 14.dp.toPx(), zeroY), 1.dp.toPx())
+            drawLine(TextSecondary.copy(alpha = 0.6f), Offset(cx - 14.dp.toPx(), zeroY), Offset(cx + 14.dp.toPx(), zeroY), 1.dp.toPx())
             // Orange fill from 0 dB to the cap
             drawRect(
                 color = TapeOrange,

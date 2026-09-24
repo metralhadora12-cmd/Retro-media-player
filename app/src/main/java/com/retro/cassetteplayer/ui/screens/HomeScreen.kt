@@ -67,7 +67,7 @@ import com.retro.cassetteplayer.ui.components.PillButton
 import com.retro.cassetteplayer.ui.components.RetroChip
 import com.retro.cassetteplayer.ui.components.SectionHeader
 import com.retro.cassetteplayer.ui.components.SongRow
-import com.retro.cassetteplayer.ui.components.TopGlow
+import com.retro.cassetteplayer.ui.theme.TopGlow
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary

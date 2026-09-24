@@ -32,6 +32,7 @@ import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.ui.theme.Hairline
 
 /** Fixed mini-player shown above the bottom navigation bar. */
 @Composable
@@ -89,7 +90,7 @@ fun MiniPlayer(
             Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.White.copy(alpha = 0.12f))
+                .background(Hairline)
         ) {
             Box(
                 Modifier

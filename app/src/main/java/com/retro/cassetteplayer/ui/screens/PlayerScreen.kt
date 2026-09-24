@@ -66,7 +66,7 @@ import com.retro.cassetteplayer.ui.components.PianoKeys
 import com.retro.cassetteplayer.ui.components.RetroSeekBar
 import com.retro.cassetteplayer.ui.components.VERTICAL_CASSETTE_ASPECT
 import com.retro.cassetteplayer.ui.components.VerticalCassette
-import com.retro.cassetteplayer.ui.components.PlayerGlow
+import com.retro.cassetteplayer.ui.theme.PlayerGlow
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary

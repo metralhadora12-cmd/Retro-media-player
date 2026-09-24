@@ -66,13 +66,14 @@ import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.CollageArt
 import com.retro.cassetteplayer.ui.components.PillButton
 import com.retro.cassetteplayer.ui.components.SongRow
-import com.retro.cassetteplayer.ui.components.TopGlow
+import com.retro.cassetteplayer.ui.theme.TopGlow
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
 import com.retro.cassetteplayer.ui.components.subtitleLabel
 import com.retro.cassetteplayer.ui.components.titleLabel
+import com.retro.cassetteplayer.ui.theme.Hairline
 
 /** Album / artist / playlist page: big cover, play & shuffle keys and the track list. */
 @Composable
@@ -276,7 +277,7 @@ fun CollectionScreen(
                         }
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 80.dp),
-                            color = Color.White.copy(alpha = 0.06f),
+                            color = Hairline,
                         )
                     }
                 }

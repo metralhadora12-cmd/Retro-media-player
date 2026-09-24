@@ -45,20 +45,9 @@ import com.retro.cassetteplayer.data.CollectionKind
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.InkRaised
+import com.retro.cassetteplayer.ui.theme.OutlineColor
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
-
-/** Subtle warm glow at the top of Home and collection pages. */
-val TopGlow = Brush.verticalGradient(
-    listOf(Color(0xFF3B2012), Color(0xFF1A120D), Ink)
-)
-
-/** Player backdrop: the same dark base with a faint warm tape-coloured glow at the top. */
-val PlayerGlow = Brush.verticalGradient(
-    0f to Color(0xFF2E1A10),
-    0.55f to Color(0xFF120D0A),
-    1f to Ink,
-)
 
 /** Flat filter chip: grey when idle, white with dark text when selected. */
 @Composable
@@ -121,7 +110,7 @@ fun PillButton(
             .clip(shape)
             .then(
                 if (filled) Modifier.background(TextPrimary)
-                else Modifier.border(1.dp, Color.White.copy(alpha = 0.25f), shape)
+                else Modifier.border(1.dp, OutlineColor, shape)
             )
             .clickable(enabled = enabled, onClick = onClick)
             .padding(contentPadding),
@@ -224,7 +213,7 @@ fun CoverTile(
                 text = collection.titleLabel(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
@@ -233,7 +222,7 @@ fun CoverTile(
                 Icon(
                     Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = TextPrimary,
+                    tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -248,7 +237,7 @@ fun PageDots(count: Int, current: Int, modifier: Modifier = Modifier) {
             Box(
                 Modifier
                     .size(7.dp)
-                    .background(if (i == current) TextPrimary else Color.White.copy(alpha = 0.3f), CircleShape)
+                    .background(if (i == current) TextPrimary else TextSecondary.copy(alpha = 0.4f), CircleShape)
             )
         }
     }

@@ -36,8 +36,9 @@ import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextSecondary
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.ui.theme.TextPrimary
 
-private val TickColor = Color.White.copy(alpha = 0.25f)
+private val TickColor: Color get() = TextSecondary.copy(alpha = 0.5f)
 
 private const val SCALE_MARKS = 10
 /**
@@ -124,7 +125,7 @@ fun RetroSeekBar(
             )
             // Played part, slightly lighter
             drawRoundRect(
-                color = Color.White.copy(alpha = 0.22f),
+                color = TextPrimary.copy(alpha = 0.25f),
                 topLeft = Offset(inset, grooveTop),
                 size = Size(trackWidth * fraction, grooveHeight),
                 cornerRadius = CornerRadius(grooveHeight),

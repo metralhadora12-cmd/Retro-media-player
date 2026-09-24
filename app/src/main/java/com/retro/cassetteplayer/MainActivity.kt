@@ -8,12 +8,23 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import com.retro.cassetteplayer.ui.RetroCassetteApp
+import com.retro.cassetteplayer.ui.theme.AppTheme
 import com.retro.cassetteplayer.ui.theme.RetroCassetteTheme
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+
+    private fun applySystemBars(dark: Boolean) {
+        val style = if (dark) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+    }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLanguage.wrap(newBase))
@@ -21,12 +32,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // The app is always dark, so keep light system-bar icons regardless of the device theme.
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-        )
+        AppTheme.load(this)
+        applySystemBars(AppTheme.isDark)
         setContent {
+            // System-bar icons follow the app theme, not the device theme.
+            val dark = AppTheme.isDark
+            LaunchedEffect(dark) { applySystemBars(dark) }
             RetroCassetteTheme {
                 RetroCassetteApp(viewModel)
             }

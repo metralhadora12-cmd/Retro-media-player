@@ -114,6 +114,11 @@
     <string name="settings_equalizer">Equalizador</string>
     <string name="settings_on">Ativado</string>
     <string name="settings_off">Desativado</string>
+    <string name="settings_theme">Tema</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_system">Padrão do sistema</string>
+    <string name="settings_section_appearance">Aparência</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_reload_summary">Procurar novas músicas no aparelho</string>
     <string name="settings_whats_new">Novidades</string>
@@ -153,6 +158,9 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_1_8">
+        <item>Tema claro, escuro ou padrão do sistema (Configurações → Aparência)</item>
+    </string-array>
     <string-array name="changelog_1_7">
         <item>Tela de configurações (engrenagem na Início e na Biblioteca)</item>
         <item>Idiomas: português, inglês e espanhol</item>

@@ -33,6 +33,7 @@ import com.retro.cassetteplayer.ui.theme.TextSecondary
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.ui.theme.Hairline
 
 @Composable
 fun SearchScreen(
@@ -103,7 +104,7 @@ fun SearchScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(start = 80.dp),
-                        color = Color.White.copy(alpha = 0.06f),
+                        color = Hairline,
                     )
                 }
             }

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.NewReleases
+import androidx.compose.material.icons.rounded.Contrast
 import androidx.compose.material.icons.rounded.Equalizer
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Refresh
@@ -44,11 +45,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.retro.cassetteplayer.AppLanguage
 import com.retro.cassetteplayer.R
+import com.retro.cassetteplayer.ui.theme.AppTheme
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import com.retro.cassetteplayer.ui.theme.ThemeMode
 
 @Composable
 fun SettingsScreen(
@@ -61,6 +64,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val currentLanguage = remember { AppLanguage.current(context) }
     var choosingLanguage by remember { mutableStateOf(false) }
+    var choosingTheme by remember { mutableStateOf(false) }
     val versionName = remember {
         runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }
             .getOrNull().orEmpty()
@@ -74,6 +78,19 @@ fun SettingsScreen(
                 context.findActivity()?.let { AppLanguage.apply(it, tag) }
             },
             onDismiss = { choosingLanguage = false },
+        )
+    }
+
+    if (choosingTheme) {
+        ChoiceDialog(
+            title = stringResource(R.string.settings_theme),
+            options = ThemeMode.entries.map { it to stringResource(it.label) },
+            selected = AppTheme.mode,
+            onSelect = { mode ->
+                choosingTheme = false
+                AppTheme.setMode(context, mode)
+            },
+            onDismiss = { choosingTheme = false },
         )
     }
 
@@ -93,6 +110,15 @@ fun SettingsScreen(
                     summary = stringResource(if (equalizerEnabled) R.string.settings_on else R.string.settings_off),
                     onClick = onOpenEqualizer,
                     showChevron = true,
+                )
+            }
+            item { SectionTitle(stringResource(R.string.settings_section_appearance)) }
+            item {
+                SettingsRow(
+                    icon = Icons.Rounded.Contrast,
+                    title = stringResource(R.string.settings_theme),
+                    summary = stringResource(AppTheme.mode.label),
+                    onClick = { choosingTheme = true },
                 )
             }
             item { SectionTitle(stringResource(R.string.settings_section_general)) }
@@ -200,29 +226,47 @@ private fun SettingsRow(
 
 @Composable
 private fun LanguageDialog(current: String, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
+    ChoiceDialog(
+        title = stringResource(R.string.settings_language),
+        options = AppLanguage.options.map { it.tag to stringResource(it.label) },
+        selected = current,
+        onSelect = onSelect,
+        onDismiss = onDismiss,
+    )
+}
+
+/** Single-choice dialog with radio buttons. */
+@Composable
+private fun <T> ChoiceDialog(
+    title: String,
+    options: List<Pair<T, String>>,
+    selected: T,
+    onSelect: (T) -> Unit,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = InkSurface,
-        title = { Text(stringResource(R.string.settings_language), color = TextPrimary) },
+        title = { Text(title, color = TextPrimary) },
         text = {
             Column {
-                AppLanguage.options.forEach { option ->
+                options.forEach { (value, label) ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onSelect(option.tag) }
+                            .clickable { onSelect(value) }
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
-                            selected = option.tag == current,
-                            onClick = { onSelect(option.tag) },
+                            selected = value == selected,
+                            onClick = { onSelect(value) },
                             colors = RadioButtonDefaults.colors(selectedColor = TapeOrange),
                         )
                         Text(
-                            stringResource(option.label),
+                            label,
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = if (option.tag == current) FontWeight.SemiBold else FontWeight.Normal,
+                            fontWeight = if (value == selected) FontWeight.SemiBold else FontWeight.Normal,
                             color = TextPrimary,
                         )
                     }

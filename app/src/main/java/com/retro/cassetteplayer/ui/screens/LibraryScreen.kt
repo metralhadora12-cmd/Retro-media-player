@@ -81,6 +81,7 @@ import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.outlined.Settings
+import com.retro.cassetteplayer.ui.theme.Hairline
 
 enum class LibraryFilter(@StringRes val label: Int) {
     PLAYLISTS(R.string.filter_playlists),
@@ -274,7 +275,7 @@ fun LibraryScreen(
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 80.dp),
-                            color = Color.White.copy(alpha = 0.06f),
+                            color = Hairline,
                         )
                     }
                 }
