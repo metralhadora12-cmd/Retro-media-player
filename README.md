@@ -5,7 +5,7 @@ Reprodutor de áudio Android nativo com estética de Walkman / tape deck metáli
 ## Stack
 - **Kotlin** + **Jetpack Compose** (Material 3)
 - **Media3 / ExoPlayer** rodando dentro de um `MediaSessionService` (tocar em segundo plano, notificação de mídia e tela de bloqueio)
-- **Navigation Compose** com barra de navegação inferior (Home, Search, Collections)
+- **Navigation Compose** com barra de navegação inferior (Início, Buscar, Biblioteca)
 - **MediaStore** para ler as músicas locais (`READ_MEDIA_AUDIO` no Android 13+, `READ_EXTERNAL_STORAGE` em versões anteriores)
 - **Coil** para as capas dos álbuns
 
@@ -15,7 +15,8 @@ app/src/main/java/com/retro/cassetteplayer/
 ├── MainActivity.kt              # Entrada, edge-to-edge
 ├── MainViewModel.kt             # Biblioteca, busca, álbuns, ações do player
 ├── data/
-│   ├── Song.kt                  # Modelos + conversão para MediaItem
+│   ├── Song.kt                  # Modelo + conversão para MediaItem
+│   ├── SongCollection.kt        # Álbuns, artistas e playlists automáticas
 │   └── MusicRepository.kt       # Consulta ao MediaStore
 ├── playback/
 │   ├── PlaybackService.kt       # MediaSessionService + ExoPlayer
@@ -29,11 +30,13 @@ app/src/main/java/com/retro/cassetteplayer/
     │   ├── MetalButton.kt       # Teclas metálicas em relevo (afundam / travam)
     │   ├── Cassette.kt          # Fita cassete em Canvas, carretéis girando, caixa de acrílico
     │   ├── RetroSeekBar.kt      # Régua graduada com agulha laranja + contadores LCD
+    │   ├── Sections.kt          # Chips, capas, cabeçalhos de seção
     │   ├── MiniPlayer.kt, RetroBottomBar.kt, SongRow.kt, AlbumArt.kt
-    └── screens/                 # Home, Player, Search, Collections
+    └── screens/                 # Início, Biblioteca, Coleção, Player, Buscar
 ```
 
 ## Destaques
+- **Layout inspirado no YouTube Music**: Início com chips de artistas, "Jukebox de fitas" em páginas 3×3, "Escolha a dedo" em colunas e "Adicionadas recentemente"; Biblioteca com filtros (Playlists, Álbuns, Artistas, Músicas), ordenação, grade/lista e botão "Modo aleatório".
 - **Carretéis animados**: `rememberReelRotation(isPlaying)` gira os hubs enquanto toca e para no mesmo ângulo quando pausado. Os rolos de fita passam do carretel esquerdo para o direito conforme o progresso da faixa.
 - **Controles de deck**: anterior, retroceder 10 s, play/pause (a tecla fica "travada" enquanto toca), avançar 10 s, próxima.
 - **Seek**: toque ou arraste na régua; o contador mostra o tempo de destino enquanto você arrasta.

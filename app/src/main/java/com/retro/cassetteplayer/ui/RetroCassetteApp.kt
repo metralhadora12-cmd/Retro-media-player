@@ -31,15 +31,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.retro.cassetteplayer.MainViewModel
+import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.ui.components.MiniPlayer
 import com.retro.cassetteplayer.ui.components.RetroBottomBar
 import com.retro.cassetteplayer.ui.navigation.Routes
-import com.retro.cassetteplayer.ui.screens.CollectionsScreen
+import com.retro.cassetteplayer.ui.screens.CollectionScreen
+import com.retro.cassetteplayer.ui.screens.LibraryScreen
 import com.retro.cassetteplayer.ui.screens.HomeScreen
 import com.retro.cassetteplayer.ui.screens.PlayerScreen
 import com.retro.cassetteplayer.ui.screens.SearchScreen
@@ -68,7 +72,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val hasPermission by viewModel.hasPermission.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
-    val albums by viewModel.albums.collectAsStateWithLifecycle()
+    val library by viewModel.library.collectAsStateWithLifecycle()
 
     // --- Permissions (READ_MEDIA_AUDIO on Android 13+) ----------------------------------
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -95,6 +99,16 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     val openPlayer = { navController.navigate(Routes.PLAYER) { launchSingleTop = true } }
+    val openTab: (String) -> Unit = { route ->
+        navController.navigate(route) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+    val openCollection: (SongCollection) -> Unit = { collection ->
+        navController.navigate(Routes.collection(collection.id))
+    }
 
     Scaffold(
         containerColor = Charcoal,
@@ -117,13 +131,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     RetroBottomBar(
                         destinations = Routes.bottomDestinations,
                         currentRoute = currentRoute,
-                        onSelect = { route ->
-                            navController.navigate(route) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
+                        onSelect = openTab,
                     )
                 }
             }
@@ -137,6 +145,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
             composable(Routes.HOME) {
                 HomeScreen(
                     songs = songs,
+                    albums = library.albums,
+                    playlists = library.playlists,
                     playback = playback,
                     isLoading = isLoading,
                     hasPermission = hasPermission,
@@ -150,8 +160,12 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                         )
                     },
                     onReload = viewModel::loadSongs,
-                    onShufflePlay = { viewModel.shufflePlay() },
-                    onSongClick = { song -> viewModel.play(songs, song) },
+                    onOpenSearch = { openTab(Routes.SEARCH) },
+                    onOpenLibrary = { openTab(Routes.LIBRARY) },
+                    onOpenCollection = openCollection,
+                    onPlayAll = viewModel::playAll,
+                    onShufflePlay = viewModel::shufflePlay,
+                    onSongClick = viewModel::play,
                     onPlayNext = viewModel::playNext,
                     onAddToQueue = viewModel::addToQueue,
                 )
@@ -167,11 +181,36 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onAddToQueue = viewModel::addToQueue,
                 )
             }
-            composable(Routes.COLLECTIONS) {
-                CollectionsScreen(
-                    albums = albums,
-                    onPlayAlbum = { album -> viewModel.play(album.songs, album.songs.first()) },
-                    onShuffleAlbum = { album -> viewModel.shufflePlay(album.songs) },
+            composable(Routes.LIBRARY) {
+                LibraryScreen(
+                    songs = songs,
+                    library = library,
+                    playback = playback,
+                    onOpenSearch = { openTab(Routes.SEARCH) },
+                    onOpenCollection = openCollection,
+                    onShufflePlay = viewModel::shufflePlay,
+                    onSongClick = viewModel::play,
+                    onPlayNext = viewModel::playNext,
+                    onAddToQueue = viewModel::addToQueue,
+                )
+            }
+            composable(
+                route = Routes.COLLECTION,
+                arguments = listOf(navArgument(Routes.COLLECTION_ARG) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }),
+            ) { entry ->
+                val id = entry.arguments?.getString(Routes.COLLECTION_ARG).orEmpty()
+                CollectionScreen(
+                    collection = library.find(id),
+                    playback = playback,
+                    onBack = { navController.popBackStack() },
+                    onPlayAll = viewModel::playAll,
+                    onShufflePlay = viewModel::shufflePlay,
+                    onSongClick = viewModel::play,
+                    onPlayNext = viewModel::playNext,
+                    onAddToQueue = viewModel::addToQueue,
                 )
             }
             composable(

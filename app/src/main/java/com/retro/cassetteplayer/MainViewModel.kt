@@ -3,9 +3,10 @@ package com.retro.cassetteplayer
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.retro.cassetteplayer.data.Album
+import com.retro.cassetteplayer.data.LibraryCollections
 import com.retro.cassetteplayer.data.MusicRepository
 import com.retro.cassetteplayer.data.Song
+import com.retro.cassetteplayer.data.buildLibrary
 import com.retro.cassetteplayer.playback.PlaybackConnection
 import com.retro.cassetteplayer.playback.PlaybackState
 import kotlinx.coroutines.delay
@@ -50,14 +51,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val albums: StateFlow<List<Album>> = _songs.map { songs ->
-        songs.groupBy { it.albumId }
-            .map { (id, tracks) ->
-                val first = tracks.first()
-                Album(id, first.album, first.artist, first.artworkUri, tracks)
-            }
-            .sortedBy { it.title.lowercase() }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val library: StateFlow<LibraryCollections> = _songs.map(::buildLibrary)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryCollections())
 
     init {
         connection.connect()
@@ -91,6 +86,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun play(songs: List<Song>, song: Song) =
         connection.playSongs(songs, songs.indexOf(song).coerceAtLeast(0))
+
+    fun playAll(songs: List<Song>) = connection.playSongs(songs, 0)
 
     fun shufflePlay(songs: List<Song> = _songs.value) {
         if (songs.isEmpty()) return

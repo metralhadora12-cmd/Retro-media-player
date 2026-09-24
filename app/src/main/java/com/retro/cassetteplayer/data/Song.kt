@@ -13,14 +13,8 @@ data class Song(
     val durationMs: Long,
     val uri: Uri,
     val artworkUri: Uri?,
-)
-
-data class Album(
-    val id: Long,
-    val title: String,
-    val artist: String,
-    val artworkUri: Uri?,
-    val songs: List<Song>,
+    /** Seconds since epoch, from MediaStore.DATE_ADDED. */
+    val dateAdded: Long,
 )
 
 /**
