@@ -160,6 +160,7 @@
     <string name="rename_song_file">Renombrar también el archivo</string>
     <string name="msg_song_renamed">Canción renombrada</string>
     <string name="msg_rename_failed">No se pudo renombrar la canción</string>
+    <string name="badge_hq_description">Alta calidad (lossless)</string>
     <string name="msg_language_changed">Idioma cambiado</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_audio">Audio</string>
@@ -213,7 +214,7 @@
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
     <string-array name="changelog_2_4">
-        <item>Insignia lossless (FLAC, WAV…) en los álbumes, artistas y playlists de la Biblioteca</item>
+        <item>Insignia HQ en las canciones lossless (FLAC, WAV…) y en los álbumes, artistas y playlists de la Biblioteca con todas las pistas lossless</item>
     </string-array>
     <string-array name="changelog_2_3">
         <item>Renombrar canciones desde la pulsación larga: cambia el título en las etiquetas y, si quieres, el nombre del archivo</item>

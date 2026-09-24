@@ -77,7 +77,7 @@ import com.retro.cassetteplayer.R
 import com.retro.cassetteplayer.ui.components.artistLabel
 import com.retro.cassetteplayer.ui.components.titleLabel
 import com.retro.cassetteplayer.playback.AudioFormatInfo
-import com.retro.cassetteplayer.ui.components.FormatTag
+import com.retro.cassetteplayer.ui.components.HqBadge
 
 @Composable
 fun PlayerScreen(
@@ -325,7 +325,7 @@ private fun ModeToggle(
     }
 }
 
-/** "LOSSLESS  FLAC · 24-bit · 96 kHz" under the artist, from the decoded track. */
+/** "[HQ] FLAC · 24-bit · 96 kHz" under the artist, from the decoded track. */
 @Composable
 private fun AudioFormatLine(format: AudioFormatInfo) {
     val parts = buildList {
@@ -338,7 +338,7 @@ private fun AudioFormatLine(format: AudioFormatInfo) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (format.lossless) {
-            FormatTag(stringResource(R.string.badge_lossless), Modifier.padding(end = 8.dp))
+            HqBadge(Modifier.padding(end = 8.dp))
         }
         Text(
             parts.joinToString(" · "),

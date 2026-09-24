@@ -41,6 +41,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import com.retro.cassetteplayer.R
+import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.data.CollectionKind
 import com.retro.cassetteplayer.data.SongCollection
 import com.retro.cassetteplayer.ui.theme.Ink
@@ -277,13 +281,11 @@ fun CollectionGridItem(
                         .aspectRatio(1f),
                     shape = collection.artShape(),
                 )
-                collection.losslessLabel?.let { label ->
-                    FormatTag(
-                        text = label,
-                        background = Color.Black.copy(alpha = 0.7f),
-                        modifier = Modifier
+                if (collection.isLossless) {
+                    HqBadge(
+                        Modifier
                             .align(if (collection.kind == CollectionKind.ARTIST) Alignment.BottomCenter else Alignment.TopStart)
-                            .padding(6.dp),
+                            .padding(6.dp)
                     )
                 }
             }
@@ -346,7 +348,7 @@ fun CollectionListItem(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    collection.losslessLabel?.let { FormatTag(it, Modifier.padding(end = 6.dp)) }
+                    if (collection.isLossless) HqBadge(Modifier.padding(end = 6.dp))
                     Text(
                         collection.subtitleLabel(),
                         style = MaterialTheme.typography.bodySmall,
@@ -360,18 +362,24 @@ fun CollectionListItem(
     }
 }
 
-/** Tiny outlined tag for lossless formats ("FLAC", "LOSSLESS"…), like a hi-fi tape label. */
+/** Compact "HQ" icon for lossless audio (like a video player's "HD" mark). */
 @Composable
-fun FormatTag(text: String, modifier: Modifier = Modifier, background: Color = Color.Transparent) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 0.5.sp),
-        fontWeight = FontWeight.Bold,
-        color = TapeOrange,
-        maxLines = 1,
+fun HqBadge(modifier: Modifier = Modifier) {
+    val description = stringResource(R.string.badge_hq_description)
+    Box(
         modifier = modifier
-            .background(background, RoundedCornerShape(3.dp))
-            .border(1.dp, TapeOrange.copy(alpha = 0.7f), RoundedCornerShape(3.dp))
-            .padding(horizontal = 4.dp, vertical = 1.dp),
-    )
+            .background(TapeOrange, RoundedCornerShape(3.dp))
+            .padding(horizontal = 3.dp)
+            .semantics { contentDescription = description },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "HQ",
+            fontSize = 9.sp,
+            lineHeight = 12.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 0.sp,
+            color = Color.White,
+        )
+    }
 }

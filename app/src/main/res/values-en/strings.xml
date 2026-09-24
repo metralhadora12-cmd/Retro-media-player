@@ -160,6 +160,7 @@
     <string name="rename_song_file">Also rename the file</string>
     <string name="msg_song_renamed">Song renamed</string>
     <string name="msg_rename_failed">Couldn\'t rename the song</string>
+    <string name="badge_hq_description">High quality (lossless)</string>
     <string name="msg_language_changed">Language changed</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_audio">Audio</string>
@@ -210,7 +211,7 @@
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
     <string-array name="changelog_2_4">
-        <item>Lossless badge (FLAC, WAV…) on Library albums, artists and playlists</item>
+        <item>HQ badge on lossless songs (FLAC, WAV…) and on Library albums, artists and playlists where every track is lossless</item>
     </string-array>
     <string-array name="changelog_2_3">
         <item>Rename songs from the long-press menu: changes the title tag and, optionally, the file name</item>

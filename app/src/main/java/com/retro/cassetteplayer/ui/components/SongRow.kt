@@ -124,7 +124,7 @@ fun SongRow(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    song.losslessLabel?.let { FormatTag(it, Modifier.padding(end = 6.dp)) }
+                    if (song.isLossless) HqBadge(Modifier.padding(end = 6.dp))
                     Text(
                         text = stringResource(R.string.song_subtitle, song.artistLabel(), song.albumLabel()),
                         style = MaterialTheme.typography.bodyMedium,
