@@ -3,6 +3,14 @@ package com.retro.cassetteplayer.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -67,73 +75,100 @@ fun SongRow(
     val favorites = LocalFavorites.current
     val isFavorite = favorites.isFavorite(song)
 
-    Row(
-        modifier = modifier
+    // Where the finger went down (row coordinates) and the row size, used to open the
+    // menu right under the finger. The ⋮ button places it at the row's right edge instead.
+    var pressOffset by remember { mutableStateOf(Offset.Zero) }
+    var rowSize by remember { mutableStateOf(IntSize.Zero) }
+    val density = LocalDensity.current
+
+    Box(
+        modifier
             .fillMaxWidth()
-            // Tap plays; press and hold opens the same options as the ⋮ button.
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            .onSizeChanged { rowSize = it }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    // Observe only: records the touch position without consuming it.
+                    awaitEachGesture {
+                        pressOffset = awaitFirstDown(requireUnconsumed = false).position
+                    }
+                }
+                // Tap plays; press and hold opens the same options as the ⋮ button.
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        menuOpen = true
+                    },
+                    onLongClickLabel = "Opções",
+                )
+                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            AlbumArt(song.artworkUri, Modifier.size(48.dp), RoundedCornerShape(4.dp))
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = song.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (isCurrent) TapeAmber else TextPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = "${song.artist} • ${song.album}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            if (isCurrent) {
+                PlaybackLed(lit = isPlaying, modifier = Modifier.padding(start = 8.dp))
+            }
+            IconButton(
+                onClick = {
+                    pressOffset = Offset(rowSize.width.toFloat(), rowSize.height.toFloat())
                     menuOpen = true
                 },
-                onLongClickLabel = "Opções",
-            )
-            .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AlbumArt(song.artworkUri, Modifier.size(48.dp), RoundedCornerShape(4.dp))
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = song.title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (isCurrent) TapeAmber else TextPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = "${song.artist} • ${song.album}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        if (isCurrent) {
-            PlaybackLed(lit = isPlaying, modifier = Modifier.padding(start = 8.dp))
-        }
-        Box {
-            IconButton(onClick = { menuOpen = true }) {
+            ) {
                 Icon(Icons.Rounded.MoreVert, contentDescription = "Opções", tint = TextSecondary)
             }
-            DropdownMenu(
-                expanded = menuOpen,
-                onDismissRequest = { menuOpen = false },
-                modifier = Modifier.background(InkSurface),
+        }
+
+        // DropdownMenu offsets are relative to the anchor's bottom-left corner;
+        // the popup is flipped/clamped automatically near the screen edges.
+        DropdownMenu(
+            expanded = menuOpen,
+            onDismissRequest = { menuOpen = false },
+            offset = with(density) {
+                DpOffset(pressOffset.x.toDp(), (pressOffset.y - rowSize.height).toDp())
+            },
+            modifier = Modifier.background(InkSurface),
+        ) {
+            SongMenuItem("Tocar", Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
+            SongMenuItem("Tocar a seguir", Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
+            SongMenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay) {
+                menuOpen = false
+                onAddToQueue()
+            }
+            SongMenuItem(
+                if (isFavorite) "Remover das favoritas" else "Adicionar às favoritas",
+                if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
             ) {
-                SongMenuItem("Tocar", Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
-                SongMenuItem("Tocar a seguir", Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
-                SongMenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay) {
+                menuOpen = false
+                favorites.toggle(song)
+            }
+            SongMenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd) {
+                menuOpen = false
+                onAddToPlaylist()
+            }
+            if (onRemoveFromPlaylist != null) {
+                SongMenuItem("Remover da playlist", Icons.Rounded.RemoveCircleOutline) {
                     menuOpen = false
-                    onAddToQueue()
-                }
-                SongMenuItem(
-                    if (isFavorite) "Remover das favoritas" else "Adicionar às favoritas",
-                    if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                ) {
-                    menuOpen = false
-                    favorites.toggle(song)
-                }
-                SongMenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd) {
-                    menuOpen = false
-                    onAddToPlaylist()
-                }
-                if (onRemoveFromPlaylist != null) {
-                    SongMenuItem("Remover da playlist", Icons.Rounded.RemoveCircleOutline) {
-                        menuOpen = false
-                        onRemoveFromPlaylist()
-                    }
+                    onRemoveFromPlaylist()
                 }
             }
         }
