@@ -1,6 +1,5 @@
 package com.retro.cassetteplayer.ui.screens
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,18 +34,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import androidx.media3.common.Player
 import com.retro.cassetteplayer.playback.PlaybackState
 import com.retro.cassetteplayer.ui.components.PianoKey
@@ -54,11 +51,11 @@ import com.retro.cassetteplayer.ui.components.PianoKeys
 import com.retro.cassetteplayer.ui.components.RetroSeekBar
 import com.retro.cassetteplayer.ui.components.VERTICAL_CASSETTE_ASPECT
 import com.retro.cassetteplayer.ui.components.VerticalCassette
-import com.retro.cassetteplayer.ui.components.brushedAluminium
-import com.retro.cassetteplayer.ui.theme.AluInk
-import com.retro.cassetteplayer.ui.theme.AluInkMuted
+import com.retro.cassetteplayer.ui.components.PlayerGlow
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.TapeOrange
+import com.retro.cassetteplayer.ui.theme.TextPrimary
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 
 @Composable
 fun PlayerScreen(
@@ -72,11 +69,10 @@ fun PlayerScreen(
     onCycleRepeat: () -> Unit,
     onOpenQueue: () -> Unit,
 ) {
-    LightSystemBars()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .brushedAluminium()
+            .background(PlayerGlow)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp),
@@ -89,12 +85,12 @@ fun PlayerScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Voltar", tint = AluInk)
+                Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = "Voltar", tint = TextPrimary)
             }
             Text(
                 text = "TOCANDO AGORA",
                 style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 2.sp),
-                color = AluInkMuted,
+                color = TextSecondary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
             )
@@ -116,7 +112,8 @@ fun PlayerScreen(
                 subtitle = playback.artist,
                 modifier = Modifier
                     .fillMaxHeight()
-                    .aspectRatio(VERTICAL_CASSETTE_ASPECT, matchHeightConstraintsFirst = true),
+                    .aspectRatio(VERTICAL_CASSETTE_ASPECT, matchHeightConstraintsFirst = true)
+                    .shadow(28.dp, RoundedCornerShape(percent = 3), spotColor = TapeOrange.copy(alpha = 0.5f)),
             )
         }
 
@@ -154,27 +151,26 @@ fun PlayerScreen(
             )
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(24.dp))
 
         Text(
             text = playback.title.ifBlank { "Nenhuma fita inserida" },
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-            color = AluInk,
+            color = TextPrimary,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
         Box(
             Modifier
-                .padding(vertical = 6.dp)
-                .fillMaxWidth(0.6f)
-                .height(1.5.dp)
-                .background(Color.White.copy(alpha = 0.85f))
+                .padding(vertical = 8.dp)
+                .size(width = 28.dp, height = 2.dp)
+                .background(TapeOrange, RoundedCornerShape(1.dp))
         )
         Text(
             text = playback.artist,
             style = MaterialTheme.typography.bodyLarge,
-            color = AluInkMuted,
+            color = TextSecondary,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -202,14 +198,14 @@ fun PlayerScreen(
             Icon(
                 Icons.AutoMirrored.Rounded.QueueMusic,
                 contentDescription = null,
-                tint = AluInk,
+                tint = TextPrimary,
                 modifier = Modifier.size(20.dp),
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 "A SEGUIR",
                 style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp),
-                color = AluInk,
+                color = TextPrimary,
             )
         }
     }
@@ -233,7 +229,7 @@ private fun ModeToggle(
         Icon(
             icon,
             contentDescription = description,
-            tint = if (active) TapeOrange else AluInkMuted,
+            tint = if (active) TapeOrange else TextSecondary,
             modifier = Modifier.size(24.dp),
         )
         Spacer(Modifier.height(4.dp))
@@ -245,18 +241,3 @@ private fun ModeToggle(
     }
 }
 
-/** Dark status/navigation bar icons while the light aluminium player is on screen. */
-@Composable
-private fun LightSystemBars() {
-    val view = LocalView.current
-    DisposableEffect(view) {
-        val window = (view.context as? Activity)?.window
-        val controller = window?.let { WindowCompat.getInsetsController(it, view) }
-        controller?.isAppearanceLightStatusBars = true
-        controller?.isAppearanceLightNavigationBars = true
-        onDispose {
-            controller?.isAppearanceLightStatusBars = false
-            controller?.isAppearanceLightNavigationBars = false
-        }
-    }
-}

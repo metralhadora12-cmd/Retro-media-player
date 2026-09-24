@@ -32,12 +32,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.retro.cassetteplayer.ui.theme.AluDark
 import com.retro.cassetteplayer.ui.theme.LabelCream
 import com.retro.cassetteplayer.ui.theme.TapeBrown
 import com.retro.cassetteplayer.ui.theme.TapeOrange
 
-/** Width / height of the recessed window that holds the cassette. */
+/** Width / height of the upright cassette. */
 const val VERTICAL_CASSETTE_ASPECT = 0.6f
 private const val REEL_TURN_MS = 1_800
 
@@ -61,7 +60,7 @@ fun rememberReelRotation(isPlaying: Boolean): State<Float> {
 }
 
 /**
- * A cassette standing upright inside a window cut into the aluminium: cream label with
+ * A cassette standing upright: cream label with
  * the title printed sideways, an orange stripe band, and a dark centre window where the
  * two reels spin. Tape winds from the top reel to the bottom one following [progress].
  */
@@ -76,11 +75,8 @@ fun VerticalCassette(
     val rotation = rememberReelRotation(isPlaying)
     val textMeasurer = rememberTextMeasurer()
     Canvas(modifier) {
-        drawRecessedWindow()
-        val inset = size.width * 0.04f
-        val cassette = Rect(inset, inset, size.width - inset, size.height - inset)
         drawCassette(
-            area = cassette,
+            area = Rect(Offset.Zero, size),
             angle = rotation.value,
             progress = progress.coerceIn(0f, 1f),
             title = title,
@@ -88,21 +84,6 @@ fun VerticalCassette(
             textMeasurer = textMeasurer,
         )
     }
-}
-
-/** The pocket cut into the metal: darker floor, inner shadow on top-left, highlight bottom-right. */
-private fun DrawScope.drawRecessedWindow() {
-    val corner = CornerRadius(size.width * 0.05f)
-    drawRoundRect(AluDark.copy(alpha = 0.9f), cornerRadius = corner)
-    drawRoundRect(
-        brush = Brush.linearGradient(
-            listOf(Color.Black.copy(alpha = 0.35f), Color.Transparent, Color.White.copy(alpha = 0.6f)),
-            start = Offset.Zero,
-            end = Offset(size.width, size.height),
-        ),
-        cornerRadius = corner,
-        style = Stroke(size.width * 0.018f),
-    )
 }
 
 private fun DrawScope.drawCassette(

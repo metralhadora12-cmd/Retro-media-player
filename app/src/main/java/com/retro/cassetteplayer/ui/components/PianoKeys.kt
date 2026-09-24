@@ -5,9 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,10 +31,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.retro.cassetteplayer.ui.theme.AluInk
-import com.retro.cassetteplayer.ui.theme.KeyGrey
-import com.retro.cassetteplayer.ui.theme.KeyShadow
-import com.retro.cassetteplayer.ui.theme.KeyWhite
+import com.retro.cassetteplayer.ui.theme.TapeOrange
+import com.retro.cassetteplayer.ui.theme.TextPrimary
 
 data class PianoKey(
     val icon: ImageVector,
@@ -46,82 +42,78 @@ data class PianoKey(
     val weight: Float = 1f,
 )
 
+private val KeyTop = Color(0xFF2E2E2E)
+private val KeyBottom = Color(0xFF222222)
+private val KeySide = Color(0xFF121212)
+
 /**
- * A block of joined cassette-deck keys. Each key has its symbol printed on the metal
- * above it, sinks when pressed and can stay latched down (PLAY while playing).
+ * A block of joined cassette-deck keys in dark graphite. Each key sinks when pressed and
+ * can stay latched down (PLAY while playing), lighting a small orange LED strip.
  */
 @Composable
 fun PianoKeys(keys: List<PianoKey>, modifier: Modifier = Modifier) {
-    Row(modifier, verticalAlignment = Alignment.Bottom) {
+    Row(modifier) {
         keys.forEachIndexed { index, key ->
             val shape = RoundedCornerShape(
-                topStart = if (index == 0) 6.dp else 0.dp,
-                bottomStart = if (index == 0) 6.dp else 0.dp,
-                topEnd = if (index == keys.lastIndex) 6.dp else 0.dp,
-                bottomEnd = if (index == keys.lastIndex) 6.dp else 0.dp,
+                topStart = if (index == 0) 10.dp else 2.dp,
+                bottomStart = if (index == 0) 10.dp else 2.dp,
+                topEnd = if (index == keys.lastIndex) 10.dp else 2.dp,
+                bottomEnd = if (index == keys.lastIndex) 10.dp else 2.dp,
             )
-            Column(
-                modifier = Modifier.weight(key.weight),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(key.icon, contentDescription = null, tint = AluInk, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.height(8.dp))
-                Key(key, shape)
-            }
-            if (index != keys.lastIndex) Spacer(Modifier.width(2.dp))
+            Key(key, shape, Modifier.weight(key.weight))
+            if (index != keys.lastIndex) Spacer(Modifier.width(3.dp))
         }
     }
 }
 
 @Composable
-private fun Key(key: PianoKey, shape: RoundedCornerShape) {
+private fun Key(key: PianoKey, shape: RoundedCornerShape, modifier: Modifier) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val down = pressed || key.latched
-    val travel by animateDpAsState(if (down) 4.dp else 0.dp, label = "keyTravel")
+    val travel by animateDpAsState(if (down) 3.dp else 0.dp, label = "keyTravel")
 
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .height(58.dp)
-    ) {
-        // Side face of the key: 6dp shows when up, 2dp when pressed down
+    Box(modifier.height(62.dp)) {
+        // Side face: 5dp of depth when up, 2dp when pressed down
         Box(
             Modifier
                 .fillMaxWidth()
-                .height(52.dp)
-                .offset(y = 6.dp)
-                .shadow(6.dp, shape)
+                .height(57.dp)
+                .offset(y = 5.dp)
                 .clip(shape)
-                .background(KeyShadow)
+                .background(KeySide)
         )
-        // Top face
         Box(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp)
+                .height(57.dp)
                 .offset(y = travel)
                 .clip(shape)
                 .background(
                     Brush.verticalGradient(
-                        if (down) listOf(KeyGrey, KeyWhite) else listOf(KeyWhite, KeyGrey)
+                        if (down) listOf(KeyBottom, KeyTop) else listOf(KeyTop, KeyBottom)
                     )
                 )
                 .drawBehind {
-                    // Ribbed grip texture across the key
-                    val gripTop = size.height * 0.2f
-                    val gripBottom = size.height * 0.8f
-                    var gy = gripTop
-                    while (gy < gripBottom) {
+                    // Hairline highlight on the top edge + fine ribbing near the bottom
+                    drawLine(Color.White.copy(alpha = 0.12f), Offset(0f, 1f), Offset(size.width, 1f), 2f)
+                    var gy = size.height * 0.78f
+                    while (gy < size.height * 0.92f) {
                         drawLine(
-                            Color.Black.copy(alpha = 0.08f),
-                            Offset(size.width * 0.12f, gy),
-                            Offset(size.width * 0.88f, gy),
+                            Color.White.copy(alpha = 0.05f),
+                            Offset(size.width * 0.2f, gy),
+                            Offset(size.width * 0.8f, gy),
                             1.5f,
                         )
-                        gy += 5f
+                        gy += 4f
                     }
-                    drawLine(Color.White, Offset(0f, 1f), Offset(size.width, 1f), 2f)
+                    if (key.latched) {
+                        drawRect(
+                            TapeOrange,
+                            topLeft = Offset(size.width * 0.35f, size.height - 5.dp.toPx()),
+                            size = Size(size.width * 0.3f, 2.dp.toPx()),
+                        )
+                    }
                 }
                 .clickable(
                     interactionSource = interaction,
@@ -130,6 +122,14 @@ private fun Key(key: PianoKey, shape: RoundedCornerShape) {
                     onClick = key.onClick,
                 )
                 .semantics { contentDescription = key.description },
-        )
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                key.icon,
+                contentDescription = null,
+                tint = if (key.latched) TapeOrange else TextPrimary,
+                modifier = Modifier.size(if (key.weight > 1f) 30.dp else 26.dp),
+            )
+        }
     }
 }

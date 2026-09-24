@@ -52,6 +52,13 @@ val TopGlow = Brush.verticalGradient(
     listOf(Color(0xFF3B2012), Color(0xFF1A120D), Ink)
 )
 
+/** Player backdrop: the same dark base with a faint warm tape-coloured glow at the top. */
+val PlayerGlow = Brush.verticalGradient(
+    0f to Color(0xFF2E1A10),
+    0.55f to Color(0xFF120D0A),
+    1f to Ink,
+)
+
 /** Flat filter chip: grey when idle, white with dark text when selected. */
 @Composable
 fun RetroChip(

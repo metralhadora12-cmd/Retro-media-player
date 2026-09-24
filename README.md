@@ -24,9 +24,8 @@ app/src/main/java/com/retro/cassetteplayer/
 └── ui/
     ├── RetroCassetteApp.kt      # Scaffold, permissões, NavHost, mini-player
     ├── navigation/Routes.kt
-    ├── theme/                   # Paleta escura minimalista + alumínio do player, laranja da fita
+    ├── theme/                   # Paleta escura minimalista com o laranja da fita
     ├── components/
-    │   ├── BrushedMetal.kt      # Textura de alumínio escovado do player
     │   ├── PianoKeys.kt         # Teclas de piano (afundam / PLAY fica travada)
     │   ├── QueueSheet.kt        # Painel "A seguir" com a fila
     │   ├── VerticalCassette.kt  # Fita vertical em Canvas, carretéis girando
@@ -38,7 +37,7 @@ app/src/main/java/com/retro/cassetteplayer/
 
 ## Destaques
 - **Layout inspirado no YouTube Music**: Início com chips de artistas, "Jukebox de fitas" em páginas 3×3, "Escolha a dedo" em colunas e "Adicionadas recentemente"; Biblioteca com filtros (Playlists, Álbuns, Artistas, Músicas), ordenação, grade/lista e botão "Modo aleatório".
-- **Player**: fita em pé numa janela rebaixada no alumínio; os carretéis giram enquanto toca e a fita passa do carretel de cima para o de baixo conforme o progresso.
+- **Player**: mesmo fundo escuro do app com um brilho laranja sutil; fita em pé com sombra suave, teclas de piano grafite; os carretéis giram enquanto toca e a fita passa do carretel de cima para o de baixo conforme o progresso.
 - **Controles**: três teclas de piano (anterior, play/pause travando, próxima), aleatório e repetir (desligado / todas / uma).
 - **A seguir**: fila de reprodução na ordem real (respeita o aleatório), tocar qualquer item ou remover da fila.
 - **Seek**: toque ou arraste na régua; o contador mostra o tempo de destino enquanto você arrasta.

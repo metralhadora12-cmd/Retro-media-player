@@ -31,13 +31,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.retro.cassetteplayer.ui.theme.AluInk
-import com.retro.cassetteplayer.ui.theme.AluInkMuted
 import com.retro.cassetteplayer.ui.theme.DisplayFont
 import com.retro.cassetteplayer.ui.theme.TapeOrange
+import com.retro.cassetteplayer.ui.theme.TextSecondary
+
+private val TickColor = Color.White.copy(alpha = 0.25f)
 
 private const val SCALE_MARKS = 10
-
 /**
  * Tape-counter style seek bar: a 0–9 graduated scale above a dark groove with an orange
  * slider block. Tap or drag to seek; while dragging the counter previews the target time.
@@ -55,7 +55,7 @@ fun RetroSeekBar(
     val shownPosition = dragFraction?.let { (it * durationMs).toLong() } ?: positionMs
     val textMeasurer = rememberTextMeasurer()
     val numberStyle = TextStyle(
-        color = AluInkMuted,
+        color = TextSecondary,
         fontFamily = DisplayFont,
         fontWeight = FontWeight.Bold,
         fontSize = 11.sp,
@@ -95,7 +95,7 @@ fun RetroSeekBar(
         ) {
             val inset = 8.dp.toPx()
             val trackWidth = size.width - inset * 2
-            val grooveHeight = 10.dp.toPx()
+            val grooveHeight = 6.dp.toPx()
             val grooveTop = size.height - grooveHeight - 2.dp.toPx()
             val scaleY = 7.dp.toPx()
 
@@ -107,36 +107,30 @@ fun RetroSeekBar(
                 drawText(layout, topLeft = Offset(cx - layout.size.width / 2f, scaleY - layout.size.height / 2f))
                 for (t in listOf(-0.35f, -0.2f, 0.2f, 0.35f)) {
                     val tx = cx + step * t
-                    drawLine(AluInkMuted, Offset(tx, scaleY - 4.dp.toPx()), Offset(tx, scaleY + 4.dp.toPx()), 1.dp.toPx())
+                    drawLine(TickColor, Offset(tx, scaleY - 4.dp.toPx()), Offset(tx, scaleY + 4.dp.toPx()), 1.dp.toPx())
                 }
-                drawLine(AluInkMuted, Offset(inset + step * i, scaleY - 5.dp.toPx()), Offset(inset + step * i, scaleY + 5.dp.toPx()), 1.dp.toPx())
+                drawLine(TickColor, Offset(inset + step * i, scaleY - 5.dp.toPx()), Offset(inset + step * i, scaleY + 5.dp.toPx()), 1.dp.toPx())
             }
 
-            // Groove with a light rim
+            // Groove
             drawRoundRect(
-                color = Color.White.copy(alpha = 0.7f),
-                topLeft = Offset(inset - 1.dp.toPx(), grooveTop - 1.dp.toPx()),
-                size = Size(trackWidth + 2.dp.toPx(), grooveHeight + 3.dp.toPx()),
-                cornerRadius = CornerRadius(grooveHeight),
-            )
-            drawRoundRect(
-                brush = Brush.verticalGradient(listOf(Color(0xFF1B1C1F), Color(0xFF3A3C41))),
+                brush = Brush.verticalGradient(listOf(Color(0xFF151515), Color(0xFF2A2A2A))),
                 topLeft = Offset(inset, grooveTop),
                 size = Size(trackWidth, grooveHeight),
                 cornerRadius = CornerRadius(grooveHeight),
             )
             // Played part, slightly lighter
             drawRoundRect(
-                color = Color.White.copy(alpha = 0.12f),
+                color = Color.White.copy(alpha = 0.22f),
                 topLeft = Offset(inset, grooveTop),
                 size = Size(trackWidth * fraction, grooveHeight),
                 cornerRadius = CornerRadius(grooveHeight),
             )
             // Orange slider block
-            val blockWidth = 12.dp.toPx()
+            val blockWidth = 8.dp.toPx()
             val blockX = (inset + trackWidth * fraction - blockWidth / 2f)
                 .coerceIn(inset, inset + trackWidth - blockWidth)
-            drawRect(TapeOrange, Offset(blockX, grooveTop - 1.dp.toPx()), Size(blockWidth, grooveHeight + 2.dp.toPx()))
+            drawRoundRect(TapeOrange, Offset(blockX, grooveTop - 4.dp.toPx()), Size(blockWidth, grooveHeight + 8.dp.toPx()), CornerRadius(2.dp.toPx()))
         }
 
         Row(
@@ -145,8 +139,8 @@ fun RetroSeekBar(
                 .padding(horizontal = 4.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(formatTime(shownPosition), style = MaterialTheme.typography.labelLarge.copy(fontFamily = DisplayFont), color = AluInk)
-            Text(formatTime(durationMs), style = MaterialTheme.typography.labelLarge.copy(fontFamily = DisplayFont), color = AluInk)
+            Text(formatTime(shownPosition), style = MaterialTheme.typography.labelLarge.copy(fontFamily = DisplayFont), color = TextSecondary)
+            Text(formatTime(durationMs), style = MaterialTheme.typography.labelLarge.copy(fontFamily = DisplayFont), color = TextSecondary)
         }
     }
 }
