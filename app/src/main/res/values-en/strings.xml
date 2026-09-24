@@ -209,6 +209,9 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_2_4">
+        <item>Lossless badge (FLAC, WAV…) on Library albums, artists and playlists</item>
+    </string-array>
     <string-array name="changelog_2_3">
         <item>Rename songs from the long-press menu: changes the title tag and, optionally, the file name</item>
     </string-array>

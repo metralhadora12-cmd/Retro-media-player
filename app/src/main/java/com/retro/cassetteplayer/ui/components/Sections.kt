@@ -269,13 +269,24 @@ fun CollectionGridItem(
         menu = menu,
     ) {
         Column(Modifier.padding(bottom = 8.dp)) {
-            CollageArt(
-                uris = collection.artworkUris,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
-                shape = collection.artShape(),
-            )
+            Box {
+                CollageArt(
+                    uris = collection.artworkUris,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f),
+                    shape = collection.artShape(),
+                )
+                collection.losslessLabel?.let { label ->
+                    FormatTag(
+                        text = label,
+                        background = Color.Black.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .align(if (collection.kind == CollectionKind.ARTIST) Alignment.BottomCenter else Alignment.TopStart)
+                            .padding(6.dp),
+                    )
+                }
+            }
             Text(
                 text = collection.titleLabel(),
                 style = MaterialTheme.typography.bodyLarge,
@@ -334,13 +345,16 @@ fun CollectionListItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
-                    collection.subtitleLabel(),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    collection.losslessLabel?.let { FormatTag(it, Modifier.padding(end = 6.dp)) }
+                    Text(
+                        collection.subtitleLabel(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
@@ -348,7 +362,7 @@ fun CollectionListItem(
 
 /** Tiny outlined tag for lossless formats ("FLAC", "LOSSLESS"…), like a hi-fi tape label. */
 @Composable
-fun FormatTag(text: String, modifier: Modifier = Modifier) {
+fun FormatTag(text: String, modifier: Modifier = Modifier, background: Color = Color.Transparent) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 0.5.sp),
@@ -356,6 +370,7 @@ fun FormatTag(text: String, modifier: Modifier = Modifier) {
         color = TapeOrange,
         maxLines = 1,
         modifier = modifier
+            .background(background, RoundedCornerShape(3.dp))
             .border(1.dp, TapeOrange.copy(alpha = 0.7f), RoundedCornerShape(3.dp))
             .padding(horizontal = 4.dp, vertical = 1.dp),
     )

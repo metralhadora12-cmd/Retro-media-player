@@ -214,6 +214,9 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_2_4">
+        <item>Selo lossless (FLAC, WAV…) nos álbuns, artistas e playlists da Biblioteca</item>
+    </string-array>
     <string-array name="changelog_2_3">
         <item>Renomear músicas pelo toque longo: muda o título nas tags e, se quiser, o nome do arquivo</item>
     </string-array>

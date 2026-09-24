@@ -212,6 +212,9 @@
         <item quantity="many">%d pistas añadidas a la cola</item>
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
+    <string-array name="changelog_2_4">
+        <item>Insignia lossless (FLAC, WAV…) en los álbumes, artistas y playlists de la Biblioteca</item>
+    </string-array>
     <string-array name="changelog_2_3">
         <item>Renombrar canciones desde la pulsación larga: cambia el título en las etiquetas y, si quieres, el nombre del archivo</item>
     </string-array>

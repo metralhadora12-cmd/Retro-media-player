@@ -29,7 +29,20 @@ data class SongCollection(
     val auto: AutoPlaylist? = null,
 ) {
     val isFavorites: Boolean get() = auto == AutoPlaylist.FAVORITES
+
+    /**
+     * Format tag when *every* track is lossless: the shared format ("FLAC") or
+     * "LOSSLESS" for a mix of lossless formats; null otherwise.
+     */
+    val losslessLabel: String?
+        get() {
+            if (songs.isEmpty()) return null
+            val labels = songs.map { it.losslessLabel ?: return null }.toSet()
+            return labels.singleOrNull() ?: LOSSLESS_LABEL
+        }
 }
+
+const val LOSSLESS_LABEL = "LOSSLESS"
 
 data class LibraryCollections(
     val playlists: List<SongCollection> = emptyList(),
