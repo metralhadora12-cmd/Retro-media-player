@@ -41,6 +41,9 @@ jobs:
           ffmpeg -loglevel error -f lavfi -i "sine=frequency=550:duration=20" -b:a 192k \
             -metadata title="Lossy Test" -metadata artist="E2E Artist" -metadata album="E2E Lossy Album" \
             e2e-media/lossy.mp3
+          ffmpeg -loglevel error -f lavfi -i "sine=frequency=330:duration=20" -c:a alac \
+            -metadata title="Alac Test" -metadata artist="E2E Artist" -metadata album="E2E Alac Album" \
+            e2e-media/alac.m4a
           ls -la e2e-media
 
       - name: Enable KVM

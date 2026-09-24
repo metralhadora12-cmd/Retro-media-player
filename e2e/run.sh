@@ -54,7 +54,7 @@ adb shell pm grant $APP android.permission.POST_NOTIFICATIONS || true
 for i in $(seq 1 40); do
   n=$(adb shell content query --uri content://media/external/audio/media --projection is_music 2>/dev/null | grep -c "is_music=1")
   echo "scanned: $n"
-  [ "$n" -ge 3 ] && break
+  [ "$n" -ge 4 ] && break
   sleep 3
 done
 adb shell content query --uri content://media/external/audio/media \
@@ -97,6 +97,13 @@ adb logcat -c
 adb shell am start -n $APP/.MainActivity
 sleep 12
 shot 01_home; dump 01_home; crashed home
+
+# --- HQ badges before anything is played (FLAC x2 + ALAC in .m4a) ---
+tap_text "Library"; sleep 3
+tap_text "Songs"; sleep 4
+shot 01b_songs; dump 01b_songs
+echo "HQ badges before playing (expected 3): $(grep -o 'High quality (lossless)' "$OUT/01b_songs.xml" | wc -l)" | tee "$OUT/hq_count.txt"
+tap_text "Songs"; sleep 2
 
 # --- Settings ---
 tap_text "Library"; sleep 3
