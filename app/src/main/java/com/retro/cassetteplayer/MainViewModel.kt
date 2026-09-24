@@ -1,6 +1,8 @@
 package com.retro.cassetteplayer
 
 import android.app.Application
+import com.retro.cassetteplayer.playback.SessionStore
+import com.retro.cassetteplayer.data.LosslessProbe
 import com.retro.cassetteplayer.data.WriteResult
 import com.retro.cassetteplayer.data.TagEditor
 import kotlinx.coroutines.Job
@@ -59,6 +61,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val favoritesRepository = FavoritesRepository(application)
     private val lyricsRepository = LyricsRepository(application)
     private val tagEditor = TagEditor(application)
+    private val losslessProbe = LosslessProbe(application)
+    private val sessionStore = SessionStore(application)
+    private var sessionRestored = false
 
     /** System confirmations (write access) the UI has to launch; answer with [onWritePermissionResult]. */
     private val _writePermissionRequests = MutableSharedFlow<IntentSender>(extraBufferCapacity = 1)
@@ -115,6 +120,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         connection.connect()
+        // The player decoded the current track as lossless: remember it for the library badge.
+        viewModelScope.launch {
+            playback.map { it.mediaId to (it.audioFormat?.lossless == true) }
+                .distinctUntilChanged()
+                .collect { (mediaId, lossless) ->
+                    val song = _songs.value.firstOrNull { it.id.toString() == mediaId } ?: return@collect
+                    if (lossless && !song.isLossless) {
+                        losslessProbe.markLossless(song)
+                        markLossless(setOf(song.id))
+                    }
+                }
+        }
         viewModelScope.launch {
             connection.errors.collect { title ->
                 _messages.tryEmit(UiMessage.Text(R.string.msg_cannot_play, title))
@@ -139,9 +156,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun loadSongs() {
         viewModelScope.launch {
             _isLoading.value = true
-            _songs.value = runCatching { repository.loadSongs() }.getOrDefault(emptyList())
+            val loaded = runCatching { repository.loadSongs() }.getOrDefault(emptyList())
+            // Songs already known to be lossless (probed before or decoded as lossless)
+            val known = losslessProbe.cachedLosslessIds(loaded)
+            _songs.value = loaded.map { if (it.id in known) it.copy(probedLossless = true) else it }
             _isLoading.value = false
+            if (!sessionRestored) {
+                sessionRestored = true
+                restoreLastSession(_songs.value)
+            }
+            // Find ALAC & co. inside .m4a files in the background
+            markLossless(losslessProbe.probe(_songs.value))
         }
+    }
+
+    private fun markLossless(ids: Set<Long>) {
+        if (ids.isEmpty()) return
+        _songs.value = _songs.value.map { if (it.id in ids && !it.probedLossless) it.copy(probedLossless = true) else it }
+    }
+
+    /** Resumes the queue from the last session, paused where it stopped. */
+    private fun restoreLastSession(songs: List<Song>) {
+        val saved = sessionStore.load() ?: return
+        val byId = songs.associateBy { it.id }
+        val queue = saved.songIds.mapNotNull { byId[it] }
+        if (queue.isEmpty()) return
+        val currentId = saved.songIds.getOrNull(saved.index)
+        val index = queue.indexOfFirst { it.id == currentId }
+        connection.restoreSession(
+            songs = queue,
+            index = index.coerceAtLeast(0),
+            positionMs = if (index >= 0) saved.positionMs else 0L,
+            shuffle = saved.shuffle,
+            repeatMode = saved.repeatMode,
+        )
     }
 
     fun onQueryChange(value: String) {

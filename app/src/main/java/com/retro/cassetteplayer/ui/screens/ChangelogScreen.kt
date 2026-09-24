@@ -36,6 +36,7 @@ private data class Release(val version: String, @ArrayRes val notes: Int)
 
 /** Newest first; the notes are string arrays so they follow the app language. */
 private val releases = listOf(
+    Release("2.5.0", R.array.changelog_2_5),
     Release("2.4.0", R.array.changelog_2_4),
     Release("2.3.0", R.array.changelog_2_3),
     Release("2.2.0", R.array.changelog_2_2),

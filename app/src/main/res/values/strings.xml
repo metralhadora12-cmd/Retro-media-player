@@ -215,6 +215,10 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_2_5">
+        <item>Continua de onde parou: fila, música e posição da última sessão são restauradas ao abrir o app</item>
+        <item>Ícone HQ na Biblioteca também para ALAC (.m4a) e arquivos com tipo genérico, detectados pelo cabeçalho do arquivo</item>
+    </string-array>
     <string-array name="changelog_2_4">
         <item>Selo HQ nas músicas lossless (FLAC, WAV…) e nos álbuns, artistas e playlists da Biblioteca em que todas as faixas são lossless</item>
     </string-array>

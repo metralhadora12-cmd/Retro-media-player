@@ -17,10 +17,33 @@ data class Song(
     val dateAdded: Long,
     /** MediaStore MIME type, e.g. "audio/flac". */
     val mimeType: String = "",
+    /** File name, e.g. "01 Song.flac" (used for its extension). */
+    val fileName: String = "",
+    /** Set when the codec was found to be lossless by probing / playing the file (e.g. ALAC in .m4a). */
+    val probedLossless: Boolean = false,
 ) {
     /** Short container/codec label for lossless files (FLAC, WAV, …), or null. */
-    val losslessLabel: String? get() = losslessLabel(mimeType)
+    val losslessLabel: String?
+        get() = losslessLabel(mimeType) ?: losslessLabelForExtension(fileName) ?: if (probedLossless) "ALAC" else null
     val isLossless: Boolean get() = losslessLabel != null
+
+    /** Containers that may hold either lossy or lossless audio and need probing (M4A: AAC or ALAC). */
+    val needsLosslessProbe: Boolean
+        get() = losslessLabel == null && (
+            mimeType.lowercase() in setOf("audio/mp4", "audio/m4a", "audio/x-m4a", "audio/mp4a-latm", "audio/alac") ||
+                fileName.substringAfterLast('.', "").lowercase() in setOf("m4a", "mp4", "alac", "caf")
+            )
+}
+
+/** Lossless formats recognised by the file extension (some devices report generic MIME types). */
+fun losslessLabelForExtension(fileName: String): String? = when (fileName.substringAfterLast('.', "").lowercase()) {
+    "flac" -> "FLAC"
+    "wav", "wave" -> "WAV"
+    "aif", "aiff", "aifc" -> "AIFF"
+    "ape" -> "APE"
+    "wv" -> "WV"
+    "dsf", "dff" -> "DSD"
+    else -> null
 }
 
 /**

@@ -137,6 +137,18 @@ class PlaybackConnection(context: Context) {
         }
     }
 
+    /** Loads a saved session paused at its position, only if nothing is loaded yet. */
+    fun restoreSession(songs: List<Song>, index: Int, positionMs: Long, shuffle: Boolean, repeatMode: Int) {
+        if (songs.isEmpty()) return
+        withController { player ->
+            if (player.mediaItemCount > 0) return@withController
+            player.shuffleModeEnabled = shuffle
+            player.repeatMode = repeatMode
+            player.setMediaItems(songs.map(Song::toMediaItem), index.coerceIn(songs.indices), positionMs)
+            player.prepare()
+        }
+    }
+
     fun playNext(song: Song) = withController { player ->
         if (player.mediaItemCount == 0) {
             playSongs(listOf(song))

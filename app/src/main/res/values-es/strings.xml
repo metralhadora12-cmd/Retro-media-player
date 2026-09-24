@@ -213,6 +213,10 @@
         <item quantity="many">%d pistas añadidas a la cola</item>
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
+    <string-array name="changelog_2_5">
+        <item>Continúa donde lo dejaste: la cola, la canción y la posición de la última sesión se restauran al abrir la app</item>
+        <item>Icono HQ en la Biblioteca también para ALAC (.m4a) y archivos con tipo genérico, detectados por la cabecera del archivo</item>
+    </string-array>
     <string-array name="changelog_2_4">
         <item>Insignia HQ en las canciones lossless (FLAC, WAV…) y en los álbumes, artistas y playlists de la Biblioteca con todas las pistas lossless</item>
     </string-array>

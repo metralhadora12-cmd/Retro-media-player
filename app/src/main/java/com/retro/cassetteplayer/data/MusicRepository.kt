@@ -37,6 +37,7 @@ class MusicRepository(private val context: Context) {
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATE_ADDED,
             MediaStore.Audio.Media.MIME_TYPE,
+            MediaStore.Audio.Media.DISPLAY_NAME,
         )
         // Skip voice notes and audio saved by messaging apps (WhatsApp, Telegram, …).
         val pathColumn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -61,6 +62,7 @@ class MusicRepository(private val context: Context) {
                 val durationCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
                 val dateAddedCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
                 val mimeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
+                val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idCol)
@@ -76,6 +78,7 @@ class MusicRepository(private val context: Context) {
                         artworkUri = ContentUris.withAppendedId(ALBUM_ART_URI, albumId),
                         dateAdded = cursor.getLong(dateAddedCol),
                         mimeType = cursor.getString(mimeCol).orEmpty(),
+                        fileName = cursor.getString(nameCol).orEmpty(),
                     )
                 }
             }

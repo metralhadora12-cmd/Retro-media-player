@@ -2,6 +2,8 @@ package com.retro.cassetteplayer.playback
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -24,6 +26,16 @@ import com.google.common.util.concurrent.ListenableFuture
 class PlaybackService : MediaSessionService() {
 
     private var mediaSession: MediaSession? = null
+    private lateinit var sessionStore: SessionStore
+    private val handler = Handler(Looper.getMainLooper())
+
+    /** Saves the position every 10 s while playing, so a killed app resumes close to where it was. */
+    private val periodicSave = object : Runnable {
+        override fun run() {
+            mediaSession?.player?.let { if (it.isPlaying) sessionStore.save(it) }
+            handler.postDelayed(this, SAVE_INTERVAL_MS)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -61,6 +73,25 @@ class PlaybackService : MediaSessionService() {
             }
         })
 
+        // Remember the session (queue, track, position, modes) to resume it next time.
+        sessionStore = SessionStore(this)
+        player.addListener(object : Player.Listener {
+            override fun onEvents(player: Player, events: Player.Events) {
+                if (events.containsAny(
+                        Player.EVENT_TIMELINE_CHANGED,
+                        Player.EVENT_MEDIA_ITEM_TRANSITION,
+                        Player.EVENT_IS_PLAYING_CHANGED,
+                        Player.EVENT_POSITION_DISCONTINUITY,
+                        Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED,
+                        Player.EVENT_REPEAT_MODE_CHANGED,
+                    )
+                ) {
+                    sessionStore.save(player)
+                }
+            }
+        })
+        handler.postDelayed(periodicSave, SAVE_INTERVAL_MS)
+
         mediaSession = MediaSession.Builder(this, player)
             .setCallback(SessionCallback)
             .apply { if (sessionActivity != null) setSessionActivity(sessionActivity) }
@@ -71,6 +102,7 @@ class PlaybackService : MediaSessionService() {
         mediaSession
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        mediaSession?.player?.let(sessionStore::save)
         val player = mediaSession?.player
         if (player == null || !player.playWhenReady || player.mediaItemCount == 0 ||
             player.playbackState == Player.STATE_ENDED
@@ -80,6 +112,8 @@ class PlaybackService : MediaSessionService() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(periodicSave)
+        mediaSession?.player?.let(sessionStore::save)
         EqualizerManager.release()
         mediaSession?.run {
             player.release()
@@ -106,5 +140,6 @@ class PlaybackService : MediaSessionService() {
 
     companion object {
         const val SEEK_INCREMENT_MS = 10_000L
+        private const val SAVE_INTERVAL_MS = 10_000L
     }
 }
