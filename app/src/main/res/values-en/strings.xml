@@ -211,7 +211,7 @@
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
     <string-array name="changelog_2_5">
-        <item>Pick up where you left off: the last session's queue, song and position are restored when the app opens</item>
+        <item>Pick up where you left off: the last session\'s queue, song and position are restored when the app opens</item>
         <item>HQ icon in the Library also for ALAC (.m4a) and files with a generic type, detected from the file header</item>
     </string-array>
     <string-array name="changelog_2_4">
