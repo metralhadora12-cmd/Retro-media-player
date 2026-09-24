@@ -28,6 +28,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.retro.cassetteplayer.ui.components.PlaylistNameDialog
+import com.retro.cassetteplayer.ui.theme.InkSurface
+import com.retro.cassetteplayer.ui.theme.TapeOrange
+import com.retro.cassetteplayer.ui.theme.TextSecondary
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,7 +61,6 @@ import com.retro.cassetteplayer.ui.components.SongRow
 import com.retro.cassetteplayer.ui.components.TopGlow
 import com.retro.cassetteplayer.ui.theme.Ink
 import com.retro.cassetteplayer.ui.theme.TextPrimary
-import com.retro.cassetteplayer.ui.theme.TextSecondary
 
 /** Album / artist / playlist page: big cover, play & shuffle keys and the track list. */
 @Composable
@@ -57,7 +73,48 @@ fun CollectionScreen(
     onSongClick: (List<Song>, Song) -> Unit,
     onPlayNext: (Song) -> Unit,
     onAddToQueue: (Song) -> Unit,
+    onAddToPlaylist: (Song) -> Unit,
+    onSaveAll: (List<Song>) -> Unit,
+    onRenamePlaylist: (String, String) -> Unit,
+    onDeletePlaylist: (String) -> Unit,
+    onRemoveFromPlaylist: (String, Song) -> Unit,
 ) {
+    val playlistId = collection?.userPlaylistId
+    var menuOpen by remember { mutableStateOf(false) }
+    var renaming by rememberSaveable { mutableStateOf(false) }
+    var confirmDelete by rememberSaveable { mutableStateOf(false) }
+
+    if (renaming && collection != null && playlistId != null) {
+        PlaylistNameDialog(
+            title = "Renomear playlist",
+            confirmLabel = "Salvar",
+            initialName = collection.title,
+            onConfirm = { name ->
+                onRenamePlaylist(playlistId, name)
+                renaming = false
+            },
+            onDismiss = { renaming = false },
+        )
+    }
+    if (confirmDelete && collection != null && playlistId != null) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            containerColor = InkSurface,
+            title = { Text("Excluir playlist?", color = TextPrimary) },
+            text = { Text("\"${collection.title}\" será excluída. As músicas continuam no aparelho.", color = TextSecondary) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDelete = false
+                    onDeletePlaylist(playlistId)
+                    onBack()
+                }) { Text("Excluir", color = TapeOrange) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDelete = false }) { Text("Cancelar", color = TextPrimary) }
+            },
+        )
+    }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -71,9 +128,38 @@ fun CollectionScreen(
         )
         LazyColumn(contentPadding = PaddingValues(bottom = 24.dp)) {
             item {
-                Row(Modifier.statusBarsPadding().padding(4.dp)) {
+                Row(
+                    Modifier
+                        .statusBarsPadding()
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                ) {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar", tint = TextPrimary)
+                    }
+                    Spacer(Modifier.weight(1f))
+                    if (playlistId != null) {
+                        Box {
+                            IconButton(onClick = { menuOpen = true }) {
+                                Icon(Icons.Rounded.MoreVert, contentDescription = "Opções da playlist", tint = TextPrimary)
+                            }
+                            DropdownMenu(
+                                expanded = menuOpen,
+                                onDismissRequest = { menuOpen = false },
+                                modifier = Modifier.background(InkSurface),
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Renomear", color = TextPrimary) },
+                                    leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null, tint = TextSecondary) },
+                                    onClick = { menuOpen = false; renaming = true },
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Excluir playlist", color = TextPrimary) },
+                                    leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null, tint = TextSecondary) },
+                                    onClick = { menuOpen = false; confirmDelete = true },
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -113,7 +199,15 @@ fun CollectionScreen(
                     ) {
                         PillButton("Tocar", onClick = { onPlayAll(collection.songs) }, icon = Icons.Rounded.PlayArrow, filled = true)
                         PillButton("Aleatório", onClick = { onShufflePlay(collection.songs) }, icon = Icons.Rounded.Shuffle)
+                        if (playlistId == null) {
+                            PillButton("Salvar", onClick = { onSaveAll(collection.songs) }, icon = Icons.AutoMirrored.Rounded.PlaylistAdd)
+                        }
                     }
+                }
+            }
+            if (collection.songs.isEmpty()) {
+                item {
+                    StatusMessage("Playlist vazia. Use \"Salvar na playlist\" no menu ⋮ de uma música para adicioná-la aqui.")
                 }
             }
             items(collection.songs, key = { it.id }) { song ->
@@ -124,6 +218,8 @@ fun CollectionScreen(
                     onClick = { onSongClick(collection.songs, song) },
                     onPlayNext = { onPlayNext(song) },
                     onAddToQueue = { onAddToQueue(song) },
+                    onAddToPlaylist = { onAddToPlaylist(song) },
+                    onRemoveFromPlaylist = playlistId?.let { id -> { onRemoveFromPlaylist(id, song) } },
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(start = 80.dp),

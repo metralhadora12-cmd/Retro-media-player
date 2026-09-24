@@ -14,6 +14,8 @@ data class SongCollection(
     val artworkUris: List<Uri>,
     val songs: List<Song>,
     val lastAdded: Long,
+    /** Set when this is a playlist the user created (and can edit). */
+    val userPlaylistId: String? = null,
 )
 
 data class LibraryCollections(
@@ -22,6 +24,7 @@ data class LibraryCollections(
     val artists: List<SongCollection> = emptyList(),
 ) {
     val all: List<SongCollection> get() = playlists + albums + artists
+    val userPlaylists: List<SongCollection> get() = playlists.filter { it.userPlaylistId != null }
     fun find(id: String): SongCollection? = all.firstOrNull { it.id == id }
 }
 
@@ -30,8 +33,22 @@ private fun List<Song>.collage(): List<Uri> =
 
 private fun tracks(count: Int) = if (count == 1) "1 faixa" else "$count faixas"
 
-fun buildLibrary(songs: List<Song>): LibraryCollections {
-    if (songs.isEmpty()) return LibraryCollections()
+fun buildLibrary(songs: List<Song>, userPlaylists: List<UserPlaylist> = emptyList()): LibraryCollections {
+    val songsById = songs.associateBy { it.id }
+    val created = userPlaylists.sortedByDescending { it.updatedAt }.map { playlist ->
+        val tracks = playlist.songIds.mapNotNull { songsById[it] }
+        SongCollection(
+            id = "user:${playlist.id}",
+            kind = CollectionKind.PLAYLIST,
+            title = playlist.name,
+            subtitle = "Playlist • ${tracks(tracks.size)}",
+            artworkUris = tracks.collage(),
+            songs = tracks,
+            lastAdded = playlist.updatedAt,
+            userPlaylistId = playlist.id,
+        )
+    }
+    if (songs.isEmpty()) return LibraryCollections(playlists = created)
 
     val albums = songs.groupBy { it.albumId }.map { (id, tracks) ->
         val first = tracks.first()
@@ -80,5 +97,5 @@ fun buildLibrary(songs: List<Song>): LibraryCollections {
         ),
     )
 
-    return LibraryCollections(playlists, albums, artists)
+    return LibraryCollections(playlists + created, albums, artists)
 }

@@ -18,9 +18,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +41,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.retro.cassetteplayer.MainViewModel
+import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.SongCollection
+import com.retro.cassetteplayer.ui.components.AddToPlaylistSheet
 import com.retro.cassetteplayer.ui.components.MiniPlayer
+import com.retro.cassetteplayer.ui.components.PlaylistNameDialog
 import com.retro.cassetteplayer.ui.components.QueueSheet
 import com.retro.cassetteplayer.ui.components.RetroBottomBar
 import com.retro.cassetteplayer.ui.navigation.Routes
@@ -99,6 +105,43 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    // --- Playlists: "Salvar na playlist" sheet and the name dialog ---------------------
+    var songsToSave by remember { mutableStateOf<List<Song>?>(null) }
+    var creatingPlaylist by rememberSaveable { mutableStateOf(false) }
+    val saveToPlaylist: (List<Song>) -> Unit = { if (it.isNotEmpty()) songsToSave = it }
+    val saveSong: (Song) -> Unit = { saveToPlaylist(listOf(it)) }
+
+    songsToSave?.let { pending ->
+        if (!creatingPlaylist) {
+            AddToPlaylistSheet(
+                playlists = library.userPlaylists,
+                onSelect = { playlist ->
+                    playlist.userPlaylistId?.let { viewModel.addToPlaylist(it, pending) }
+                    songsToSave = null
+                },
+                onNewPlaylist = { creatingPlaylist = true },
+                onDismiss = { songsToSave = null },
+            )
+        }
+    }
+    if (creatingPlaylist) {
+        PlaylistNameDialog(
+            title = "Nova playlist",
+            confirmLabel = "Criar",
+            onConfirm = { name ->
+                viewModel.createPlaylist(name, songsToSave.orEmpty())
+                songsToSave = null
+                creatingPlaylist = false
+            },
+            onDismiss = { creatingPlaylist = false },
+        )
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        viewModel.messages.collect { snackbarHostState.showSnackbar(it) }
+    }
+
     var showQueue by rememberSaveable { mutableStateOf(false) }
     if (showQueue) {
         QueueSheet(
@@ -123,6 +166,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
 
     Scaffold(
         containerColor = Ink,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             AnimatedVisibility(
@@ -178,6 +222,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onSongClick = viewModel::play,
                     onPlayNext = viewModel::playNext,
                     onAddToQueue = viewModel::addToQueue,
+                    onAddToPlaylist = saveSong,
                 )
             }
             composable(Routes.SEARCH) {
@@ -189,6 +234,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onSongClick = { song -> viewModel.play(searchResults, song) },
                     onPlayNext = viewModel::playNext,
                     onAddToQueue = viewModel::addToQueue,
+                    onAddToPlaylist = saveSong,
                 )
             }
             composable(Routes.LIBRARY) {
@@ -202,6 +248,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onSongClick = viewModel::play,
                     onPlayNext = viewModel::playNext,
                     onAddToQueue = viewModel::addToQueue,
+                    onAddToPlaylist = saveSong,
+                    onCreatePlaylist = { creatingPlaylist = true },
                 )
             }
             composable(
@@ -221,6 +269,11 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onSongClick = viewModel::play,
                     onPlayNext = viewModel::playNext,
                     onAddToQueue = viewModel::addToQueue,
+                    onAddToPlaylist = saveSong,
+                    onSaveAll = saveToPlaylist,
+                    onRenamePlaylist = viewModel::renamePlaylist,
+                    onDeletePlaylist = viewModel::deletePlaylist,
+                    onRemoveFromPlaylist = viewModel::removeFromPlaylist,
                 )
             }
             composable(
@@ -239,6 +292,9 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onToggleShuffle = viewModel::toggleShuffle,
                     onCycleRepeat = viewModel::cycleRepeat,
                     onOpenQueue = { showQueue = true },
+                    onSaveToPlaylist = {
+                        songs.firstOrNull { it.id.toString() == playback.mediaId }?.let(saveSong)
+                    },
                 )
             }
         }

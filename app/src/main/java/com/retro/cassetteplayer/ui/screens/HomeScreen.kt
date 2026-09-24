@@ -98,6 +98,7 @@ fun HomeScreen(
     onSongClick: (List<Song>, Song) -> Unit,
     onPlayNext: (Song) -> Unit,
     onAddToQueue: (Song) -> Unit,
+    onAddToPlaylist: (Song) -> Unit,
 ) {
     // Artist chips act like YouTube Music's mood chips: they filter the whole page.
     var selectedArtist by rememberSaveable { mutableStateOf<String?>(null) }
@@ -206,6 +207,7 @@ fun HomeScreen(
                                     onSongClick = { onSongClick(quickPicks, it) },
                                     onPlayNext = onPlayNext,
                                     onAddToQueue = onAddToQueue,
+                                    onAddToPlaylist = onAddToPlaylist,
                                 )
                             }
                         }
@@ -323,6 +325,7 @@ private fun QuickPicks(
     onSongClick: (Song) -> Unit,
     onPlayNext: (Song) -> Unit,
     onAddToQueue: (Song) -> Unit,
+    onAddToPlaylist: (Song) -> Unit,
 ) {
     val rowHeight = 72.dp
     BoxWithConstraints(Modifier.fillMaxWidth()) {
@@ -341,6 +344,7 @@ private fun QuickPicks(
                     onClick = { onSongClick(song) },
                     onPlayNext = { onPlayNext(song) },
                     onAddToQueue = { onAddToQueue(song) },
+                    onAddToPlaylist = { onAddToPlaylist(song) },
                     modifier = Modifier.width(itemWidth),
                 )
             }

@@ -41,6 +41,7 @@ fun SearchScreen(
     onSongClick: (Song) -> Unit,
     onPlayNext: (Song) -> Unit,
     onAddToQueue: (Song) -> Unit,
+    onAddToPlaylist: (Song) -> Unit,
 ) {
     Column(
         Modifier
@@ -93,6 +94,7 @@ fun SearchScreen(
                         onClick = { onSongClick(song) },
                         onPlayNext = { onPlayNext(song) },
                         onAddToQueue = { onAddToQueue(song) },
+                        onAddToPlaylist = { onAddToPlaylist(song) },
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(start = 80.dp),

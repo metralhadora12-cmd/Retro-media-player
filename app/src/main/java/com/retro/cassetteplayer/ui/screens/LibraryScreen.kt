@@ -1,6 +1,11 @@
 package com.retro.cassetteplayer.ui.screens
 
 import androidx.compose.foundation.background
+import com.retro.cassetteplayer.ui.theme.InkRaised
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -86,6 +91,8 @@ fun LibraryScreen(
     onSongClick: (List<Song>, Song) -> Unit,
     onPlayNext: (Song) -> Unit,
     onAddToQueue: (Song) -> Unit,
+    onAddToPlaylist: (Song) -> Unit,
+    onCreatePlaylist: () -> Unit,
 ) {
     var filter by rememberSaveable { mutableStateOf<LibraryFilter?>(null) }
     var sort by rememberSaveable { mutableStateOf(LibrarySort.RECENT) }
@@ -133,6 +140,9 @@ fun LibraryScreen(
                     color = TextPrimary,
                     modifier = Modifier.weight(1f),
                 )
+                IconButton(onClick = onCreatePlaylist) {
+                    Icon(Icons.Rounded.Add, contentDescription = "Nova playlist", tint = TextPrimary)
+                }
                 IconButton(onClick = onOpenSearch) {
                     Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = TextPrimary)
                 }
@@ -178,6 +188,7 @@ fun LibraryScreen(
             }
 
             val bottomSpace = PaddingValues(bottom = 96.dp)
+            val showNewTile = filter == LibraryFilter.PLAYLISTS
             when {
                 filter == LibraryFilter.SONGS -> LazyColumn(contentPadding = bottomSpace) {
                     items(sortedSongs, key = { it.id }) { song ->
@@ -188,6 +199,7 @@ fun LibraryScreen(
                             onClick = { onSongClick(sortedSongs, song) },
                             onPlayNext = { onPlayNext(song) },
                             onAddToQueue = { onAddToQueue(song) },
+                            onAddToPlaylist = { onAddToPlaylist(song) },
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 80.dp),
@@ -195,18 +207,25 @@ fun LibraryScreen(
                         )
                     }
                 }
-                collections.isEmpty() -> StatusMessage("Nada na biblioteca ainda.")
+                collections.isEmpty() && filter != LibraryFilter.PLAYLISTS ->
+                    StatusMessage("Nada na biblioteca ainda.")
                 gridMode -> LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 150.dp),
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
+                    if (showNewTile) {
+                        item(key = "new-playlist") { NewPlaylistGridItem(onCreatePlaylist) }
+                    }
                     items(collections, key = { it.id }) { collection ->
                         CollectionGridItem(collection, onClick = { onOpenCollection(collection) })
                     }
                 }
                 else -> LazyColumn(contentPadding = bottomSpace) {
+                    if (showNewTile) {
+                        item(key = "new-playlist") { NewPlaylistListItem(onCreatePlaylist) }
+                    }
                     items(collections, key = { it.id }) { collection ->
                         CollectionListItem(collection, onClick = { onOpenCollection(collection) })
                     }
@@ -258,5 +277,57 @@ private fun SortSelector(sort: LibrarySort, onSortChange: (LibrarySort) -> Unit)
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun NewPlaylistGridItem(onClick: () -> Unit) {
+    Column(
+        Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .clickable(onClick = onClick)
+            .padding(bottom = 8.dp)
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .background(InkRaised, RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Rounded.Add, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(40.dp))
+        }
+        Text(
+            "Nova playlist",
+            style = MaterialTheme.typography.bodyLarge,
+            color = TextPrimary,
+            modifier = Modifier.padding(top = 8.dp),
+        )
+    }
+}
+
+@Composable
+private fun NewPlaylistListItem(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(56.dp)
+                .background(InkRaised, RoundedCornerShape(4.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Rounded.Add, contentDescription = null, tint = TextPrimary)
+        }
+        Text(
+            "Nova playlist",
+            style = MaterialTheme.typography.bodyLarge,
+            color = TextPrimary,
+            modifier = Modifier.padding(start = 14.dp),
+        )
     }
 }

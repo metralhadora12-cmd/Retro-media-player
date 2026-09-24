@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Pause
@@ -68,6 +69,7 @@ fun PlayerScreen(
     onToggleShuffle: () -> Unit,
     onCycleRepeat: () -> Unit,
     onOpenQueue: () -> Unit,
+    onSaveToPlaylist: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -94,7 +96,13 @@ fun PlayerScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
             )
-            Spacer(Modifier.width(48.dp))
+            IconButton(onClick = onSaveToPlaylist, enabled = playback.hasMedia) {
+                Icon(
+                    Icons.AutoMirrored.Rounded.PlaylistAdd,
+                    contentDescription = "Salvar na playlist",
+                    tint = if (playback.hasMedia) TextPrimary else TextSecondary,
+                )
+            }
         }
 
         // The cassette takes whatever height is left, keeping its upright proportions.

@@ -5,14 +5,18 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.retro.cassetteplayer.data.LibraryCollections
 import com.retro.cassetteplayer.data.MusicRepository
+import com.retro.cassetteplayer.data.PlaylistRepository
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.buildLibrary
 import com.retro.cassetteplayer.playback.PlaybackConnection
 import com.retro.cassetteplayer.playback.PlaybackState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -25,6 +29,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = MusicRepository(application)
     private val connection = PlaybackConnection(application)
+    private val playlistRepository = PlaylistRepository(application)
+
+    private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 4)
+    /** One-off feedback shown as a snackbar ("Adicionada a …"). */
+    val messages: SharedFlow<String> = _messages.asSharedFlow()
 
     val playback: StateFlow<PlaybackState> = connection.state
 
@@ -51,7 +60,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val library: StateFlow<LibraryCollections> = _songs.map(::buildLibrary)
+    val library: StateFlow<LibraryCollections> = combine(_songs, playlistRepository.playlists) { songs, playlists ->
+        buildLibrary(songs, playlists)
+    }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryCollections())
 
     init {
@@ -106,6 +117,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun cycleRepeat() = connection.cycleRepeat()
     fun playQueueItem(index: Int) = connection.playQueueItem(index)
     fun removeQueueItem(index: Int) = connection.removeQueueItem(index)
+
+    // --- User playlists -------------------------------------------------------------
+
+    fun createPlaylist(name: String, songs: List<Song> = emptyList()) {
+        if (name.isBlank()) return
+        val playlist = playlistRepository.create(name, songs.map { it.id })
+        _messages.tryEmit(
+            if (songs.isEmpty()) "Playlist \"${playlist.name}\" criada"
+            else "Salvo em \"${playlist.name}\""
+        )
+    }
+
+    fun renamePlaylist(id: String, name: String) {
+        if (name.isNotBlank()) playlistRepository.rename(id, name)
+    }
+
+    fun deletePlaylist(id: String) {
+        playlistRepository.delete(id)
+        _messages.tryEmit("Playlist excluída")
+    }
+
+    fun addToPlaylist(playlistId: String, songs: List<Song>) {
+        val name = playlistRepository.playlists.value.firstOrNull { it.id == playlistId }?.name ?: return
+        val added = playlistRepository.addSongs(playlistId, songs.map { it.id })
+        _messages.tryEmit(if (added == 0) "Já está em \"$name\"" else "Salvo em \"$name\"")
+    }
+
+    fun removeFromPlaylist(playlistId: String, song: Song) = playlistRepository.removeSong(playlistId, song.id)
 
     override fun onCleared() {
         connection.release()

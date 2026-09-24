@@ -14,8 +14,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -50,7 +52,9 @@ fun SongRow(
     onClick: () -> Unit,
     onPlayNext: () -> Unit,
     onAddToQueue: () -> Unit,
+    onAddToPlaylist: () -> Unit,
     modifier: Modifier = Modifier,
+    onRemoveFromPlaylist: (() -> Unit)? = null,
 ) {
     var menuOpen by remember { mutableStateOf(false) }
 
@@ -93,9 +97,19 @@ fun SongRow(
             ) {
                 SongMenuItem("Tocar", Icons.Rounded.PlayArrow) { menuOpen = false; onClick() }
                 SongMenuItem("Tocar a seguir", Icons.AutoMirrored.Rounded.QueueMusic) { menuOpen = false; onPlayNext() }
-                SongMenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistAdd) {
+                SongMenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay) {
                     menuOpen = false
                     onAddToQueue()
+                }
+                SongMenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd) {
+                    menuOpen = false
+                    onAddToPlaylist()
+                }
+                if (onRemoveFromPlaylist != null) {
+                    SongMenuItem("Remover da playlist", Icons.Rounded.RemoveCircleOutline) {
+                        menuOpen = false
+                        onRemoveFromPlaylist()
+                    }
                 }
             }
         }
