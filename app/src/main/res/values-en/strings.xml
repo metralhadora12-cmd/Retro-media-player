@@ -145,6 +145,15 @@
     <string name="msg_backup_invalid">Invalid backup file</string>
     <string name="msg_backup_imported">Backup restored: %1$d playlists, %2$d favorites</string>
     <string name="msg_backup_imported_missing">Backup restored: %1$d playlists, %2$d favorites (%3$d songs not found)</string>
+    <string name="player_lyrics">LYRICS</string>
+    <string name="lyrics_title">LYRICS</string>
+    <string name="lyrics_loading">Looking for lyrics…</string>
+    <string name="lyrics_not_found">No lyrics found for this song.</string>
+    <string name="lyrics_offline">No connection to look up the lyrics.</string>
+    <string name="lyrics_retry">Try again</string>
+    <string name="lyrics_source_file">Lyrics embedded in the file</string>
+    <string name="lyrics_source_lrc">Lyrics from the .lrc file</string>
+    <string name="lyrics_source_online">Lyrics: LRCLIB (lrclib.net)</string>
     <string name="msg_language_changed">Language changed</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_audio">Audio</string>
@@ -194,6 +203,10 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_2_2">
+        <item>Lyrics in the player (LYRICS tab): from the track itself, an .lrc file or online via LRCLIB</item>
+        <item>Synced lyrics follow the song; tap a line to jump to it</item>
+    </string-array>
     <string-array name="changelog_2_1">
         <item>Playlists and favorites backup: export to a file and restore later, even on another device</item>
     </string-array>

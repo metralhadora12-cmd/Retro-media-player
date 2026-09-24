@@ -93,6 +93,18 @@ class TagEditor(private val context: Context) {
         }
     }
 
+    /** Lyrics embedded in the file's tags (plain text or LRC), if any. */
+    suspend fun readLyrics(song: Song): String? = withContext(Dispatchers.IO) {
+        val temp = copyToCache(song) ?: return@withContext null
+        try {
+            AudioFileIO.read(temp).tag?.value(FieldKey.LYRICS)?.takeIf { it.isNotBlank() }
+        } catch (e: Exception) {
+            null
+        } finally {
+            temp.delete()
+        }
+    }
+
     /**
      * Writes [tags] into [song] (text fields) and applies [artwork] to it and to every
      * song in [artworkAlsoFor].

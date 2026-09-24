@@ -147,6 +147,15 @@
     <string name="msg_backup_invalid">Arquivo de backup inválido</string>
     <string name="msg_backup_imported">Backup restaurado: %1$d playlists, %2$d favoritas</string>
     <string name="msg_backup_imported_missing">Backup restaurado: %1$d playlists, %2$d favoritas (%3$d músicas não encontradas)</string>
+    <string name="player_lyrics">LETRA</string>
+    <string name="lyrics_title">LETRA</string>
+    <string name="lyrics_loading">Procurando a letra…</string>
+    <string name="lyrics_not_found">Letra não encontrada para esta música.</string>
+    <string name="lyrics_offline">Sem conexão para buscar a letra.</string>
+    <string name="lyrics_retry">Tentar de novo</string>
+    <string name="lyrics_source_file">Letra gravada no arquivo</string>
+    <string name="lyrics_source_lrc">Letra do arquivo .lrc</string>
+    <string name="lyrics_source_online">Letra: LRCLIB (lrclib.net)</string>
     <string name="msg_language_changed">Idioma alterado</string>
     <string name="settings_title">Configurações</string>
     <string name="settings_section_audio">Áudio</string>
@@ -199,6 +208,10 @@
         <item quantity="many">%d faixas adicionadas à fila</item>
         <item quantity="other">%d faixas adicionadas à fila</item>
     </plurals>
+    <string-array name="changelog_2_2">
+        <item>Letras no player (aba LETRA): da própria faixa, de um arquivo .lrc ou online pelo LRCLIB</item>
+        <item>Letras sincronizadas acompanham a música; toque numa linha para pular até ela</item>
+    </string-array>
     <string-array name="changelog_2_1">
         <item>Backup de playlists e favoritas: exporte para um arquivo e restaure depois, até em outro aparelho</item>
     </string-array>

@@ -1,6 +1,10 @@
 package com.retro.cassetteplayer
 
 import android.app.Application
+import kotlinx.coroutines.Job
+import com.retro.cassetteplayer.data.LyricsResult
+import com.retro.cassetteplayer.data.LyricsRepository
+import com.retro.cassetteplayer.data.Lyrics
 import android.content.IntentSender
 import android.os.Build
 import androidx.lifecycle.AndroidViewModel
@@ -33,12 +37,30 @@ import com.retro.cassetteplayer.data.Backup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+sealed interface LyricsState {
+    val songId: Long?
+
+    data object Idle : LyricsState {
+        override val songId: Long? = null
+    }
+    data class Loading(override val songId: Long) : LyricsState
+    data class Found(override val songId: Long, val lyrics: Lyrics) : LyricsState
+    data class NotFound(override val songId: Long) : LyricsState
+    data class Offline(override val songId: Long) : LyricsState
+}
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = MusicRepository(application)
     private val connection = PlaybackConnection(application)
     private val playlistRepository = PlaylistRepository(application)
     private val favoritesRepository = FavoritesRepository(application)
+    private val lyricsRepository = LyricsRepository(application)
+
+    /** Lyrics of the song they were requested for; Loading while looking them up. */
+    private val _lyrics = MutableStateFlow<LyricsState>(LyricsState.Idle)
+    val lyrics: StateFlow<LyricsState> = _lyrics.asStateFlow()
+    private var lyricsJob: Job? = null
 
     /** Favourite song ids, most recent first. */
     val favorites: StateFlow<List<Long>> = favoritesRepository.favorites
@@ -194,6 +216,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /** Shows feedback coming from other screens (e.g. the tag editor). */
     fun showMessage(message: UiMessage) {
         _messages.tryEmit(message)
+    }
+
+    // --- Lyrics -----------------------------------------------------------------
+
+    fun requestLyrics(song: Song, forceRefresh: Boolean = false) {
+        val current = _lyrics.value
+        if (!forceRefresh && current.songId == song.id && current !is LyricsState.Idle) return
+        lyricsJob?.cancel()
+        _lyrics.value = LyricsState.Loading(song.id)
+        lyricsJob = viewModelScope.launch {
+            _lyrics.value = when (val result = lyricsRepository.lyricsFor(song, forceRefresh)) {
+                is LyricsResult.Found -> LyricsState.Found(song.id, result.lyrics)
+                LyricsResult.NotFound -> LyricsState.NotFound(song.id)
+                LyricsResult.Offline -> LyricsState.Offline(song.id)
+            }
+        }
     }
 
     // --- Backup -----------------------------------------------------------------

@@ -87,6 +87,8 @@ import com.retro.cassetteplayer.UiMessage
 import com.retro.cassetteplayer.ui.components.LocalEditSong
 import com.retro.cassetteplayer.ui.screens.EditTagsScreen
 import com.retro.cassetteplayer.ui.screens.StatusMessage
+import com.retro.cassetteplayer.LyricsState
+import com.retro.cassetteplayer.ui.components.LyricsSheet
 
 private val audioPermission: String =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
@@ -176,6 +178,24 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         viewModel.messages.collect { snackbarHostState.showSnackbar(it.resolve(context)) }
+    }
+
+    // --- Lyrics sheet ("LETRA"): follows the current song while open ---------------
+    val lyricsState by viewModel.lyrics.collectAsStateWithLifecycle()
+    var showLyrics by rememberSaveable { mutableStateOf(false) }
+    val currentSong = remember(songs, playback.mediaId) { songs.firstOrNull { it.id.toString() == playback.mediaId } }
+    LaunchedEffect(showLyrics, currentSong?.id) {
+        if (showLyrics) currentSong?.let { viewModel.requestLyrics(it) }
+    }
+    if (showLyrics) {
+        LyricsSheet(
+            title = titleLabel(playback.title),
+            state = lyricsState.takeIf { it.songId == currentSong?.id } ?: LyricsState.Idle,
+            positionMs = playback.positionMs,
+            onSeek = viewModel::seekTo,
+            onRetry = { currentSong?.let { viewModel.requestLyrics(it, forceRefresh = true) } },
+            onDismiss = { showLyrics = false },
+        )
     }
 
     var showQueue by rememberSaveable { mutableStateOf(false) }
@@ -479,6 +499,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                         onToggleFavorite = {
                             playback.mediaId?.toLongOrNull()?.let(viewModel::toggleFavorite)
                         },
+                        onOpenLyrics = { showLyrics = true },
                     )
                 }
             }

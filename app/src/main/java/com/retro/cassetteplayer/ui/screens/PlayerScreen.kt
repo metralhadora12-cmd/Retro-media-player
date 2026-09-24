@@ -37,6 +37,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Lyrics
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Repeat
@@ -92,6 +93,7 @@ fun PlayerScreen(
     onSaveToPlaylist: () -> Unit,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
+    onOpenLyrics: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -216,7 +218,7 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        // Bottom row: heart (favourite) on the left, "A SEGUIR" tab in the middle
+        // Bottom row: heart (favourite) on the left, "A SEGUIR" and "LETRA" tabs in the middle
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -229,30 +231,29 @@ fun PlayerScreen(
                 onClick = onToggleFavorite,
             )
             Spacer(Modifier.weight(1f))
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable(onClick = onOpenQueue)
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Rounded.QueueMusic,
-                    contentDescription = null,
-                    tint = TextPrimary,
-                    modifier = Modifier.size(20.dp),
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    stringResource(R.string.player_up_next),
-                    style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp),
-                    color = TextPrimary,
-                )
-            }
+            PlayerTab(Icons.AutoMirrored.Rounded.QueueMusic, stringResource(R.string.player_up_next), onOpenQueue)
+            PlayerTab(Icons.Rounded.Lyrics, stringResource(R.string.player_lyrics), onOpenLyrics, enabled = playback.hasMedia)
             Spacer(Modifier.weight(1f))
-            // Balances the heart so "A SEGUIR" stays centred
+            // Balances the heart so the tabs stay centred
             Spacer(Modifier.size(48.dp))
         }
+    }
+}
+
+/** Text tab at the bottom of the player, like YouTube Music's "A SEGUIR" / "LETRA". */
+@Composable
+private fun PlayerTab(icon: ImageVector, label: String, onClick: () -> Unit, enabled: Boolean = true) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val color = if (enabled) TextPrimary else TextSecondary.copy(alpha = 0.5f)
+        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(label, style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp), color = color)
     }
 }
 
