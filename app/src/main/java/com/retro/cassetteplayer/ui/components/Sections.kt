@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -268,45 +269,47 @@ fun CollectionGridItem(
     collection: SongCollection,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    menu: (@Composable ColumnScope.(dismiss: () -> Unit) -> Unit)? = null,
 ) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(6.dp))
-            .clickable(onClick = onClick)
-            .padding(bottom = 8.dp),
+    LongPressMenuBox(
+        onClick = onClick,
+        modifier = modifier.clip(RoundedCornerShape(6.dp)),
+        menu = menu,
     ) {
-        CollageArt(
-            uris = collection.artworkUris,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-            shape = collection.artShape(),
-        )
-        Text(
-            text = collection.title,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = TextPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        Row(verticalAlignment = Alignment.Top) {
-            Icon(
-                collection.kindIcon(),
-                contentDescription = null,
-                tint = TextSecondary,
+        Column(Modifier.padding(bottom = 8.dp)) {
+            CollageArt(
+                uris = collection.artworkUris,
                 modifier = Modifier
-                    .padding(top = 2.dp, end = 4.dp)
-                    .size(14.dp),
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                shape = collection.artShape(),
             )
             Text(
-                text = collection.subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
-                maxLines = 2,
+                text = collection.title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = TextPrimary,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 8.dp),
             )
+            Row(verticalAlignment = Alignment.Top) {
+                Icon(
+                    collection.kindIcon(),
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier
+                        .padding(top = 2.dp, end = 4.dp)
+                        .size(14.dp),
+                )
+                Text(
+                    text = collection.subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
@@ -316,35 +319,37 @@ fun CollectionListItem(
     collection: SongCollection,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    menu: (@Composable ColumnScope.(dismiss: () -> Unit) -> Unit)? = null,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        CollageArt(collection.artworkUris, Modifier.size(56.dp), collection.artShape(4))
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(start = 14.dp)
+    LongPressMenuBox(onClick = onClick, modifier = modifier.fillMaxWidth(), menu = menu) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                collection.title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = TextPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                collection.subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            CollageArt(collection.artworkUris, Modifier.size(56.dp), collection.artShape(4))
+            Column(
+                Modifier
+                    .weight(1f)
+                    .padding(start = 14.dp)
+            ) {
+                Text(
+                    collection.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    collection.subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

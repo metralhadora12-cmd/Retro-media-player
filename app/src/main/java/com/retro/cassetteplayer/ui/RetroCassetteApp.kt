@@ -290,6 +290,11 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                             onAddToQueue = viewModel::addToQueue,
                             onAddToPlaylist = saveSong,
                             onCreatePlaylist = { creatingPlaylist = true },
+                        onPlayAll = viewModel::playAll,
+                        onAddAllToQueue = viewModel::addAllToQueue,
+                        onSaveAll = saveToPlaylist,
+                        onRenamePlaylist = viewModel::renamePlaylist,
+                        onDeletePlaylist = viewModel::deletePlaylist,
                         )
                     }
                 }

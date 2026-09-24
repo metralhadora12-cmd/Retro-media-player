@@ -115,6 +115,13 @@ class PlaybackConnection(context: Context) {
         if (player.mediaItemCount == 0) playSongs(listOf(song)) else player.addMediaItem(song.toMediaItem())
     }
 
+    fun addAllToQueue(songs: List<Song>) {
+        if (songs.isEmpty()) return
+        withController { player ->
+            if (player.mediaItemCount == 0) playSongs(songs) else player.addMediaItems(songs.map(Song::toMediaItem))
+        }
+    }
+
     fun togglePlayPause() = withController { player ->
         when {
             player.isPlaying -> player.pause()

@@ -156,4 +156,21 @@ fun AddToPlaylistSheet(
     }
 }
 
+/** Confirmation before deleting a user playlist (the songs themselves stay on the device). */
+@Composable
+fun DeletePlaylistDialog(name: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = InkSurface,
+        title = { Text("Excluir playlist?", color = TextPrimary) },
+        text = { Text("\"$name\" será excluída. As músicas continuam no aparelho.", color = TextSecondary) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text("Excluir", color = TapeOrange) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar", color = TextPrimary) }
+        },
+    )
+}
+
 private const val MAX_NAME_LENGTH = 60

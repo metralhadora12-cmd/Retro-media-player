@@ -41,15 +41,14 @@ import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.retro.cassetteplayer.ui.components.DeletePlaylistDialog
 import com.retro.cassetteplayer.ui.components.PlaylistNameDialog
 import com.retro.cassetteplayer.ui.theme.InkSurface
 import com.retro.cassetteplayer.ui.theme.TapeOrange
@@ -122,21 +121,14 @@ fun CollectionScreen(
         )
     }
     if (confirmDelete && collection != null && playlistId != null) {
-        AlertDialog(
-            onDismissRequest = { confirmDelete = false },
-            containerColor = InkSurface,
-            title = { Text("Excluir playlist?", color = TextPrimary) },
-            text = { Text("\"${collection.title}\" será excluída. As músicas continuam no aparelho.", color = TextSecondary) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmDelete = false
-                    onDeletePlaylist(playlistId)
-                    onBack()
-                }) { Text("Excluir", color = TapeOrange) }
+        DeletePlaylistDialog(
+            name = collection.title,
+            onConfirm = {
+                confirmDelete = false
+                onDeletePlaylist(playlistId)
+                onBack()
             },
-            dismissButton = {
-                TextButton(onClick = { confirmDelete = false }) { Text("Cancelar", color = TextPrimary) }
-            },
+            onDismiss = { confirmDelete = false },
         )
     }
 

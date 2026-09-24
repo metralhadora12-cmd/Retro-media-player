@@ -116,6 +116,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun playNext(song: Song) = connection.playNext(song)
     fun addToQueue(song: Song) = connection.addToQueue(song)
+
+    fun addAllToQueue(songs: List<Song>) {
+        if (songs.isEmpty()) return
+        connection.addAllToQueue(songs)
+        _messages.tryEmit(if (songs.size == 1) "1 faixa adicionada à fila" else "${songs.size} faixas adicionadas à fila")
+    }
     fun togglePlayPause() = connection.togglePlayPause()
     fun skipNext() = connection.skipNext()
     fun skipPrevious() = connection.skipPrevious()

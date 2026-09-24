@@ -1,6 +1,17 @@
 package com.retro.cassetteplayer.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
+import androidx.compose.material.icons.automirrored.rounded.QueueMusic
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.DriveFileRenameOutline
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.PlayArrow
+import com.retro.cassetteplayer.ui.components.DeletePlaylistDialog
+import com.retro.cassetteplayer.ui.components.MenuItem
+import com.retro.cassetteplayer.ui.components.PlaylistNameDialog
 import com.retro.cassetteplayer.ui.theme.InkRaised
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.ui.draw.clip
@@ -93,7 +104,59 @@ fun LibraryScreen(
     onAddToQueue: (Song) -> Unit,
     onAddToPlaylist: (Song) -> Unit,
     onCreatePlaylist: () -> Unit,
+    onPlayAll: (List<Song>) -> Unit,
+    onAddAllToQueue: (List<Song>) -> Unit,
+    onSaveAll: (List<Song>) -> Unit,
+    onRenamePlaylist: (String, String) -> Unit,
+    onDeletePlaylist: (String) -> Unit,
 ) {
+    // Long-press menu targets for the rename / delete dialogs
+    var renameTarget by remember { mutableStateOf<SongCollection?>(null) }
+    var deleteTarget by remember { mutableStateOf<SongCollection?>(null) }
+    renameTarget?.let { target ->
+        val id = target.userPlaylistId
+        if (id != null) {
+            PlaylistNameDialog(
+                title = "Renomear playlist",
+                confirmLabel = "Salvar",
+                initialName = target.title,
+                onConfirm = { name ->
+                    onRenamePlaylist(id, name)
+                    renameTarget = null
+                },
+                onDismiss = { renameTarget = null },
+            )
+        }
+    }
+    deleteTarget?.let { target ->
+        val id = target.userPlaylistId
+        if (id != null) {
+            DeletePlaylistDialog(
+                name = target.title,
+                onConfirm = {
+                    onDeletePlaylist(id)
+                    deleteTarget = null
+                },
+                onDismiss = { deleteTarget = null },
+            )
+        }
+    }
+    val menuFor: (SongCollection) -> @Composable ColumnScope.(() -> Unit) -> Unit = { collection ->
+        { dismiss ->
+            CollectionMenuItems(
+                collection = collection,
+                dismiss = dismiss,
+                onPlay = { onPlayAll(collection.songs) },
+                onShuffle = { onShufflePlay(collection.songs) },
+                onAddToQueue = { onAddAllToQueue(collection.songs) },
+                onSave = { onSaveAll(collection.songs) },
+                onEdit = { onOpenCollection(collection) },
+                onRename = { renameTarget = collection },
+                onDelete = { deleteTarget = collection },
+            )
+        }
+    }
+
     var filter by rememberSaveable { mutableStateOf<LibraryFilter?>(null) }
     var sort by rememberSaveable { mutableStateOf(LibrarySort.RECENT) }
     var gridMode by rememberSaveable { mutableStateOf(true) }
@@ -219,7 +282,7 @@ fun LibraryScreen(
                         item(key = "new-playlist") { NewPlaylistGridItem(onCreatePlaylist) }
                     }
                     items(collections, key = { it.id }) { collection ->
-                        CollectionGridItem(collection, onClick = { onOpenCollection(collection) })
+                        CollectionGridItem(collection, onClick = { onOpenCollection(collection) }, menu = menuFor(collection))
                     }
                 }
                 else -> LazyColumn(contentPadding = bottomSpace) {
@@ -227,7 +290,7 @@ fun LibraryScreen(
                         item(key = "new-playlist") { NewPlaylistListItem(onCreatePlaylist) }
                     }
                     items(collections, key = { it.id }) { collection ->
-                        CollectionListItem(collection, onClick = { onOpenCollection(collection) })
+                        CollectionListItem(collection, onClick = { onOpenCollection(collection) }, menu = menuFor(collection))
                     }
                 }
             }
@@ -329,5 +392,37 @@ private fun NewPlaylistListItem(onClick: () -> Unit) {
             color = TextPrimary,
             modifier = Modifier.padding(start = 14.dp),
         )
+    }
+}
+
+/** Long-press options for a library item; editing entries only for the user's playlists. */
+@Composable
+private fun CollectionMenuItems(
+    collection: SongCollection,
+    dismiss: () -> Unit,
+    onPlay: () -> Unit,
+    onShuffle: () -> Unit,
+    onAddToQueue: () -> Unit,
+    onSave: () -> Unit,
+    onEdit: () -> Unit,
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    fun closing(action: () -> Unit): () -> Unit = {
+        dismiss()
+        action()
+    }
+    if (collection.songs.isNotEmpty()) {
+        MenuItem("Tocar", Icons.Rounded.PlayArrow, closing(onPlay))
+        MenuItem("Tocar em ordem aleatória", Icons.Rounded.Shuffle, closing(onShuffle))
+        MenuItem("Adicionar à fila", Icons.AutoMirrored.Rounded.PlaylistPlay, closing(onAddToQueue))
+        MenuItem("Salvar na playlist", Icons.AutoMirrored.Rounded.PlaylistAdd, closing(onSave))
+    }
+    if (collection.userPlaylistId != null) {
+        MenuItem("Editar playlist", Icons.Rounded.Edit, closing(onEdit))
+        MenuItem("Renomear", Icons.Rounded.DriveFileRenameOutline, closing(onRename))
+        MenuItem("Excluir playlist", Icons.Rounded.Delete, closing(onDelete))
+    } else if (collection.songs.isEmpty()) {
+        MenuItem("Abrir", Icons.AutoMirrored.Rounded.QueueMusic, closing(onEdit))
     }
 }
