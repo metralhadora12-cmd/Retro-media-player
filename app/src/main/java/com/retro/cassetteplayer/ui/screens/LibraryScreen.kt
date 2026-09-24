@@ -88,6 +88,7 @@ enum class LibraryFilter(@StringRes val label: Int) {
     ALBUMS(R.string.filter_albums),
     ARTISTS(R.string.filter_artists),
     SONGS(R.string.filter_songs),
+    LOSSLESS(R.string.filter_lossless),
 }
 
 enum class LibrarySort(@StringRes val label: Int) {
@@ -172,7 +173,7 @@ fun LibraryScreen(
             LibraryFilter.PLAYLISTS -> library.playlists
             LibraryFilter.ALBUMS -> library.albums
             LibraryFilter.ARTISTS -> library.artists
-            LibraryFilter.SONGS -> emptyList()
+            LibraryFilter.SONGS, LibraryFilter.LOSSLESS -> emptyList()
             null -> library.playlists + library.albums
         }
         // Automatic playlists stay pinned on top, like "Músicas salvas".
@@ -183,11 +184,12 @@ fun LibraryScreen(
             LibrarySort.SIZE -> rest.sortedByDescending { it.songs.size }
         }
     }
-    val sortedSongs = remember(songs, sort) {
+    val sortedSongs = remember(songs, sort, filter) {
+        val source = if (filter == LibraryFilter.LOSSLESS) songs.filter { it.isLossless } else songs
         when (sort) {
-            LibrarySort.RECENT -> songs.sortedByDescending { it.dateAdded }
-            LibrarySort.ALPHABETICAL -> songs.sortedBy { it.title.lowercase() }
-            LibrarySort.SIZE -> songs.sortedByDescending { it.durationMs }
+            LibrarySort.RECENT -> source.sortedByDescending { it.dateAdded }
+            LibrarySort.ALPHABETICAL -> source.sortedBy { it.title.lowercase() }
+            LibrarySort.SIZE -> source.sortedByDescending { it.durationMs }
         }
     }
 
@@ -248,7 +250,7 @@ fun LibraryScreen(
             ) {
                 SortSelector(sort, onSortChange = { sort = it })
                 Spacer(Modifier.weight(1f))
-                if (filter != LibraryFilter.SONGS) {
+                if (filter != LibraryFilter.SONGS && filter != LibraryFilter.LOSSLESS) {
                     IconButton(onClick = { gridMode = !gridMode }) {
                         Icon(
                             if (gridMode) Icons.AutoMirrored.Rounded.ViewList else Icons.Rounded.GridView,
@@ -262,7 +264,9 @@ fun LibraryScreen(
             val bottomSpace = PaddingValues(bottom = 96.dp)
             val showNewTile = filter == LibraryFilter.PLAYLISTS
             when {
-                filter == LibraryFilter.SONGS -> LazyColumn(contentPadding = bottomSpace) {
+                filter == LibraryFilter.LOSSLESS && sortedSongs.isEmpty() ->
+                    StatusMessage(stringResource(R.string.library_empty))
+                filter == LibraryFilter.SONGS || filter == LibraryFilter.LOSSLESS -> LazyColumn(contentPadding = bottomSpace) {
                     items(sortedSongs, key = { it.id }) { song ->
                         SongRow(
                             song = song,

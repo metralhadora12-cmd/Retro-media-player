@@ -79,6 +79,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         connection.connect()
+        viewModelScope.launch {
+            connection.errors.collect { title ->
+                _messages.tryEmit(UiMessage.Text(R.string.msg_cannot_play, title))
+            }
+        }
         // Tick the playback position while audio is playing (drives seekbar + reels).
         viewModelScope.launch {
             playback.map { it.isPlaying }.distinctUntilChanged().collectLatest { playing ->

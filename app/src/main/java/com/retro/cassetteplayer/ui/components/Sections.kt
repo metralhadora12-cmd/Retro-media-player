@@ -48,6 +48,9 @@ import com.retro.cassetteplayer.ui.theme.InkRaised
 import com.retro.cassetteplayer.ui.theme.OutlineColor
 import com.retro.cassetteplayer.ui.theme.TextPrimary
 import com.retro.cassetteplayer.ui.theme.TextSecondary
+import androidx.compose.ui.unit.sp
+import com.retro.cassetteplayer.ui.theme.DisplayFont
+import com.retro.cassetteplayer.ui.theme.TapeOrange
 
 /** Flat filter chip: grey when idle, white with dark text when selected. */
 @Composable
@@ -341,4 +344,19 @@ fun CollectionListItem(
             }
         }
     }
+}
+
+/** Tiny outlined tag for lossless formats ("FLAC", "LOSSLESS"…), like a hi-fi tape label. */
+@Composable
+fun FormatTag(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont, letterSpacing = 0.5.sp),
+        fontWeight = FontWeight.Bold,
+        color = TapeOrange,
+        maxLines = 1,
+        modifier = modifier
+            .border(1.dp, TapeOrange.copy(alpha = 0.7f), RoundedCornerShape(3.dp))
+            .padding(horizontal = 4.dp, vertical = 1.dp),
+    )
 }

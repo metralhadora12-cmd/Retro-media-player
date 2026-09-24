@@ -119,13 +119,16 @@ fun SongRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
-                    text = stringResource(R.string.song_subtitle, song.artistLabel(), song.albumLabel()),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    song.losslessLabel?.let { FormatTag(it, Modifier.padding(end = 6.dp)) }
+                    Text(
+                        text = stringResource(R.string.song_subtitle, song.artistLabel(), song.albumLabel()),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
             if (isCurrent) {
                 PlaybackLed(lit = isPlaying, modifier = Modifier.padding(start = 8.dp))

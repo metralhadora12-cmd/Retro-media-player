@@ -3,15 +3,23 @@ package com.retro.cassetteplayer.playback
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.media3.common.C
+import androidx.media3.common.Format
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.retro.cassetteplayer.data.Song
 import com.retro.cassetteplayer.data.toMediaItem
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,6 +31,16 @@ data class QueueItem(
     val title: String,
     val artist: String,
     val artworkUri: Uri?,
+)
+
+/** What the decoder reports for the current track (e.g. FLAC, 24-bit, 96 kHz). */
+data class AudioFormatInfo(
+    val codec: String,
+    val lossless: Boolean,
+    /** 0 when unknown. */
+    val bitDepth: Int,
+    /** Hz, 0 when unknown. */
+    val sampleRate: Int,
 )
 
 data class PlaybackState(
@@ -37,6 +55,7 @@ data class PlaybackState(
     val repeatMode: Int = Player.REPEAT_MODE_OFF,
     /** Current item first, then what plays next. */
     val queue: List<QueueItem> = emptyList(),
+    val audioFormat: AudioFormatInfo? = null,
 ) {
     val hasMedia: Boolean get() = mediaId != null
     val progress: Float
@@ -58,8 +77,23 @@ class PlaybackConnection(context: Context) {
     private var controller: MediaController? = null
     private val pendingCommands = mutableListOf<(MediaController) -> Unit>()
 
+    private val _errors = MutableSharedFlow<String>(extraBufferCapacity = 4)
+    /** Title of a track that could not be played (unsupported format, broken file…). */
+    val errors: SharedFlow<String> = _errors.asSharedFlow()
+
     private val listener = object : Player.Listener {
         override fun onEvents(player: Player, events: Player.Events) = publish(player)
+
+        override fun onPlayerError(error: PlaybackException) {
+            val player = controller ?: return
+            _errors.tryEmit(player.mediaMetadata.title?.toString().orEmpty())
+            // Skip the unplayable track instead of leaving the queue stuck.
+            if (player.hasNextMediaItem()) {
+                player.seekToNextMediaItem()
+                player.prepare()
+                player.play()
+            }
+        }
     }
 
     fun connect() {
@@ -194,7 +228,38 @@ class PlaybackConnection(context: Context) {
             shuffleEnabled = player.shuffleModeEnabled,
             repeatMode = player.repeatMode,
             queue = buildQueue(player),
+            audioFormat = audioFormatOf(player),
         )
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun audioFormatOf(player: Player): AudioFormatInfo? {
+        val format = player.currentTracks.groups
+            .firstOrNull { it.type == C.TRACK_TYPE_AUDIO && it.isSelected }
+            ?.let { group -> (0 until group.length).firstOrNull { group.isTrackSelected(it) }?.let(group::getTrackFormat) }
+            ?: return null
+        val mime = format.sampleMimeType ?: return null
+        val codec = when (mime) {
+            MimeTypes.AUDIO_FLAC -> "FLAC"
+            MimeTypes.AUDIO_ALAC -> "ALAC"
+            MimeTypes.AUDIO_RAW -> "PCM"
+            MimeTypes.AUDIO_WAV -> "WAV"
+            MimeTypes.AUDIO_MPEG -> "MP3"
+            MimeTypes.AUDIO_AAC -> "AAC"
+            MimeTypes.AUDIO_OPUS -> "OPUS"
+            MimeTypes.AUDIO_VORBIS -> "OGG"
+            else -> mime.substringAfter('/').uppercase()
+        }
+        val lossless = mime in LOSSLESS_MIME_TYPES
+        val bitDepth = when (format.pcmEncoding) {
+            C.ENCODING_PCM_8BIT -> 8
+            C.ENCODING_PCM_16BIT, C.ENCODING_PCM_16BIT_BIG_ENDIAN -> 16
+            C.ENCODING_PCM_24BIT -> 24
+            C.ENCODING_PCM_32BIT, C.ENCODING_PCM_FLOAT -> 32
+            else -> 0
+        }
+        val sampleRate = format.sampleRate.takeIf { it != Format.NO_VALUE } ?: 0
+        return AudioFormatInfo(codec, lossless, bitDepth, sampleRate)
     }
 
     private fun buildQueue(player: Player): List<QueueItem> {
@@ -218,6 +283,12 @@ class PlaybackConnection(context: Context) {
 
     private companion object {
         const val MAX_QUEUE_ITEMS = 300
+        val LOSSLESS_MIME_TYPES = setOf(
+            MimeTypes.AUDIO_FLAC,
+            MimeTypes.AUDIO_ALAC,
+            MimeTypes.AUDIO_RAW,
+            MimeTypes.AUDIO_WAV,
+        )
     }
 
     private fun Player.safeDuration(): Long = duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: 0L

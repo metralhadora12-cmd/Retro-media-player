@@ -104,6 +104,11 @@
     <string name="msg_removed_favorite">Quitada de favoritas</string>
     <string name="msg_delete_failed">No se pudo eliminar la canción</string>
     <string name="msg_song_deleted">\"%1$s\" eliminada</string>
+    <string name="msg_cannot_play">No se pudo reproducir \"%1$s\" (formato no compatible)</string>
+    <string name="filter_lossless">Lossless</string>
+    <string name="badge_lossless">LOSSLESS</string>
+    <string name="audio_bits">%1$d bits</string>
+    <string name="audio_khz">%1$s kHz</string>
     <string name="msg_language_changed">Idioma cambiado</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_section_audio">Audio</string>
@@ -156,6 +161,13 @@
         <item quantity="many">%d pistas añadidas a la cola</item>
         <item quantity="other">%d pistas añadidas a la cola</item>
     </plurals>
+    <string-array name="changelog_1_9">
+        <item>Compatibilidad con audio lossless: FLAC, WAV y ALAC, con decodificador FFmpeg integrado</item>
+        <item>Audio hi-res de 24 bits conservado en la salida</item>
+        <item>Insignia LOSSLESS y formato de la pista en el reproductor (p. ej. FLAC · 24-bit · 96 kHz)</item>
+        <item>Filtro Lossless en la Biblioteca</item>
+        <item>Las pistas que no se pueden reproducir se saltan con un aviso</item>
+    </string-array>
     <string-array name="changelog_1_8">
         <item>Tema claro, oscuro o del sistema (Ajustes → Apariencia)</item>
     </string-array>

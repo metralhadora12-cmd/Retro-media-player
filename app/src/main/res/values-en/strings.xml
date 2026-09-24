@@ -104,6 +104,11 @@
     <string name="msg_removed_favorite">Removed from favorites</string>
     <string name="msg_delete_failed">Couldn\'t delete the song</string>
     <string name="msg_song_deleted">\"%1$s\" deleted</string>
+    <string name="msg_cannot_play">Couldn\'t play \"%1$s\" (unsupported format)</string>
+    <string name="filter_lossless">Lossless</string>
+    <string name="badge_lossless">LOSSLESS</string>
+    <string name="audio_bits">%1$d-bit</string>
+    <string name="audio_khz">%1$s kHz</string>
     <string name="msg_language_changed">Language changed</string>
     <string name="settings_title">Settings</string>
     <string name="settings_section_audio">Audio</string>
@@ -153,6 +158,13 @@
         <item quantity="one">%d track added to the queue</item>
         <item quantity="other">%d tracks added to the queue</item>
     </plurals>
+    <string-array name="changelog_1_9">
+        <item>Lossless audio support: FLAC, WAV and ALAC, with a built-in FFmpeg decoder</item>
+        <item>24-bit hi-res audio kept intact on output</item>
+        <item>LOSSLESS badge and track format in the player (e.g. FLAC · 24-bit · 96 kHz)</item>
+        <item>Lossless filter in the Library</item>
+        <item>Tracks that can\'t be played are skipped with a notice</item>
+    </string-array>
     <string-array name="changelog_1_8">
         <item>Light, dark or system theme (Settings → Appearance)</item>
     </string-array>

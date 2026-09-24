@@ -75,6 +75,8 @@ import androidx.compose.ui.res.stringResource
 import com.retro.cassetteplayer.R
 import com.retro.cassetteplayer.ui.components.artistLabel
 import com.retro.cassetteplayer.ui.components.titleLabel
+import com.retro.cassetteplayer.playback.AudioFormatInfo
+import com.retro.cassetteplayer.ui.components.FormatTag
 
 @Composable
 fun PlayerScreen(
@@ -203,6 +205,7 @@ fun PlayerScreen(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        playback.audioFormat?.takeIf { playback.hasMedia }?.let { AudioFormatLine(it) }
 
         Spacer(Modifier.height(16.dp))
 
@@ -320,4 +323,30 @@ private fun ModeToggle(
         )
     }
 }
+
+/** "LOSSLESS  FLAC · 24-bit · 96 kHz" under the artist, from the decoded track. */
+@Composable
+private fun AudioFormatLine(format: AudioFormatInfo) {
+    val parts = buildList {
+        add(format.codec)
+        if (format.bitDepth > 0) add(stringResource(R.string.audio_bits, format.bitDepth))
+        if (format.sampleRate > 0) add(stringResource(R.string.audio_khz, formatKhz(format.sampleRate)))
+    }
+    Row(
+        modifier = Modifier.padding(top = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (format.lossless) {
+            FormatTag(stringResource(R.string.badge_lossless), Modifier.padding(end = 8.dp))
+        }
+        Text(
+            parts.joinToString(" · "),
+            style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont),
+            color = TextSecondary,
+        )
+    }
+}
+
+private fun formatKhz(hz: Int): String =
+    String.format(java.util.Locale.ROOT, "%.1f", hz / 1000f).removeSuffix(".0")
 

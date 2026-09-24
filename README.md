@@ -4,6 +4,7 @@ Reprodutor de áudio Android nativo com interface minimalista inspirada no YouTu
 
 ## Stack
 - **Kotlin** + **Jetpack Compose** (Material 3)
+- **Áudio lossless**: FLAC, WAV e ALAC (decodificador FFmpeg `org.jellyfin.media3:media3-ffmpeg-decoder` como reserva), saída em ponto flutuante para hi-res 24 bits, selo LOSSLESS no player e filtro na Biblioteca
 - **Media3 / ExoPlayer** rodando dentro de um `MediaSessionService` (tocar em segundo plano, notificação de mídia e tela de bloqueio)
 - **Navigation Compose** com barra de navegação inferior (Início, Buscar, Biblioteca)
 - **MediaStore** para ler as músicas locais (ignora áudios de WhatsApp, Telegram e Messenger) (`READ_MEDIA_AUDIO` no Android 13+, `READ_EXTERNAL_STORAGE` em versões anteriores)

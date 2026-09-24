@@ -12,8 +12,8 @@ android {
         applicationId = "com.retro.cassetteplayer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.8.0"
+        versionCode = 10
+        versionName = "1.9.0"
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.common)
+    implementation(libs.media3.ffmpeg.decoder)
     implementation(libs.guava)
 
     // Album art loading
