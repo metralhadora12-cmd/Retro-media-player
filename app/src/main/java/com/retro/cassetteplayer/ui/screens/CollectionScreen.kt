@@ -88,7 +88,9 @@ fun CollectionScreen(
     onDeletePlaylist: (String) -> Unit,
     onRemoveFromPlaylist: (String, Song) -> Unit,
     onReorderPlaylist: (String, List<Song>) -> Unit,
+    onToggleFavorite: (Song) -> Unit,
 ) {
+    val isFavorites = collection?.isFavorites == true
     val playlistId = collection?.userPlaylistId
 
     // Local copy of the track order: updated live while dragging, saved when the drag ends.
@@ -231,7 +233,10 @@ fun CollectionScreen(
             }
             if (collection.songs.isEmpty()) {
                 item {
-                    StatusMessage("Playlist vazia. Use \"Salvar na playlist\" no menu ⋮ de uma música para adicioná-la aqui.")
+                    StatusMessage(
+                        if (isFavorites) "Nenhuma favorita ainda. Toque no coração no player para adicionar a música que está tocando."
+                        else "Playlist vazia. Use \"Salvar na playlist\" no menu ⋮ de uma música para adicioná-la aqui."
+                    )
                 }
             }
             items(tracks, key = { it.id }) { song ->
@@ -251,7 +256,11 @@ fun CollectionScreen(
                                 onPlayNext = { onPlayNext(song) },
                                 onAddToQueue = { onAddToQueue(song) },
                                 onAddToPlaylist = { onAddToPlaylist(song) },
-                                onRemoveFromPlaylist = playlistId?.let { id -> { onRemoveFromPlaylist(id, song) } },
+                                onRemoveFromPlaylist = when {
+                                    isFavorites -> { { onToggleFavorite(song) } }
+                                    playlistId != null -> { { onRemoveFromPlaylist(playlistId, song) } }
+                                    else -> null
+                                },
                                 modifier = Modifier.weight(1f),
                             )
                             if (playlistId != null) {

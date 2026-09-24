@@ -16,6 +16,8 @@ data class SongCollection(
     val lastAdded: Long,
     /** Set when this is a playlist the user created (and can edit). */
     val userPlaylistId: String? = null,
+    /** The automatic "Favoritas" playlist. */
+    val isFavorites: Boolean = false,
 )
 
 data class LibraryCollections(
@@ -28,12 +30,18 @@ data class LibraryCollections(
     fun find(id: String): SongCollection? = all.firstOrNull { it.id == id }
 }
 
+const val FAVORITES_ID = "playlist:favorites"
+
 private fun List<Song>.collage(): List<Uri> =
     distinctBy { it.albumId }.mapNotNull { it.artworkUri }.take(4)
 
 private fun tracks(count: Int) = if (count == 1) "1 faixa" else "$count faixas"
 
-fun buildLibrary(songs: List<Song>, userPlaylists: List<UserPlaylist> = emptyList()): LibraryCollections {
+fun buildLibrary(
+    songs: List<Song>,
+    userPlaylists: List<UserPlaylist> = emptyList(),
+    favoriteIds: List<Long> = emptyList(),
+): LibraryCollections {
     val songsById = songs.associateBy { it.id }
     val created = userPlaylists.sortedByDescending { it.updatedAt }.map { playlist ->
         val tracks = playlist.songIds.mapNotNull { songsById[it] }
@@ -76,7 +84,18 @@ fun buildLibrary(songs: List<Song>, userPlaylists: List<UserPlaylist> = emptyLis
     }
 
     val recent = songs.sortedByDescending { it.dateAdded }.take(50)
+    val favorites = favoriteIds.mapNotNull { songsById[it] }
     val playlists = listOf(
+        SongCollection(
+            id = FAVORITES_ID,
+            kind = CollectionKind.PLAYLIST,
+            title = "Favoritas",
+            subtitle = "Playlist automática • ${tracks(favorites.size)}",
+            artworkUris = favorites.collage(),
+            songs = favorites,
+            lastAdded = Long.MAX_VALUE,
+            isFavorites = true,
+        ),
         SongCollection(
             id = "playlist:all",
             kind = CollectionKind.PLAYLIST,

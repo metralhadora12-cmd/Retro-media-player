@@ -1,5 +1,19 @@
 package com.retro.cassetteplayer.ui.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -70,6 +84,8 @@ fun PlayerScreen(
     onCycleRepeat: () -> Unit,
     onOpenQueue: () -> Unit,
     onSaveToPlaylist: () -> Unit,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -193,29 +209,81 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        // "A SEGUIR" tab, like YouTube Music's player
+        // Bottom row: heart (favourite) on the left, "A SEGUIR" tab in the middle
         Row(
             modifier = Modifier
-                .padding(vertical = 8.dp)
-                .clip(RoundedCornerShape(50))
-                .clickable(onClick = onOpenQueue)
-                .padding(horizontal = 20.dp, vertical = 12.dp),
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
         ) {
-            Icon(
-                Icons.AutoMirrored.Rounded.QueueMusic,
-                contentDescription = null,
-                tint = TextPrimary,
-                modifier = Modifier.size(20.dp),
+            FavoriteButton(
+                isFavorite = isFavorite,
+                enabled = playback.hasMedia,
+                onClick = onToggleFavorite,
             )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                "A SEGUIR",
-                style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp),
-                color = TextPrimary,
-            )
+            Spacer(Modifier.weight(1f))
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .clickable(onClick = onOpenQueue)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Rounded.QueueMusic,
+                    contentDescription = null,
+                    tint = TextPrimary,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    "A SEGUIR",
+                    style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.sp),
+                    color = TextPrimary,
+                )
+            }
+            Spacer(Modifier.weight(1f))
+            // Balances the heart so "A SEGUIR" stays centred
+            Spacer(Modifier.size(48.dp))
         }
+    }
+}
+
+/** Heart that fills in tape orange and does a small bounce when liked. */
+@Composable
+private fun FavoriteButton(isFavorite: Boolean, enabled: Boolean, onClick: () -> Unit) {
+    val haptics = LocalHapticFeedback.current
+    val scale = remember { Animatable(1f) }
+    var bounceKey by remember { mutableIntStateOf(0) }
+    LaunchedEffect(bounceKey) {
+        if (bounceKey > 0) {
+            scale.animateTo(1.3f, tween(110))
+            scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+        }
+    }
+    IconButton(
+        onClick = {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            if (!isFavorite) bounceKey++
+            onClick()
+        },
+        enabled = enabled,
+    ) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+            contentDescription = if (isFavorite) "Remover das favoritas" else "Adicionar às favoritas",
+            tint = when {
+                !enabled -> TextSecondary.copy(alpha = 0.4f)
+                isFavorite -> TapeOrange
+                else -> TextPrimary
+            },
+            modifier = Modifier
+                .size(26.dp)
+                .graphicsLayer {
+                    scaleX = scale.value
+                    scaleY = scale.value
+                },
+        )
     }
 }
 

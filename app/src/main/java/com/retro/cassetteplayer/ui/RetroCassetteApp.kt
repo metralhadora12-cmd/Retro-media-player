@@ -87,6 +87,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val query by viewModel.query.collectAsStateWithLifecycle()
     val searchResults by viewModel.searchResults.collectAsStateWithLifecycle()
     val library by viewModel.library.collectAsStateWithLifecycle()
+    val favorites by viewModel.favorites.collectAsStateWithLifecycle()
 
     // --- Permissions (READ_MEDIA_AUDIO on Android 13+) ----------------------------------
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -308,6 +309,7 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                         onDeletePlaylist = viewModel::deletePlaylist,
                         onRemoveFromPlaylist = viewModel::removeFromPlaylist,
                         onReorderPlaylist = viewModel::reorderPlaylist,
+                        onToggleFavorite = { song -> viewModel.toggleFavorite(song.id) },
                     )
                 }
             }
@@ -329,6 +331,10 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                     onOpenQueue = { showQueue = true },
                     onSaveToPlaylist = {
                         songs.firstOrNull { it.id.toString() == playback.mediaId }?.let(saveSong)
+                    },
+                    isFavorite = favorites.any { it.toString() == playback.mediaId },
+                    onToggleFavorite = {
+                        playback.mediaId?.toLongOrNull()?.let(viewModel::toggleFavorite)
                     },
                 )
             }

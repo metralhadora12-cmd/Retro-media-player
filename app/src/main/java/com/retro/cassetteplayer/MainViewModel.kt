@@ -3,6 +3,7 @@ package com.retro.cassetteplayer
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.retro.cassetteplayer.data.FavoritesRepository
 import com.retro.cassetteplayer.data.LibraryCollections
 import com.retro.cassetteplayer.data.MusicRepository
 import com.retro.cassetteplayer.data.PlaylistRepository
@@ -30,6 +31,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = MusicRepository(application)
     private val connection = PlaybackConnection(application)
     private val playlistRepository = PlaylistRepository(application)
+    private val favoritesRepository = FavoritesRepository(application)
+
+    /** Favourite song ids, most recent first. */
+    val favorites: StateFlow<List<Long>> = favoritesRepository.favorites
 
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 4)
     /** One-off feedback shown as a snackbar ("Adicionada a …"). */
@@ -60,8 +65,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val library: StateFlow<LibraryCollections> = combine(_songs, playlistRepository.playlists) { songs, playlists ->
-        buildLibrary(songs, playlists)
+    val library: StateFlow<LibraryCollections> = combine(
+        _songs,
+        playlistRepository.playlists,
+        favoritesRepository.favorites,
+    ) { songs, playlists, favoriteIds ->
+        buildLibrary(songs, playlists, favoriteIds)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryCollections())
 
@@ -117,6 +126,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun cycleRepeat() = connection.cycleRepeat()
     fun playQueueItem(index: Int) = connection.playQueueItem(index)
     fun removeQueueItem(index: Int) = connection.removeQueueItem(index)
+
+    // --- Favourites -----------------------------------------------------------------
+
+    fun toggleFavorite(songId: Long) {
+        val nowFavorite = favoritesRepository.toggle(songId)
+        _messages.tryEmit(if (nowFavorite) "Adicionada às favoritas" else "Removida das favoritas")
+    }
 
     // --- User playlists -------------------------------------------------------------
 
