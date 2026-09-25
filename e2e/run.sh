@@ -180,5 +180,6 @@ tap_text "Lyrics"; sleep 2
 shot 20_lyrics_search; crashed lyrics_search
 
 adb shell dumpsys media_session > "$OUT/dumpsys_media_session.txt" 2>&1 || true
+adb logcat -d | grep -iE "soundpool|SoundDecoder|key_click" > "$OUT/soundpool.txt" || true
 finish
 echo done

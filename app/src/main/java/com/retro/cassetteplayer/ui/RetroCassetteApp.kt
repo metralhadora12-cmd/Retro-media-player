@@ -96,6 +96,7 @@ import com.retro.cassetteplayer.data.AppSettings
 import com.retro.cassetteplayer.data.PlayStats
 import com.retro.cassetteplayer.playback.SleepTimer
 import com.retro.cassetteplayer.ui.components.SleepTimerSheet
+import com.retro.cassetteplayer.ui.components.KeyClick
 import com.retro.cassetteplayer.ui.components.SpeedSheet
 import com.retro.cassetteplayer.ui.components.displayName
 import com.retro.cassetteplayer.ui.screens.StatsScreen
@@ -137,6 +138,10 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
     val speed by AppSettings.speed.flow.collectAsStateWithLifecycle()
     val pitch by AppSettings.pitch.flow.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    // Load the key sounds as soon as the option is on, so the first press already clacks
+    LaunchedEffect(Unit) {
+        AppSettings.keyClicks.flow.collect { if (it) KeyClick.preload(context) }
+    }
     val shareMixtape: (String, List<Song>) -> Unit = { name, tracks ->
         scope.launch {
             if (!Mixtape.share(context, name, tracks)) viewModel.showMessage(UiMessage.Text(R.string.msg_share_failed))
@@ -366,8 +371,8 @@ fun RetroCassetteApp(viewModel: MainViewModel) {
                         MiniPlayer(
                             state = playback,
                             onOpen = openPlayer,
-                            onTogglePlay = viewModel::togglePlayPause,
-                            onNext = viewModel::skipNext,
+                            onTogglePlay = { KeyClick.play(context); viewModel.togglePlayPause() },
+                            onNext = { KeyClick.play(context); viewModel.skipNext() },
                         )
                     }
                     RetroBottomBar(

@@ -243,7 +243,7 @@ fun PlayerScreen(
                 icon = Icons.Rounded.Shuffle,
                 description = stringResource(R.string.action_shuffle),
                 active = playback.shuffleEnabled,
-                onClick = onToggleShuffle,
+                onClick = click(onToggleShuffle),
             )
             PianoKeys(
                 keys = listOf(
@@ -265,7 +265,7 @@ fun PlayerScreen(
                 icon = if (playback.repeatMode == Player.REPEAT_MODE_ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
                 description = stringResource(R.string.player_repeat),
                 active = playback.repeatMode != Player.REPEAT_MODE_OFF,
-                onClick = onCycleRepeat,
+                onClick = click(onCycleRepeat),
             )
         }
 
