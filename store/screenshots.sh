@@ -40,11 +40,12 @@ tap_last_text() {
 import re, sys, xml.etree.ElementTree as ET
 best = None
 for node in ET.parse(sys.argv[2]).getroot().iter("node"):
-    if node.get("text") == sys.argv[1]:
+    if node.get("text") == sys.argv[1] or node.get("content-desc") == sys.argv[1]:
         x1, y1, x2, y2 = map(int, re.findall(r"\d+", node.get("bounds")))
         if best is None or y1 > best[1]:
             best = ((x1 + x2) // 2, (y1 + y2) // 2)
-print(f"{best[0]} {best[1]}" if best else "")
+# the mini player's pause key: tap its title area, left of the key
+print(f"{best[0] // 3} {best[1]}" if best else "")
 PY2
 )
   if [ -n "$pos" ]; then adb shell input tap $pos; else echo "NOT FOUND: $1"; fi
@@ -71,8 +72,8 @@ adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi s
 SIZE=$(adb shell wm size | grep -oE "[0-9]+x[0-9]+" | tail -1); W=${SIZE%x*}; H=${SIZE#*x}
 echo "screen $W x $H"
 
-declare -A PT=([library]="Biblioteca" [albums]="Álbuns" [play]="Tocar" [speed]="Velocidade e tom" [sleep]="Timer de sono" [home]="Início" [clear]="Limpar filtro" [settings]="Configurações" [tape]="EFEITOS DE FITA" [stats]="Estatísticas de escuta")
-declare -A EN=([library]="Library" [albums]="Albums" [play]="Play" [speed]="Speed and pitch" [sleep]="Sleep timer" [home]="Home" [clear]="Clear filter" [settings]="Settings" [tape]="TAPE EFFECTS" [stats]="Listening stats")
+declare -A PT=([library]="Biblioteca" [albums]="Álbuns" [play]="Tocar" [speed]="Velocidade e tom" [sleep]="Timer de sono" [home]="Início" [clear]="Limpar filtro" [settings]="Configurações" [tape]="EFEITOS DE FITA" [stats]="Estatísticas de escuta" [pause]="Pausar")
+declare -A EN=([library]="Library" [albums]="Albums" [play]="Play" [speed]="Speed and pitch" [sleep]="Sleep timer" [home]="Home" [clear]="Clear filter" [settings]="Settings" [tape]="TAPE EFFECTS" [stats]="Listening stats" [pause]="Pause")
 
 pass() {
   local lang=$1; local -n L=$2
@@ -85,7 +86,7 @@ pass() {
   scroll_tap "Midnight Drive"; sleep 3
   shot "$lang/04_album"
   tap_text "${L[play]}"; sleep 4
-  tap_last_text "City Lights"; sleep 4
+  tap_last_text "${L[pause]}"; sleep 4
   shot "$lang/01_player"
   tap_text "${L[sleep]}"; sleep 2
   shot "$lang/06_sleep_timer"
