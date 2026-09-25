@@ -33,6 +33,22 @@ scroll_tap() {
   echo "NOT FOUND after scrolling: $1"
 }
 back() { adb shell input keyevent KEYCODE_BACK; sleep 2; }
+# tap the lowest node with this text (e.g. the song title in the mini player)
+tap_last_text() {
+  dump
+  pos=$(python3 - "$1" "$OUT/tmp.xml" <<'PY2'
+import re, sys, xml.etree.ElementTree as ET
+best = None
+for node in ET.parse(sys.argv[2]).getroot().iter("node"):
+    if node.get("text") == sys.argv[1]:
+        x1, y1, x2, y2 = map(int, re.findall(r"\d+", node.get("bounds")))
+        if best is None or y1 > best[1]:
+            best = ((x1 + x2) // 2, (y1 + y2) // 2)
+print(f"{best[0]} {best[1]}" if best else "")
+PY2
+)
+  if [ -n "$pos" ]; then adb shell input tap $pos; else echo "NOT FOUND: $1"; fi
+}
 
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell mkdir -p /sdcard/Music/Samples
@@ -66,18 +82,17 @@ pass() {
   adb shell am start -n $APP/.MainActivity; sleep 10
   tap_text "${L[library]}"; sleep 3
   tap_text "${L[albums]}"; sleep 3
-  tap_text "Midnight Drive"; sleep 3
+  scroll_tap "Midnight Drive"; sleep 3
   shot "$lang/04_album"
-  tap_text "${L[play]}"; sleep 3
-  # full player from the mini player
-  adb shell input tap $((W/2)) $((H*82/100)); sleep 4
+  tap_text "${L[play]}"; sleep 4
+  tap_last_text "City Lights"; sleep 4
   shot "$lang/01_player"
   tap_text "${L[sleep]}"; sleep 2
   shot "$lang/06_sleep_timer"
   back
   sleep 35
-  back; back
-  tap_text "${L[home]}"; sleep 3
+  back
+  tap_text "${L[home]}"; sleep 4
   shot "$lang/02_home"
   tap_text "${L[library]}"; sleep 3
   tap_text "${L[clear]}"; sleep 2
@@ -87,10 +102,9 @@ pass() {
   adb shell input swipe $((W/2)) $((H/2)) $((W/2)) $((H/4)) 400; sleep 1
   shot "$lang/05_settings"
   adb shell input keyevent KEYCODE_MEDIA_PAUSE; sleep 2
-  for i in 1 2 3; do adb shell input swipe $((W/2)) $((H/3)) $((W/2)) $((H*9/10)) 300; sleep 1; done
+  for i in 1 2 3 4; do adb shell input swipe $((W/2)) $((H/3)) $((W/2)) $((H*9/10)) 300; sleep 1; done
   tap_text "${L[stats]}"; sleep 3
   shot "$lang/07_stats"
-  back; back
 }
 pass pt-BR PT pt-BR
 pass en-US EN en-US
