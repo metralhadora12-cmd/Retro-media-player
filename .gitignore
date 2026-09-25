@@ -9,3 +9,7 @@
 .externalNativeBuild/
 .cxx/
 .kotlin/
+*.whl
+# Release signing (never commit the upload key)
+*.jks
+keystore.properties

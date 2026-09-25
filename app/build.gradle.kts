@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.retro.cassetteplayer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.retro.cassetteplayer"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 17
         versionName = "3.0.0"
         vectorDrawables { useSupportLibrary = true }
@@ -27,6 +27,18 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+        // Google Play upload key. Never committed: the release workflow writes it from
+        // GitHub secrets (RELEASE_KEYSTORE_BASE64, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS,
+        // RELEASE_KEY_PASSWORD); locally it can come from the same environment variables.
+        create("release") {
+            val keystorePath = System.getenv("RELEASE_KEYSTORE_PATH")
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
@@ -34,6 +46,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            if (System.getenv("RELEASE_KEYSTORE_PATH") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
