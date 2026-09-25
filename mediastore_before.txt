@@ -1,0 +1,4 @@
+Row: 0 _id=17, _display_name=alac.m4a, mime_type=audio/mp4, title=Alac Test, is_music=1
+Row: 1 _id=18, _display_name=lossless_one.flac, mime_type=audio/flac, title=Lossless Test One, is_music=1
+Row: 2 _id=19, _display_name=lossless_two.flac, mime_type=audio/flac, title=Lossless Test Two, is_music=1
+Row: 3 _id=20, _display_name=lossy.mp3, mime_type=audio/mpeg, title=Lossy Test, is_music=1
