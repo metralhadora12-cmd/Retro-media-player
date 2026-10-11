@@ -175,6 +175,15 @@ fun PlayerScreen(
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
                 )
+                if (playback.speed != 1f) {
+                    Text(
+                        stringResource(R.string.speed_value, formatSpeedLabel(playback.speed)),
+                        style = MaterialTheme.typography.labelSmall.copy(fontFamily = DisplayFont),
+                        color = TapeOrange,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.clickable(onClick = onOpenSpeed),
+                    )
+                }
                 sleepTimerLabel(sleepTimer)?.let {
                     Text(
                         it,
@@ -437,3 +446,7 @@ private fun AudioFormatLine(format: AudioFormatInfo) {
 private fun formatKhz(hz: Int): String =
     String.format(java.util.Locale.ROOT, "%.1f", hz / 1000f).removeSuffix(".0")
 
+
+/** "1.25", "0.5", "2" */
+fun formatSpeedLabel(speed: Float): String =
+    String.format(java.util.Locale.ROOT, "%.2f", speed).trimEnd('0').trimEnd('.')

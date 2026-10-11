@@ -84,8 +84,11 @@ object AppSettings {
     val crossfadeSeconds = int("crossfade_seconds", 0)
     val replayGain = enum("replay_gain", ReplayGainMode.OFF)
     val resumeOnConnect = bool("resume_on_connect", false)
-    /** 24-bit float output for hi-res files (speed and tape effects don't apply to those). */
-    val hiResOutput = bool("hi_res_output", true)
+    /**
+     * 24-bit float output for hi-res files. Off by default: with it on, speed, pitch and
+     * tape effects skip hi-res files, so a changed speed only affected some songs.
+     */
+    val hiResOutput = bool("hi_res_output_v2", false)
     val speed = float("speed", 1f)
     val pitch = float("pitch", 1f)
 

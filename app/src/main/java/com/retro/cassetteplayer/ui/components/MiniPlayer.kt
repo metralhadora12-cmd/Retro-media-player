@@ -67,7 +67,11 @@ fun MiniPlayer(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = artistLabel(state.artist),
+                    text = if (state.speed != 1f) {
+                        "${stringResource(R.string.speed_value, com.retro.cassetteplayer.ui.screens.formatSpeedLabel(state.speed))} · ${artistLabel(state.artist)}"
+                    } else {
+                        artistLabel(state.artist)
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary,
                     maxLines = 1,

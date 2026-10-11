@@ -310,7 +310,7 @@
     <string name="settings_resume_connect">Resume when headphones connect</string>
     <string name="settings_resume_connect_summary">Resumes when wired or Bluetooth headphones connect (pauses when they disconnect)</string>
     <string name="settings_hires">High-resolution output (24-bit)</string>
-    <string name="settings_hires_summary">Keeps hi-res files intact; speed and tape effects don\'t apply to them. Takes effect when the player restarts.</string>
+    <string name="settings_hires_summary">Keeps 24-bit files at full precision, but speed, pitch and tape effects no longer apply to them. Takes effect when the player restarts.</string>
     <string name="settings_section_tape">Tape effects</string>
     <string name="settings_hiss">Tape hiss</string>
     <string name="settings_hiss_summary">A faint background hiss</string>
@@ -405,5 +405,11 @@
         <item>Listening stats with a monthly recap</item>
         <item>Last.fm scrobbling via Pano Scrobbler or Simple Last.fm Scrobbler</item>
         <item>Search inside song lyrics</item>
+    </string-array>
+    <string-array name="changelog_3_0_1">
+        <item>Fixed: some songs played sped up when the speed wasn\'t 1× (speed now applies to every song)</item>
+        <item>The current speed shows in the player and the mini player when it isn\'t 1×</item>
+        <item>HQ badge detected from the file itself (ALAC and others), no need to play the song first</item>
+        <item>Key sounds on the media stream (no longer muted by Do Not Disturb)</item>
     </string-array>
 </resources>

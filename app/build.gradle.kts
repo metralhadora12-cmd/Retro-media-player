@@ -12,8 +12,8 @@ android {
         applicationId = "com.retro.cassetteplayer"
         minSdk = 26
         targetSdk = 36
-        versionCode = 17
-        versionName = "3.0.0"
+        versionCode = 18
+        versionName = "3.0.1"
         vectorDrawables { useSupportLibrary = true }
     }
 

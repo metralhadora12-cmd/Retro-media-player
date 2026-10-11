@@ -315,7 +315,7 @@
     <string name="settings_resume_connect">Continuar ao conectar fone</string>
     <string name="settings_resume_connect_summary">Retoma a música ao conectar fone com fio ou Bluetooth (ao desconectar, pausa)</string>
     <string name="settings_hires">Saída de alta resolução (24-bit)</string>
-    <string name="settings_hires_summary">Preserva arquivos hi-res; neles, velocidade e efeitos de fita ficam desligados. Vale ao reiniciar o player.</string>
+    <string name="settings_hires_summary">Mantém a precisão total de arquivos de 24 bits, mas velocidade, tom e efeitos de fita deixam de valer para eles. Vale ao reiniciar o player.</string>
     <string name="settings_section_tape">Efeitos de fita</string>
     <string name="settings_hiss">Chiado de fita</string>
     <string name="settings_hiss_summary">Um leve chiado de fundo</string>
@@ -411,5 +411,11 @@
         <item>Estatísticas de escuta com resumo do mês</item>
         <item>Scrobbling para o Last.fm via Pano Scrobbler ou Simple Last.fm Scrobbler</item>
         <item>Busca dentro das letras das músicas</item>
+    </string-array>
+    <string-array name="changelog_3_0_1">
+        <item>Corrigido: algumas músicas tocavam aceleradas quando a velocidade estava diferente de 1× (a velocidade agora vale para todas as músicas)</item>
+        <item>A velocidade atual aparece no player e no mini player quando não é 1×</item>
+        <item>Selo HQ detectado direto no arquivo (ALAC e outros), sem precisar tocar a música</item>
+        <item>Som das teclas no canal de mídia (não é mais silenciado pelo Não perturbar)</item>
     </string-array>
 </resources>

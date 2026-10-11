@@ -313,7 +313,7 @@
     <string name="settings_resume_connect">Seguir al conectar auriculares</string>
     <string name="settings_resume_connect_summary">Reanuda al conectar auriculares con cable o Bluetooth (al desconectar, pausa)</string>
     <string name="settings_hires">Salida de alta resolución (24 bits)</string>
-    <string name="settings_hires_summary">Conserva los archivos hi-res; en ellos no se aplican velocidad ni efectos de cinta. Se aplica al reiniciar el reproductor.</string>
+    <string name="settings_hires_summary">Mantiene la precisión completa de los archivos de 24 bits, pero la velocidad, el tono y los efectos de cinta dejan de aplicarse a ellos. Se aplica al reiniciar el reproductor.</string>
     <string name="settings_section_tape">Efectos de cinta</string>
     <string name="settings_hiss">Siseo de cinta</string>
     <string name="settings_hiss_summary">Un ligero siseo de fondo</string>
@@ -409,5 +409,11 @@
         <item>Estadísticas de escucha con resumen del mes</item>
         <item>Scrobbling a Last.fm con Pano Scrobbler o Simple Last.fm Scrobbler</item>
         <item>Búsqueda dentro de las letras</item>
+    </string-array>
+    <string-array name="changelog_3_0_1">
+        <item>Corregido: algunas canciones sonaban aceleradas cuando la velocidad no era 1× (ahora la velocidad se aplica a todas)</item>
+        <item>La velocidad actual aparece en el reproductor y en el minirreproductor cuando no es 1×</item>
+        <item>Sello HQ detectado desde el propio archivo (ALAC y otros), sin tener que reproducir la canción</item>
+        <item>Sonido de las teclas en el canal multimedia (ya no lo silencia No molestar)</item>
     </string-array>
 </resources>
