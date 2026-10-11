@@ -75,6 +75,7 @@ PY
   [ -n "$pp" ] && adb shell input tap $pp
   sleep 3
   for i in $(seq 1 10); do
+    adb get-state >/dev/null 2>&1 || { echo "EMULATOR GONE during $label (track $i)" | tee -a "$OUT/speed.txt"; return; }
     sleep 2
     t0=$(date +%s.%N); a=$(read_player)
     sleep 12
