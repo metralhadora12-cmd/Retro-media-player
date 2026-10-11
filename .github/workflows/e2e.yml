@@ -45,6 +45,20 @@ jobs:
             -metadata title="Alac Test" -metadata artist="E2E Artist" -metadata album="E2E Alac Album" \
             e2e-media/alac.m4a
           ls -la e2e-media
+          # Formats and sample rates for the playback speed check (40 s each)
+          mkdir -p speed-media
+          gen() { ffmpeg -loglevel error -f lavfi -i "sine=frequency=$2:duration=40" $3 -metadata title="$1" -metadata artist="Speed" -metadata album="Speed Check" "speed-media/$4"; }
+          gen "Rate 22k Mono MP3" 300 "-ar 22050 -ac 1 -b:a 64k" r22.mp3
+          gen "Rate 44k MP3" 320 "-ar 44100 -ac 2 -b:a 192k" r44.mp3
+          gen "FLAC 16-bit 44k" 340 "-ar 44100 -ac 2 -sample_fmt s16" f16.flac
+          gen "FLAC 24-bit 48k" 360 "-ar 48000 -ac 2 -sample_fmt s32" f24.flac
+          gen "FLAC 24-bit 96k" 380 "-ar 96000 -ac 2 -sample_fmt s32" f96.flac
+          gen "ALAC 16-bit 44k" 400 "-ar 44100 -ac 2 -c:a alac" alac.m4a
+          gen "AAC 44k" 420 "-ar 44100 -ac 2 -c:a aac -b:a 192k" aac.m4a
+          gen "Opus 48k" 440 "-ar 48000 -ac 2 -c:a libopus -b:a 128k" opus.ogg
+          gen "Vorbis 44k" 460 "-ar 44100 -ac 2 -c:a libvorbis" vorbis.ogg
+          gen "WAV 16-bit 22k" 480 "-ar 22050 -ac 2 -c:a pcm_s16le" w22.wav
+          ls -la speed-media
 
       - name: Enable KVM
         run: |
@@ -60,7 +74,7 @@ jobs:
           arch: x86_64
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash e2e/run.sh
+          script: bash e2e/speed.sh
 
       - name: Publish results to the e2e-results branch
         if: always()
