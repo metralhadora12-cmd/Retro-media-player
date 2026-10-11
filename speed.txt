@@ -1,0 +1,13 @@
+effects-off  AAC 44k                advanced  14s in 14.2s  -> speed 0.98x
+effects-off  ALAC 16-bit 44k        advanced  15s in 14.1s  -> speed 1.07x
+effects-off  FLAC 16-bit 44k        advanced  14s in 14.1s  -> speed 0.99x
+effects-off  FLAC 24-bit 48k        advanced  14s in 14.0s  -> speed 1.00x
+effects-off  FLAC 24-bit 96k        advanced  14s in 14.1s  -> speed 1.00x
+effects-off  Opus 48k               advanced  14s in 14.1s  -> speed 0.99x
+effects-off  Rate 22k Mono MP3      advanced  14s in 14.0s  -> speed 1.00x
+effects-off  Rate 22k Mono MP3      advanced  14s in 14.1s  -> speed 0.99x
+effects-off  Rate 22k Mono MP3      advanced   0s in 14.0s  -> speed 0.00x
+effects-off  Rate 22k Mono MP3      advanced   0s in 14.0s  -> speed 0.00x
+effects-on   AAC 44k                advanced  14s in 14.0s  -> speed 1.00x
+effects-on   ALAC 16-bit 44k        advanced   0s in 14.0s  -> speed 0.00x
+EMULATOR GONE during effects-on (track 3)
